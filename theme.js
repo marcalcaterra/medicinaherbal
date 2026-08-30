@@ -1,14 +1,16 @@
-const THEME_KEY = "mar_theme";
+const THEME_KEY = "mar_theme_v2";
 const AUTH_KEY = "mar_auth";
 
 const DEFAULT_THEME = {
-  bg: "#96ab82",
-  btn1: "#234634",
+  bg: "#e7eee3",
+  card: "#ffffff",
+  btn1: "#2c4a38",
   btn2: "#ffffff",
-  font: '"Manrope", sans-serif',
+  login: "#dce7d4",
+  font: '"Nunito", sans-serif',
   logoX: 50,
-  logoY: 18,
-  logoSize: 280
+  logoY: 50,
+  logoSize: 210
 };
 
 function getTheme() {
@@ -28,11 +30,13 @@ function applyTheme(theme) {
   const t = theme || getTheme();
   const root = document.documentElement;
   root.style.setProperty("--bg", t.bg);
+  root.style.setProperty("--card", t.card);
   root.style.setProperty("--btn1", t.btn1);
   root.style.setProperty("--btn2", t.btn2);
+  root.style.setProperty("--login", t.login);
   root.style.setProperty("--font", t.font);
-  root.style.setProperty("--logo-x", t.logoX + "%");
-  root.style.setProperty("--logo-y", t.logoY + "%");
+  root.style.setProperty("--logo-x", t.logoX);
+  root.style.setProperty("--logo-y", t.logoY);
   root.style.setProperty("--logo-size", t.logoSize + "px");
   document.body.style.fontFamily = t.font;
 }

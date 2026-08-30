@@ -3,18 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ingresá a tu cuenta | Mar</title>
+  <title>Login | Mar</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="logo.png" />
+  <link rel="icon" href="logo-dark.png" />
 </head>
 <body>
   <div class="page">
-    <div class="topbar">
-      <a class="back" href="index.html">← Inicio</a>
-    </div>
-    <section class="card">
-      <h1>Ingresá a tu cuenta</h1>
-      <p class="lead">Usá tu usuario para entrar al panel y ajustar la estética del sitio.</p>
+    <div class="topbar"><a class="back" href="index.html">← Inicio</a></div>
+    <section class="inner">
+      <h1>Login</h1>
+      <p class="lead">Entrá para modificar la estética del sitio.</p>
       <form id="form-cuenta">
         <div class="form-grid">
           <div class="field full">
@@ -40,11 +38,8 @@
       e.preventDefault();
       const user = document.getElementById("usuario").value.trim();
       const pass = document.getElementById("clave").value;
-      if (login(user, pass)) {
-        window.location.href = "panel.html";
-      } else {
-        document.getElementById("toast-cuenta").classList.add("show");
-      }
+      if (login(user, pass)) window.location.href = "panel.html";
+      else document.getElementById("toast-cuenta").classList.add("show");
     });
   </script>
 </body>

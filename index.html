@@ -5,16 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mar | Terapia y Medicina Herbal</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="logo.png" />
+  <link rel="icon" href="logo-dark.png" />
 </head>
 <body>
-  <main class="landing">
-    <div class="logo-wrap" id="logoWrap">
-      <img src="logo.png" alt="Mar" />
-      <div class="logo-caption">Terapia & Medicina Herbal</div>
-    </div>
+  <main class="wrap">
+    <section class="card logo-card">
+      <div class="logo-wrap" id="logoWrap">
+        <img src="logo-dark.png" alt="Mar Terapia y Medicina Herbal" />
+      </div>
+    </section>
 
-    <div class="actions">
+    <section class="actions">
       <a class="pill pill-dark" href="turno.html">
         <b>Agendá tu turno</b>
         <small>Primera consulta o seguimiento</small>
@@ -23,9 +24,9 @@
         <b>Ingresá a tu cuenta</b>
         <small>Consultá o modificá turnos</small>
       </a>
-    </div>
+    </section>
 
-    <a class="login-only" href="cuenta.html">Login</a>
+    <a class="login-bar" href="cuenta.html">Login</a>
   </main>
 
   <script src="theme.js"></script>
@@ -45,9 +46,10 @@
       });
       wrap.addEventListener("pointermove", (e) => {
         if (!dragging) return;
+        const card = wrap.parentElement.getBoundingClientRect();
         const theme = getTheme();
-        theme.logoX = Math.max(8, Math.min(92, (e.clientX / window.innerWidth) * 100));
-        theme.logoY = Math.max(2, Math.min(70, (e.clientY / window.innerHeight) * 100));
+        theme.logoX = Math.max(10, Math.min(90, ((e.clientX - card.left) / card.width) * 100));
+        theme.logoY = Math.max(10, Math.min(90, ((e.clientY - card.top) / card.height) * 100));
         saveTheme(theme);
       });
     }

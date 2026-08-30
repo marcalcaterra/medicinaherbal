@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panel de estética | Mar</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="logo.png" />
+  <link rel="icon" href="logo-dark.png" />
 </head>
 <body>
   <div class="page">
@@ -13,32 +13,38 @@
       <a class="back" href="index.html">← Ver sitio</a>
       <a class="back" href="#" id="salir">Salir</a>
     </div>
-    <section class="card">
+    <section class="inner">
       <h1>Control de estética</h1>
-      <p class="lead">Cambiá colores, fuente y posición del logo. El logo se mueve aparte del fondo.</p>
-
-      <form id="form-theme" class="panel-grid">
-        <p class="hint">Usuario activo: javier. En el inicio, arrastrá el logo para moverlo.</p>
-
+      <p class="lead">Cambiá colores, fuente y el logo. El logo se mueve aparte del fondo.</p>
+      <form class="panel-grid">
+        <p class="hint">Usuario: javier. En el inicio podés arrastrar el logo dentro de su tarjeta.</p>
         <div class="field">
-          <label for="bg">Color de fondo</label>
+          <label for="bg">Fondo de la página</label>
           <input id="bg" type="color" />
         </div>
         <div class="field">
-          <label for="btn1">Color botón Agendá</label>
+          <label for="card">Color de tarjetas</label>
+          <input id="card" type="color" />
+        </div>
+        <div class="field">
+          <label for="btn1">Botón Agendá</label>
           <input id="btn1" type="color" />
         </div>
         <div class="field">
-          <label for="btn2">Color botón Ingresá</label>
+          <label for="btn2">Botón Ingresá</label>
           <input id="btn2" type="color" />
+        </div>
+        <div class="field">
+          <label for="login">Barra de Login</label>
+          <input id="login" type="color" />
         </div>
         <div class="field">
           <label for="font">Fuente</label>
           <select id="font">
+            <option value='"Nunito", sans-serif'>Nunito</option>
             <option value='"Manrope", sans-serif'>Manrope</option>
             <option value='"Montserrat", sans-serif'>Montserrat</option>
             <option value='"Playfair Display", serif'>Playfair Display</option>
-            <option value='"Cormorant Garamond", serif'>Cormorant Garamond</option>
             <option value='"Lora", serif'>Lora</option>
           </select>
         </div>
@@ -48,11 +54,11 @@
         </div>
         <div class="field">
           <label for="logoY">Logo vertical</label>
-          <input id="logoY" type="range" min="2" max="60" />
+          <input id="logoY" type="range" min="10" max="90" />
         </div>
         <div class="field full">
           <label for="logoSize">Tamaño del logo</label>
-          <input id="logoSize" type="range" min="140" max="420" />
+          <input id="logoSize" type="range" min="120" max="360" />
         </div>
         <div class="form-actions field full">
           <button class="btn-submit" type="button" id="reset">Restablecer</button>
@@ -63,24 +69,22 @@
   <script src="theme.js"></script>
   <script>
     if (!isLogged()) window.location.href = "cuenta.html";
-
     const theme = getTheme();
-    const fields = ["bg", "btn1", "btn2", "font", "logoX", "logoY", "logoSize"];
+    const fields = ["bg","card","btn1","btn2","login","font","logoX","logoY","logoSize"];
+    const colors = ["bg","card","btn1","btn2","login"];
     fields.forEach((id) => {
       const el = document.getElementById(id);
       el.value = theme[id];
       el.addEventListener("input", () => {
         const next = getTheme();
-        next[id] = id === "font" ? el.value : (["bg","btn1","btn2"].includes(id) ? el.value : Number(el.value));
+        next[id] = id === "font" ? el.value : (colors.includes(id) ? el.value : Number(el.value));
         saveTheme(next);
       });
     });
-
     document.getElementById("reset").addEventListener("click", () => {
       saveTheme(DEFAULT_THEME);
       fields.forEach((id) => document.getElementById(id).value = DEFAULT_THEME[id]);
     });
-
     document.getElementById("salir").addEventListener("click", (e) => {
       e.preventDefault();
       logout();
