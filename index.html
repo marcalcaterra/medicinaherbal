@@ -67,13 +67,21 @@
     .top { display:flex; justify-content:space-between; margin-bottom:12px; }
     .top button { border:0; background:transparent; font:600 14px "Cormorant Garamond",serif; color:#4a5740; }
     .wrap { width:min(520px,92vw); margin:0 auto; }
-    .card input, .card textarea { width:100% !important; max-width:100%; }
     .view h1 { color:#f7f1e8; font-family:var(--display); font-size:34px; font-weight:600; margin:0 0 6px; letter-spacing:.02em; }
     .lead { color:#f3eadf; margin:0 0 16px; font-size:15px; }
     .card { background:#fbf6ef; border-radius:22px; padding:20px; box-shadow:0 10px 30px rgba(74,87,64,.08); }
-    .field { margin:10px 0; }
-    label { display:block; font-size:12px; font-weight:700; margin-bottom:6px; letter-spacing:.04em; color:#6b5c4c; }
-    input[type="text"],input[type="password"],input[type="tel"],input[type="date"],textarea { width:100%; min-height:44px; border:1px solid var(--sand-deep); border-radius:14px; padding:8px 14px; font:inherit; background:#fffdf9; }
+    .field { margin:12px 0; }
+    label { display:block; font-size:12px; font-weight:700; margin-bottom:8px; letter-spacing:.04em; color:#6b5c4c; }
+    .card input, .field input, #tNombre, #tTel, #nuevoNombre, #nuevoTel, #usuario, #clave, #owNombre, #owTel, #cHour {
+      width:100% !important; max-width:100%; min-height:48px !important; height:48px;
+      border:1px solid #d8cbb8 !important; border-radius:18px !important;
+      padding:12px 16px !important; background:#fffdf9 !important;
+      font:600 16px "Cormorant Garamond",serif !important; color:#4a5740;
+      outline:none !important; box-shadow:none !important; -webkit-appearance:none; appearance:none;
+    }
+    .card input:focus, .field input:focus, #tNombre:focus, #tTel:focus, #nuevoNombre:focus, #nuevoTel:focus {
+      border-color:#5c6f4e !important; box-shadow:0 0 0 3px rgba(92,111,78,.12) !important;
+    }
     .save,.add { width:100%; height:48px; border:0; background:#5c6f4e; color:#f7f1e8; font-family:var(--display); font-size:16px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; margin-top:10px; border-radius:14px; }
     .add.light { background:#fff; color:#2c4a38; }
     .toast { display:none; margin-top:12px; padding:12px; border-radius:12px; background:#d7efd8; }
@@ -221,8 +229,8 @@
               <button class="tipo" type="button" data-tipo="Integral-Herbal">5. Integral-Herbal</button>
             </div>
           </div>
-          <div class="field"><label>Nombre completo</label><input id="tNombre" required></div>
-          <div class="field"><label>Teléfono / contacto</label><input id="tTel" required></div>
+          <div class="field"><label>Nombre completo</label><input id="tNombre" type="text" required placeholder="Nombre y apellido"></div>
+          <div class="field"><label>Teléfono / contacto</label><input id="tTel" type="tel" required placeholder="WhatsApp o teléfono"></div>
           <button class="save" type="submit">Guardar turno</button>
           <div class="toast" id="tToast"></div>
         </form>
@@ -257,8 +265,8 @@
       <h1>Historial clínico</h1>
       <p class="lead">Agregá pacientes y abrí la ficha médica.</p>
       <div class="card" id="altaBox">
-        <div class="field"><label>Nombre del paciente</label><input id="nuevoNombre"></div>
-        <div class="field"><label>Teléfono</label><input id="nuevoTel"></div>
+        <div class="field"><label>Nombre del paciente</label><input id="nuevoNombre" type="text" placeholder="Nombre y apellido"></div>
+        <div class="field"><label>Teléfono</label><input id="nuevoTel" type="tel" placeholder="WhatsApp o teléfono"></div>
         <button class="save" type="button" id="addPac">Agregar paciente</button>
       </div>
       <div id="pList" style="margin-top:12px"></div>
