@@ -57,4 +57,20 @@ function logout() {
   sessionStorage.removeItem(AUTH_KEY);
 }
 
+function injectFlowers() {
+  if (document.querySelector(".flowers")) return;
+  const layer = document.createElement("div");
+  layer.className = "flowers";
+  layer.setAttribute("aria-hidden", "true");
+  const svg = '<svg viewBox="0 0 64 64" fill="currentColor"><path d="M32 30c6-12 16-14 16-6s-8 10-16 10c8 0 16 2 16 10s-10 6-16-6c0 12-8 14-16 6s2-10 10-10c-8 0-18-2-10-10s10 6 16 6z"/><circle cx="32" cy="32" r="5"/></svg>';
+  for (let i = 1; i <= 6; i++) {
+    const el = document.createElement("div");
+    el.className = "flower f" + i;
+    el.innerHTML = svg;
+    layer.appendChild(el);
+  }
+  document.body.prepend(layer);
+}
+
 applyTheme();
+injectFlowers();

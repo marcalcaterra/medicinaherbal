@@ -13,59 +13,86 @@
       <a class="back" href="index.html">← Ver sitio</a>
       <a class="back" href="#" id="salir">Salir</a>
     </div>
-    <section class="inner">
-      <h1>Control de estética</h1>
-      <p class="lead">Cambiá colores, fuente y el logo. El logo se mueve aparte del fondo.</p>
-      <form class="panel-grid">
-        <p class="hint">Usuario: javier. En el inicio podés arrastrar el logo dentro de su tarjeta.</p>
-        <div class="field">
-          <label for="bg">Fondo de la página</label>
-          <input id="bg" type="color" />
+
+    <div class="studio">
+      <section class="inner">
+        <h1>Estética en vivo</h1>
+        <p class="lead">Los cambios se ven al instante a la derecha.</p>
+        <form class="panel-grid">
+          <div class="field">
+            <label for="bg">Fondo de la página</label>
+            <input id="bg" type="color" />
+          </div>
+          <div class="field">
+            <label for="card">Color de tarjetas</label>
+            <input id="card" type="color" />
+          </div>
+          <div class="field">
+            <label for="btn1">Botón Agendá</label>
+            <input id="btn1" type="color" />
+          </div>
+          <div class="field">
+            <label for="btn2">Botón Ingresá</label>
+            <input id="btn2" type="color" />
+          </div>
+          <div class="field">
+            <label for="login">Barra de Login</label>
+            <input id="login" type="color" />
+          </div>
+          <div class="field">
+            <label for="font">Fuente</label>
+            <select id="font">
+              <option value='"Nunito", sans-serif'>Nunito</option>
+              <option value='"Manrope", sans-serif'>Manrope</option>
+              <option value='"Montserrat", sans-serif'>Montserrat</option>
+              <option value='"Playfair Display", serif'>Playfair Display</option>
+              <option value='"Lora", serif'>Lora</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="logoX">Logo horizontal</label>
+            <input id="logoX" type="range" min="10" max="90" />
+          </div>
+          <div class="field">
+            <label for="logoY">Logo vertical</label>
+            <input id="logoY" type="range" min="10" max="90" />
+          </div>
+          <div class="field full">
+            <label for="logoSize">Tamaño del logo</label>
+            <input id="logoSize" type="range" min="120" max="360" />
+          </div>
+          <div class="form-actions field full">
+            <button class="btn-submit" type="button" id="reset">Restablecer</button>
+          </div>
+        </form>
+      </section>
+
+      <section>
+        <div class="preview-tag">Vista previa en tiempo real</div>
+        <div class="preview-frame card">
+          <div class="wrap">
+            <section class="card logo-card">
+              <div class="logo-wrap">
+                <img src="logo-dark.png" alt="Mar" />
+              </div>
+            </section>
+            <section class="actions">
+              <div class="pill pill-dark">
+                <b>Agendá tu turno</b>
+                <small>Primera consulta o seguimiento</small>
+              </div>
+              <div class="pill pill-light">
+                <b>Ingresá a tu cuenta</b>
+                <small>Consultá o modificá turnos</small>
+              </div>
+            </section>
+            <div class="login-bar">Login</div>
+          </div>
         </div>
-        <div class="field">
-          <label for="card">Color de tarjetas</label>
-          <input id="card" type="color" />
-        </div>
-        <div class="field">
-          <label for="btn1">Botón Agendá</label>
-          <input id="btn1" type="color" />
-        </div>
-        <div class="field">
-          <label for="btn2">Botón Ingresá</label>
-          <input id="btn2" type="color" />
-        </div>
-        <div class="field">
-          <label for="login">Barra de Login</label>
-          <input id="login" type="color" />
-        </div>
-        <div class="field">
-          <label for="font">Fuente</label>
-          <select id="font">
-            <option value='"Nunito", sans-serif'>Nunito</option>
-            <option value='"Manrope", sans-serif'>Manrope</option>
-            <option value='"Montserrat", sans-serif'>Montserrat</option>
-            <option value='"Playfair Display", serif'>Playfair Display</option>
-            <option value='"Lora", serif'>Lora</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="logoX">Logo horizontal</label>
-          <input id="logoX" type="range" min="10" max="90" />
-        </div>
-        <div class="field">
-          <label for="logoY">Logo vertical</label>
-          <input id="logoY" type="range" min="10" max="90" />
-        </div>
-        <div class="field full">
-          <label for="logoSize">Tamaño del logo</label>
-          <input id="logoSize" type="range" min="120" max="360" />
-        </div>
-        <div class="form-actions field full">
-          <button class="btn-submit" type="button" id="reset">Restablecer</button>
-        </div>
-      </form>
-    </section>
+      </section>
+    </div>
   </div>
+
   <script src="theme.js"></script>
   <script>
     if (!isLogged()) window.location.href = "cuenta.html";
