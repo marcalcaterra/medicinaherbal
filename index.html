@@ -584,8 +584,33 @@ function withKey(data){
   o.k=FB_WRITE_KEY;
   return o;
 }
-function cloudPut(col,id,data){ if(!fbOn()) return Promise.resolve(); try{ return fbDb.ref(col+"/"+id).set(withKey(data)); }catch(e){ return Promise.resolve(); } }
-function cloudDel(col,id){ if(!fbOn()) return Promise.resolve(); try{ return fbDb.ref(col+"/"+id).remove(); }catch(e){ return Promise.resolve(); } }
+function cloudPut(col,id,data){
+  const body=withKey(data);
+  const path=col+"/"+id;
+  const jobs=[];
+  if(fbOn()){ try{ jobs.push(fbDb.ref(path).set(body)); }catch(e){} }
+  try{
+    const cfg=getFbCfg();
+    if(cfg.databaseURL){
+      jobs.push(fetch(cfg.databaseURL.replace(/\/$/,"")+"/"+path+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(function(r){
+        if(!r.ok) throw new Error("nube "+r.status);
+        window.fbLastError="";
+        return r;
+      }));
+    }
+  }catch(e){}
+  return Promise.all(jobs).catch(function(err){ window.fbLastError=String(err&&err.message||err||"error"); });
+}
+function cloudDel(col,id){
+  const path=col+"/"+id;
+  const jobs=[];
+  if(fbOn()){ try{ jobs.push(fbDb.ref(path).remove()); }catch(e){} }
+  try{
+    const cfg=getFbCfg();
+    if(cfg.databaseURL) jobs.push(fetch(cfg.databaseURL.replace(/\/$/,"")+"/"+path+".json",{method:"DELETE"}));
+  }catch(e){}
+  return Promise.all(jobs).catch(function(){});
+}
 function cloudObjToList(val){
   if(!val) return [];
   if(Array.isArray(val)) return val.filter(Boolean);
@@ -614,7 +639,16 @@ function refreshOpenViews(){
 function listenCloud(){
   if(!fbOn()||fbListen) return;
   fbListen=true;
-  fbDb.ref("meta/agenda").on("value", function(s){ const v=s.val(); if(!v) return; localStorage.setItem(AGENDA_KEY, JSON.stringify(v)); refreshOpenViews(); });
+  fbDb.ref("meta/agenda").on("value", function(s){
+    const v=s.val()||{};
+    const incoming={available:v.available||{}, booked:v.booked||{}};
+    const local=getAgenda();
+    const inHas=Object.keys(incoming.available).length;
+    const locHas=Object.keys((local&&local.available)||{}).length;
+    if(!inHas && locHas){ cloudPut("meta","agenda", local); return; }
+    localStorage.setItem(AGENDA_KEY, JSON.stringify(incoming));
+    refreshOpenViews();
+  });
   fbDb.ref("meta/owner").on("value", function(s){ const v=s.val(); if(!v) return; localStorage.setItem(OWNER_KEY, JSON.stringify(v)); refreshOpenViews(); });
   fbDb.ref("meta/theme").on("value", function(s){ const v=s.val(); if(!v) return; localStorage.setItem(THEME_KEY, JSON.stringify(v)); applyTheme(); });
   fbDb.ref("meta/files").on("value", function(s){ const v=s.val(); if(!v) return; localStorage.setItem(FILES_KEY, JSON.stringify(v)); refreshOpenViews(); });
@@ -643,16 +677,15 @@ async function startFirebase(){
     fbDb=firebase.database();
     try{ fbSt=firebase.storage(); }catch(e){ fbSt=null; }
     fbReady=true;
-    const ag=await fbDb.ref("meta/agenda").once("value");
-    if(!ag.exists()){
-      await cloudPut("meta","agenda", getAgenda());
-      await cloudPut("meta","owner", getOwner());
-      await cloudPut("meta","theme", getTheme());
-      await cloudPut("meta","files", stripFiles(getFiles()));
-      getInbox().forEach(function(t){ if(t.id) cloudPut("inbox", t.id, t); });
-      getPacs().forEach(function(p){ if(p.id) cloudPut("pacs", p.id, p); });
-      getAcc().forEach(function(a){ if(a.user) cloudPut("acc", String(a.user).toLowerCase(), a); });
-    }
+    let cloudAg=null;
+    try{ const ag=await fbDb.ref("meta/agenda").once("value"); cloudAg=ag.val(); }catch(e){ cloudAg=null; }
+    const localAg=getAgenda();
+    const localHas=localAg&&localAg.available&&Object.keys(localAg.available).length;
+    const cloudHas=cloudAg&&cloudAg.available&&Object.keys(cloudAg.available).length;
+    if(cloudHas){ localStorage.setItem(AGENDA_KEY, JSON.stringify(cloudAg)); }
+    else if(localHas){ await cloudPut("meta","agenda", localAg); }
+    else { await cloudPut("meta","agenda", localAg); }
+    await cloudPut("meta","owner", getOwner());
     listenCloud();
     if(st) st.textContent="Conectada. Los cambios se ven en todos los dispositivos.";
     return true;
@@ -687,7 +720,12 @@ function isoDay(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getD
 function isSunday(date){return new Date(date+"T12:00:00").getDay()===0;}
 function defaultAgenda(){return{available:{},booked:{}};}
 function getAgenda(){try{const s=JSON.parse(localStorage.getItem(AGENDA_KEY));if(s&&s.available)return s;}catch(e){}const f=defaultAgenda();localStorage.setItem(AGENDA_KEY,JSON.stringify(f));return f;}
-function saveAgenda(a){localStorage.setItem(AGENDA_KEY,JSON.stringify(a)); cloudPut("meta","agenda", a);}
+function saveAgenda(a){
+  a.available=a.available||{};
+  a.booked=a.booked||{};
+  localStorage.setItem(AGENDA_KEY,JSON.stringify({available:a.available,booked:a.booked}));
+  cloudPut("meta","agenda", {available:a.available,booked:a.booked});
+}
 function hoursOf(date){if(isSunday(date)) return []; return (getAgenda().available[date]||[]).map(normHora);}
 function freeHours(date){const taken=(getAgenda().booked[date]||[]).map(normHora); return hoursOf(date).filter(h=>!taken.includes(h));}
 function dayStatus(date){if(isSunday(date)) return "sun"; return freeHours(date).length?"green":"red";}
@@ -828,7 +866,11 @@ function renderTurno(){
   document.getElementById("tLabel").textContent=MONTHS[tView.getMonth()]+" "+tView.getFullYear();
   paintDays(document.getElementById("tDays"), tView, tDay, onTurnoDay);
   const nube=document.getElementById("turnoNube");
-  if(nube) nube.textContent=fbOn()?"Nube activa.":"Nube no conectada: este celular todavía no comparte el calendario.";
+  if(nube){
+    if(window.fbLastError) nube.textContent="Nube con error. En Firebase → Realtime Database → Reglas, publicá las reglas y después recargá.";
+    else if(fbOn()) nube.textContent="Nube activa.";
+    else nube.textContent="Nube no conectada.";
+  }
 }
 function onCalDay(id,date){
   cDay=id;
@@ -1347,7 +1389,7 @@ if("serviceWorker" in navigator){
   }).then(function(keys){
     return Promise.all(keys.map(function(k){ return caches.delete(k); }));
   }).then(function(){
-    return navigator.serviceWorker.register("sw.js?v=9");
+    return navigator.serviceWorker.register("sw.js?v=11");
   }).catch(function(){});
 }
 document.addEventListener("click",function(e){

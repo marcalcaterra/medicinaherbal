@@ -1,4 +1,4 @@
-const CACHE = "mar-app-v4";
+const CACHE = "mar-app-v11";
 self.addEventListener("install", (event) => { self.skipWaiting(); });
 self.addEventListener("activate", (event) => {
   event.waitUntil(
