@@ -4,169 +4,119 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mar | Terapia y Medicina Herbal</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&family=Manrope:wght@500;700&family=Montserrat:wght@500;700&family=Lora:wght@500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --bg: #96ab82;
-      --btn1: #2c4a38;
-      --btn2: #ffffff;
-      --login: #ffffff;
-      --font: "Nunito", sans-serif;
-      --font-size: 13px;
-      --sway: 7s;
-      --enter: 1.4s;
+    :root { --bg:#96ab82; --btn1:#2c4a38; --btn2:#fff; --login:#fff; --font:"Nunito",sans-serif; --font-size:13px; --sway:7s; --enter:1.4s; }
+    * { box-sizing:border-box; }
+    html, body { margin:0; min-height:100%; }
+    body { font-family:var(--font); background:var(--bg); color:#2c4a38; }
+    body.page-home { height:100%; overflow:hidden; }
+    .bloom { position:fixed; left:50%; top:38%; width:min(620px,86vw); height:68vh; transform:translate(-50%,-50%); pointer-events:none; z-index:1; }
+    body:not(.page-home) .bloom { display:none; }
+    .branch { position:absolute; bottom:0; opacity:0; }
+    .branch img { height:100%; width:auto; display:block; transform-origin:50% 100%; }
+    .b1 { left:0; height:80%; animation:enterL var(--enter) ease forwards; }
+    .b2 { left:18%; height:90%; animation:enterL var(--enter) ease .1s forwards; }
+    .b3 { left:36%; height:96%; animation:enterC var(--enter) ease .16s forwards; }
+    .b4 { left:54%; height:86%; animation:enterR var(--enter) ease .12s forwards; }
+    .b5 { left:72%; height:74%; animation:enterR var(--enter) ease .2s forwards; }
+    .branch.is-sway img { animation:swaySoft var(--sway) ease-in-out infinite; }
+    .b2.is-sway img { animation-duration:calc(var(--sway)*1.1); animation-direction:reverse; }
+    .b3.is-sway img { animation-duration:calc(var(--sway)*1.2); }
+    .stage { position:relative; z-index:5; min-height:100vh; }
+    .box { position:absolute; display:flex; align-items:center; justify-content:center; transform:translate(-50%,0); overflow:hidden; }
+    body.is-admin.page-home .box[data-box] { outline:1px dashed rgba(44,74,56,.4); cursor:grab; }
+    #box-logo { left:50%; top:10%; width:260px; height:210px; }
+    #box-logo img { width:100%; height:100%; object-fit:contain; pointer-events:none; }
+    #box-turno,#box-cal { left:50%; top:68%; width:min(520px,92vw); height:58px; }
+    #box-cuenta,#box-hist { left:50%; top:78%; width:min(520px,92vw); height:58px; }
+    #box-login,#box-salir { left:50%; top:90%; width:120px; height:38px; }
+    .btn-main,.login-pill { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; border:0; text-decoration:none; text-align:center; font-family:var(--font); background:transparent; color:inherit; cursor:pointer; }
+    .btn-main b { font-size:var(--font-size); letter-spacing:.14em; text-transform:uppercase; }
+    .btn-main small { font-size:calc(var(--font-size) - 2px); opacity:.85; margin-top:2px; }
+    .btn-main.dark { background:var(--btn1); color:#fff; }
+    .btn-main.light { background:var(--btn2); color:var(--btn1); }
+    .login-pill { background:var(--login); color:#6f8464; font-weight:700; font-size:var(--font-size); }
+    body.is-admin .guest-only { display:none; }
+    .admin-only { display:none; }
+    body.is-admin .admin-only { display:flex; }
+    .estetica { display:none; position:fixed; top:12px; right:12px; z-index:90; background:#2c4a38; color:#fff; border:0; border-radius:999px; padding:8px 14px; font:800 12px Nunito,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
+    body.is-admin.page-home .estetica { display:block; }
+    .editor { display:none; position:fixed; top:52px; right:12px; width:280px; max-height:calc(100vh - 70px); overflow:auto; background:#fff; border-radius:16px; padding:14px; z-index:80; box-shadow:0 12px 28px rgba(0,0,0,.16); }
+    body.show-editor .editor { display:block; }
+    .editor h2 { font-size:16px; margin:0 0 6px; }
+    .editor p,.editor h3 { font-size:12px; margin:10px 0 6px; }
+    .editor .ed-row { display:flex; justify-content:space-between; align-items:center; margin:7px 0; font-size:12px; font-weight:700; }
+    .editor .ed-row.col { flex-direction:column; align-items:stretch; gap:4px; }
+    .editor input[type="color"] { width:42px; height:28px; padding:0; border:0; background:none; }
+    .editor input,.editor select { width:130px; height:28px; }
+    .editor input[type="range"] { width:100%; }
+    .view { display:none; position:relative; z-index:6; padding:16px 16px 40px; }
+    .view.on { display:block; }
+    .top { display:flex; justify-content:space-between; margin-bottom:12px; }
+    .top button { border:0; background:transparent; font:800 14px Nunito,sans-serif; color:#2c4a38; }
+    .wrap { width:min(640px,100%); margin:0 auto; }
+    .view h1 { color:#fff; font-size:26px; margin:0 0 6px; }
+    .lead { color:#eef3e8; margin:0 0 16px; }
+    .card { background:#fff; border-radius:16px; padding:16px; }
+    .field { margin:10px 0; }
+    label { display:block; font-size:12px; font-weight:800; margin-bottom:4px; }
+    input[type="text"],input[type="password"],input[type="tel"] { width:100%; height:46px; border:1px solid #d7e0d2; border-radius:12px; padding:0 12px; font:inherit; }
+    .save { width:100%; height:48px; border:0; background:#2c4a38; color:#fff; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin-top:10px; }
+    .toast { display:none; margin-top:12px; padding:12px; border-radius:12px; background:#d7efd8; }
+    .toast.show { display:block; }
+    .cal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .cal-head button { border:0; background:#2c4a38; color:#fff; border-radius:10px; width:36px; height:36px; }
+    .week,.days { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+    .week { font-size:11px; font-weight:800; text-align:center; color:#7a8b7d; margin-bottom:6px; }
+    .day { min-height:42px; border:0; border-radius:10px; font-weight:700; background:#f4d4d0; color:#b4453b; }
+    .day.green { background:#d7efd8; color:#2f7a4a; }
+    .day.sel { outline:2px solid #2c4a38; }
+    .slots { display:flex; flex-wrap:wrap; gap:8px; }
+    .slot { border:0; border-radius:999px; padding:8px 12px; background:#f4d4d0; color:#b4453b; font-weight:700; }
+    .slot.on,.slot.ok { background:#2c4a38; color:#fff; }
+    .slot.off { opacity:.55; }
+    .hours,.datos { display:none; margin-top:14px; }
+    .hours.show,.datos.show { display:block; }
+    .pac { background:#fff; border-radius:16px; margin:0 0 10px; overflow:hidden; }
+    .pac .name { width:100%; border:0; background:#fff; text-align:left; padding:16px; font:800 16px Nunito,sans-serif; }
+    .actions { display:none; grid-template-columns:1fr 1fr; }
+    .pac.open .actions { display:grid; }
+    .act-h { border:0; min-height:46px; background:#2c4a38; color:#fff; font-weight:800; }
+    .act-c { border:0; min-height:46px; background:#fff; color:#2c4a38; font-weight:800; border-top:1px solid #e7eee3; }
+    .detail { display:none; padding:0 16px 16px; font-size:14px; color:#4d5f52; }
+    .pac.show-h .hist,.pac.show-c .cont { display:block; }
+    @media (max-width:720px) {
+      .bloom { top:30%; width:100vw; height:50vh; }
+      #box-logo { width:min(230px,62vw)!important; height:190px!important; top:7%!important; }
+      #box-turno,#box-cuenta,#box-cal,#box-hist { width:100vw!important; left:50%!important; height:70px!important; }
+      #box-turno,#box-cal { top:auto!important; bottom:148px!important; }
+      #box-cuenta,#box-hist { top:auto!important; bottom:76px!important; }
+      #box-login,#box-salir { top:auto!important; bottom:18px!important; width:140px!important; height:42px!important; }
     }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; }
-    body {
-      font-family: var(--font);
-      background: var(--bg);
-      overflow: hidden;
-      color: #2c4a38;
-    }
-    .bloom {
-      position: fixed;
-      left: 50%;
-      top: 38%;
-      width: min(620px, 86vw);
-      height: 68vh;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 1;
-    }
-    .branch {
-      position: absolute;
-      bottom: 0;
-      opacity: 0;
-    }
-    .branch img {
-      height: 100%;
-      width: auto;
-      display: block;
-      transform-origin: 50% 100%;
-    }
-    .b1 { left: 0; height: 80%; animation: enterL var(--enter) ease forwards; }
-    .b2 { left: 18%; height: 90%; animation: enterL var(--enter) ease .1s forwards; }
-    .b3 { left: 36%; height: 96%; animation: enterC var(--enter) ease .16s forwards; }
-    .b4 { left: 54%; height: 86%; animation: enterR var(--enter) ease .12s forwards; }
-    .b5 { left: 72%; height: 74%; animation: enterR var(--enter) ease .2s forwards; }
-    .branch.is-sway img { animation: swaySoft var(--sway) ease-in-out infinite; }
-    .b2.is-sway img { animation-duration: calc(var(--sway) * 1.1); animation-direction: reverse; }
-    .b3.is-sway img { animation-duration: calc(var(--sway) * 1.2); }
-    .b4.is-sway img { animation-duration: calc(var(--sway) * 1.08); animation-direction: reverse; }
-    .b5.is-sway img { animation-duration: calc(var(--sway) * 1.16); }
-
-    .stage { position: relative; z-index: 5; min-height: 100vh; }
-    .box {
-      position: absolute;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transform: translate(-50%, 0);
-      overflow: hidden;
-      border-radius: 0;
-    }
-    body.is-admin .box { outline: 1px dashed rgba(44,74,56,.4); cursor: grab; }
-    body.is-admin .box.dragging { cursor: grabbing; outline-color: #2c4a38; }
-    #box-logo { left: 50%; top: 10%; width: 260px; height: 210px; border-radius: 0; }
-    #box-logo img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
-    #box-turno { left: 50%; top: 68%; width: min(520px, 92vw); height: 58px; }
-    #box-cuenta { left: 50%; top: 78%; width: min(520px, 92vw); height: 58px; }
-    #box-login { left: 50%; top: 90%; width: 120px; height: 38px; }
-    .btn-main, .login-pill {
-      width: 100%; height: 100%;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-decoration: none; text-align: center;
-      font-family: var(--font);
-    }
-    .btn-main b { font-size: var(--font-size); letter-spacing: .14em; text-transform: uppercase; }
-    .btn-main small { font-size: calc(var(--font-size) - 2px); opacity: .85; margin-top: 2px; }
-    .btn-main.dark { background: var(--btn1); color: #fff; }
-    .btn-main.light { background: var(--btn2); color: var(--btn1); }
-    .login-pill {
-      background: var(--login); color: #6f8464; font-weight: 700; font-size: var(--font-size);
-    }
-    .admin-link {
-      display: none;
-      position: fixed;
-      left: 12px;
-      bottom: 12px;
-      z-index: 70;
-      background: #2c4a38;
-      color: #fff;
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 800;
-      padding: 10px 12px;
-      border-radius: 999px;
-    }
-    body.is-admin .admin-link { display: inline-block; }
-    @media (max-width: 720px) {
-      .bloom { top: 30%; width: 100vw; height: 50vh; }
-      #box-logo { width: min(230px, 62vw) !important; height: 190px !important; top: 7% !important; }
-      #box-turno, #box-cuenta {
-        width: 100vw !important;
-        left: 50% !important;
-        height: 70px !important;
-      }
-      #box-turno { top: auto !important; bottom: 148px !important; }
-      #box-cuenta { top: auto !important; bottom: 76px !important; }
-      #box-login { top: auto !important; bottom: 18px !important; width: 140px !important; height: 42px !important; }
-      .editor { width: calc(100% - 24px); left: 12px; right: 12px; max-height: 42vh; }
-    }
-    .editor {
-      display: none;
-      position: fixed; top: 12px; right: 12px;
-      width: 280px; max-height: calc(100vh - 24px); overflow: auto;
-      background: #fff; border-radius: 16px; padding: 14px; z-index: 80;
-      box-shadow: 0 12px 28px rgba(0,0,0,.16);
-    }
-    body.is-admin .editor { display: block; }
-    .editor h2 { font-size: 16px; margin: 0 0 6px; }
-    .editor p, .editor h3 { font-size: 12px; margin: 10px 0 6px; }
-    .editor .ed-row { display: flex; justify-content: space-between; align-items: center; margin: 7px 0; font-size: 12px; font-weight: 700; }
-    .editor .ed-row.col { flex-direction: column; align-items: stretch; gap: 4px; }
-    .editor input[type="color"] { width: 42px; height: 28px; padding: 0; border: 0; background: none; }
-    .editor input, .editor select { width: 130px; height: 28px; }
-    .editor input[type="range"] { width: 100%; }
-    .editor button, .editor a { font-size: 13px; font-weight: 800; color: #2c4a38; margin-right: 8px; }
-
-    @keyframes enterL {
-      from { opacity: 0; transform: translate(-24px, 28px); }
-      to { opacity: .72; transform: translate(0, 0); }
-    }
-    @keyframes enterC {
-      from { opacity: 0; transform: translate(0, 36px); }
-      to { opacity: .78; transform: translate(0, 0); }
-    }
-    @keyframes enterR {
-      from { opacity: 0; transform: translate(24px, 28px); }
-      to { opacity: .72; transform: translate(0, 0); }
-    }
-    @keyframes swaySoft {
-      0% { transform: rotate(0deg); }
-      50% { transform: rotate(1.6deg); }
-      100% { transform: rotate(0deg); }
-    }
+    @keyframes enterL { from{opacity:0;transform:translate(-24px,28px)} to{opacity:.72;transform:none} }
+    @keyframes enterC { from{opacity:0;transform:translate(0,36px)} to{opacity:.78;transform:none} }
+    @keyframes enterR { from{opacity:0;transform:translate(24px,28px)} to{opacity:.72;transform:none} }
+    @keyframes swaySoft { 0%,100%{transform:rotate(0)} 50%{transform:rotate(1.6deg)} }
   </style>
 </head>
-<body>
+<body class="page-home">
   <div class="bloom">
-    <div class="branch b1"><img src="branch-1.png" alt="" /></div>
-    <div class="branch b2"><img src="branch-2.png" alt="" /></div>
-    <div class="branch b3"><img src="branch-3.png" alt="" /></div>
-    <div class="branch b4"><img src="branch-4.png" alt="" /></div>
-    <div class="branch b5"><img src="branch-5.png" alt="" /></div>
+    <div class="branch b1"><img src="branch-1.png" alt=""></div>
+    <div class="branch b2"><img src="branch-2.png" alt=""></div>
+    <div class="branch b3"><img src="branch-3.png" alt=""></div>
+    <div class="branch b4"><img src="branch-4.png" alt=""></div>
+    <div class="branch b5"><img src="branch-5.png" alt=""></div>
   </div>
 
+  <button class="estetica" id="btnEstetica" type="button">Estética</button>
   <aside class="editor" id="editor">
     <h2>Editar en vivo</h2>
     <p>Cambios al instante. Arrastrá los recuadros.</p>
-    <div class="ed-row"><span>Fondo</span><input id="bg" type="color" /></div>
-    <div class="ed-row"><span>Botón Agendá</span><input id="btn1" type="color" /></div>
-    <div class="ed-row"><span>Botón Ingresá</span><input id="btn2" type="color" /></div>
-    <div class="ed-row"><span>Login</span><input id="loginColor" type="color" /></div>
+    <div class="ed-row"><span>Fondo</span><input id="bg" type="color"></div>
+    <div class="ed-row"><span>Botón Agendá</span><input id="btn1" type="color"></div>
+    <div class="ed-row"><span>Botón Ingresá</span><input id="btn2" type="color"></div>
+    <div class="ed-row"><span>Login</span><input id="loginColor" type="color"></div>
     <div class="ed-row"><span>Fuente</span>
       <select id="font">
         <option value='"Nunito", sans-serif'>Nunito</option>
@@ -176,12 +126,11 @@
         <option value='"Lora", serif'>Lora</option>
       </select>
     </div>
-    <div class="ed-row col"><span>Tamaño de fuente</span><input id="fontSize" type="range" min="10" max="22" /></div>
-    <div class="ed-row col"><span>Velocidad de flores</span><input id="sway" type="range" min="3" max="16" /></div>
-    <div class="ed-row col"><span>Entrada de flores</span><input id="enter" type="range" min="6" max="28" /></div>
+    <div class="ed-row col"><span>Tamaño de fuente</span><input id="fontSize" type="range" min="10" max="22"></div>
+    <div class="ed-row col"><span>Velocidad de flores</span><input id="sway" type="range" min="3" max="16"></div>
+    <div class="ed-row col"><span>Entrada de flores</span><input id="enter" type="range" min="6" max="28"></div>
     <h3>Recuadro</h3>
-    <div class="ed-row">
-      <span>Cuál</span>
+    <div class="ed-row"><span>Cuál</span>
       <select id="boxName">
         <option value="logo">Logo</option>
         <option value="turno">Agendá tu turno</option>
@@ -189,31 +138,254 @@
         <option value="login">Login</option>
       </select>
     </div>
-    <div class="ed-row col"><span>Posición X</span><input id="boxX" type="range" min="8" max="92" /></div>
-    <div class="ed-row col"><span>Posición Y</span><input id="boxY" type="range" min="4" max="92" /></div>
-    <div class="ed-row col"><span>Ancho</span><input id="boxW" type="range" min="80" max="700" /></div>
-    <div class="ed-row col"><span>Alto</span><input id="boxH" type="range" min="36" max="360" /></div>
-    <div class="ed-row col"><span>Redondeo</span><input id="boxR" type="range" min="0" max="80" /></div>
+    <div class="ed-row col"><span>Posición X</span><input id="boxX" type="range" min="8" max="92"></div>
+    <div class="ed-row col"><span>Posición Y</span><input id="boxY" type="range" min="4" max="92"></div>
+    <div class="ed-row col"><span>Ancho</span><input id="boxW" type="range" min="80" max="700"></div>
+    <div class="ed-row col"><span>Alto</span><input id="boxH" type="range" min="36" max="360"></div>
+    <div class="ed-row col"><span>Redondeo</span><input id="boxR" type="range" min="0" max="80"></div>
     <div class="ed-actions">
-      <a href="calendario.html">Cargar calendario</a>
       <button type="button" id="reset">Restablecer</button>
-      <a href="#" id="salir">Salir</a>
+      <button type="button" id="salir">Salir</button>
     </div>
   </aside>
 
-  <a class="admin-link" href="calendario.html">Cargar calendario</a>
-  <main class="stage">
-    <div class="box" id="box-logo" data-box="logo"><img src="logo.png" alt="Mar" /></div>
-    <a class="box btn-main dark" id="box-turno" data-box="turno" href="turno.html">
-      <b>Agendá tu turno</b>
-      <small>Primera consulta o seguimiento</small>
-    </a>
-    <a class="box btn-main light" id="box-cuenta" data-box="cuenta" href="cuenta.html">
-      <b>Ingresá a tu cuenta</b>
-      <small>Consultá o modificá turnos</small>
-    </a>
-    <a class="box login-pill" id="box-login" data-box="login" href="cuenta.html">Login</a>
+  <main class="stage" id="home">
+    <div class="box" id="box-logo" data-box="logo"><img src="logo.png" alt="Mar"></div>
+    <button class="box btn-main dark guest-only" id="box-turno" data-box="turno" data-go="turno" type="button">
+      <b>Agendá tu turno</b><small>Primera consulta o seguimiento</small>
+    </button>
+    <button class="box btn-main light guest-only" id="box-cuenta" data-box="cuenta" data-go="login" type="button">
+      <b>Ingresá a tu cuenta</b><small>Consultá o modificá turnos</small>
+    </button>
+    <button class="box login-pill guest-only" id="box-login" data-box="login" data-go="login" type="button">Login</button>
+    <button class="box btn-main dark admin-only" id="box-cal" data-go="cal" type="button">
+      <b>Organizar calendario</b><small>Días y horarios para el cliente</small>
+    </button>
+    <button class="box btn-main light admin-only" id="box-hist" data-go="hist" type="button">
+      <b>Historial clínico</b><small>Pacientes y contacto</small>
+    </button>
+    <button class="box login-pill admin-only" id="box-salir" type="button">Salir</button>
   </main>
-  <script src="theme.js"></script>
+
+  <section class="view" id="view-login">
+    <div class="wrap">
+      <div class="top"><button type="button" data-go="home">← Inicio</button></div>
+      <h1>Login</h1>
+      <p class="lead">Entrá para organizar el sitio.</p>
+      <div class="card">
+        <div class="field"><label>Usuario</label><input id="usuario" type="text"></div>
+        <div class="field"><label>Contraseña</label><input id="clave" type="password"></div>
+        <button class="save" type="button" id="doLogin">Ingresar</button>
+        <div class="toast" id="toastLogin">Usuario o contraseña incorrectos.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-turno">
+    <div class="wrap">
+      <div class="top"><button type="button" data-go="home">← Inicio</button></div>
+      <h1>Agendá tu turno</h1>
+      <p class="lead">Verde: hay lugar. Rojo: ocupado o cerrado.</p>
+      <div class="card">
+        <div class="cal-head"><button type="button" id="tPrev">‹</button><strong id="tLabel"></strong><button type="button" id="tNext">›</button></div>
+        <div class="week"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+        <div class="days" id="tDays"></div>
+        <div class="hours" id="tHours"><p id="tDayTitle"></p><div class="slots" id="tSlots"></div></div>
+        <form class="datos" id="tDatos">
+          <div class="field"><label>Nombre completo</label><input id="tNombre" required></div>
+          <div class="field"><label>Teléfono</label><input id="tTel" required></div>
+          <button class="save" type="submit">Guardar turno</button>
+          <div class="toast" id="tToast"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-cal">
+    <div class="wrap">
+      <div class="top"><button type="button" data-go="home">← Inicio</button><button type="button" id="salirCal">Salir</button></div>
+      <h1>Organizar calendario</h1>
+      <p class="lead">Prendé los horarios libres. El resto queda rojo.</p>
+      <div class="card">
+        <div class="cal-head"><button type="button" id="cPrev">‹</button><strong id="cLabel"></strong><button type="button" id="cNext">›</button></div>
+        <div class="week"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+        <div class="days" id="cDays"></div>
+        <p id="cTitle">Elegí un día</p>
+        <div class="slots" id="cSlots"></div>
+        <button class="save" type="button" id="cSave">Guardar día</button>
+        <div class="toast" id="cToast">Calendario actualizado.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-hist">
+    <div class="wrap">
+      <div class="top"><button type="button" data-go="home">← Inicio</button><button type="button" id="salirHist">Salir</button></div>
+      <h1>Historial clínico</h1>
+      <p class="lead">Tocá un paciente para ver Historial o Contacto.</p>
+      <div id="pList"></div>
+    </div>
+  </section>
+
+<script>
+const THEME_KEY="mar_theme_v6", AUTH_KEY="mar_auth", AGENDA_KEY="mar_agenda_v1";
+const HOURS=["09:00","10:00","11:00","12:00","16:00","17:00","18:00"];
+const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const DEFAULT_THEME={bg:"#96ab82",btn1:"#2c4a38",btn2:"#ffffff",login:"#ffffff",font:'"Nunito", sans-serif',fontSize:13,sway:7,enter:14,boxes:{logo:{x:50,y:10,w:260,h:210,r:0},turno:{x:50,y:68,w:520,h:58,r:2},cuenta:{x:50,y:78,w:520,h:58,r:2},login:{x:50,y:90,w:120,h:38,r:40}}};
+const clone=o=>JSON.parse(JSON.stringify(o));
+function getTheme(){try{const s=JSON.parse(localStorage.getItem(THEME_KEY))||{};const t=clone(DEFAULT_THEME);Object.assign(t,s);t.boxes=clone(DEFAULT_THEME.boxes);if(s.boxes)Object.keys(t.boxes).forEach(k=>t.boxes[k]={...t.boxes[k],...(s.boxes[k]||{})});return t;}catch(e){return clone(DEFAULT_THEME);}}
+function saveTheme(t){localStorage.setItem(THEME_KEY,JSON.stringify(t));applyTheme(t);}
+function applyTheme(theme){const t=theme||getTheme();const r=document.documentElement;r.style.setProperty("--bg",t.bg);r.style.setProperty("--btn1",t.btn1);r.style.setProperty("--btn2",t.btn2);r.style.setProperty("--login",t.login);r.style.setProperty("--font",t.font);r.style.setProperty("--font-size",t.fontSize+"px");r.style.setProperty("--sway",t.sway+"s");r.style.setProperty("--enter",(Number(t.enter)/10)+"s");document.body.style.background=t.bg;document.body.style.fontFamily=t.font;Object.keys(t.boxes).forEach(name=>{const el=document.getElementById("box-"+name);if(!el)return;const b=t.boxes[name];el.style.left=b.x+"%";if(window.innerWidth>720)el.style.top=b.y+"%";el.style.width=b.w+"px";el.style.height=b.h+"px";el.style.setProperty("border-radius",(b.r||0)+"px","important");el.style.transform="translate(-50%,0)";});}
+function isLogged(){try{return sessionStorage.getItem(AUTH_KEY)==="ok";}catch(e){return false;}}
+function login(u,p){if(String(u).trim().toLowerCase()==="javier"&&String(p)==="1234"){sessionStorage.setItem(AUTH_KEY,"ok");return true;}return false;}
+function logout(){sessionStorage.removeItem(AUTH_KEY);}
+function pad(n){return String(n).padStart(2,"0");}
+function isoDay(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+function defaultAgenda(){const available={},booked={},start=new Date();start.setHours(0,0,0,0);for(let i=1;i<=45;i++){const d=new Date(start);d.setDate(start.getDate()+i);if(d.getDay()===0||d.getDay()===6)continue;available[isoDay(d)]=["09:00","10:00","11:00","16:00","17:00"];}return{available,booked,bookings:[{date:isoDay(new Date()),hour:"10:00",nombre:"Ana Pérez",telefono:"3401555001",nota:"Primera consulta"},{date:isoDay(new Date()),hour:"16:00",nombre:"Luis Gómez",telefono:"3401555002",nota:"Seguimiento"}]};}
+function getAgenda(){try{const s=JSON.parse(localStorage.getItem(AGENDA_KEY));if(s&&s.available)return s;}catch(e){}const f=defaultAgenda();localStorage.setItem(AGENDA_KEY,JSON.stringify(f));return f;}
+function saveAgenda(a){localStorage.setItem(AGENDA_KEY,JSON.stringify(a));}
+function freeHours(date){const a=getAgenda();return (a.available[date]||[]).filter(h=>!(a.booked[date]||[]).includes(h));}
+function dayStatus(date){return freeHours(date).length?"green":"red";}
+function listPatients(){const map={};(getAgenda().bookings||[]).forEach(b=>{const k=(b.nombre||"Sin nombre").trim();if(!map[k])map[k]={nombre:k,telefono:b.telefono||"",visitas:[]};if(b.telefono)map[k].telefono=b.telefono;map[k].visitas.push(b);});return Object.values(map).sort((a,b)=>a.nombre.localeCompare(b.nombre,"es"));}
+function bookSlot(date,hour,nombre,telefono){if(!freeHours(date).includes(hour))return false;const a=getAgenda();a.booked[date]=a.booked[date]||[];a.booked[date].push(hour);a.bookings=a.bookings||[];a.bookings.push({date,hour,nombre,telefono,at:Date.now()});saveAgenda(a);return true;}
+
+function go(name){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("on"));
+  document.getElementById("home").style.display = name==="home"?"block":"none";
+  document.body.classList.toggle("page-home", name==="home");
+  document.body.classList.remove("show-editor");
+  if(name!=="home") document.getElementById("view-"+name).classList.add("on");
+  if(name==="cal"){ if(!isLogged()) return go("login"); renderCal(); }
+  if(name==="hist"){ if(!isLogged()) return go("login"); renderHist(); }
+  if(name==="turno") renderTurno();
+  window.scrollTo(0,0);
+}
+
+function bindNav(){
+  document.querySelectorAll("[data-go]").forEach(el=>el.addEventListener("click",()=>go(el.dataset.go)));
+  document.getElementById("doLogin").onclick=()=>{
+    if(login(document.getElementById("usuario").value, document.getElementById("clave").value)){
+      document.body.classList.add("is-admin"); go("home"); bindEditor();
+    } else document.getElementById("toastLogin").classList.add("show");
+  };
+  ["salir","box-salir","salirCal","salirHist"].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.addEventListener("click",e=>{e.preventDefault(); logout(); document.body.classList.remove("is-admin","show-editor"); go("home");});
+  });
+}
+
+function bindEditor(){
+  if(!isLogged()) return;
+  document.body.classList.add("is-admin");
+  const btn=document.getElementById("btnEstetica");
+  btn.onclick=()=>document.body.classList.toggle("show-editor");
+  const idMap={bg:"bg",btn1:"btn1",btn2:"btn2",loginColor:"login",font:"font",fontSize:"fontSize",sway:"sway",enter:"enter"};
+  Object.keys(idMap).forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.value=getTheme()[idMap[id]];
+    el.oninput=()=>{const n=getTheme(); n[idMap[id]]=(idMap[id]==="font"||id==="bg"||id==="btn1"||id==="btn2"||id==="loginColor")?el.value:Number(el.value); saveTheme(n);};
+  });
+  const nameEl=document.getElementById("boxName");
+  const sliders={boxX:"x",boxY:"y",boxW:"w",boxH:"h",boxR:"r"};
+  const fill=()=>{const b=getTheme().boxes[nameEl.value]; document.getElementById("boxX").value=b.x; document.getElementById("boxY").value=b.y; document.getElementById("boxW").value=b.w; document.getElementById("boxH").value=b.h; document.getElementById("boxR").value=b.r||0;};
+  fill(); nameEl.onchange=fill;
+  Object.keys(sliders).forEach(id=>document.getElementById(id).oninput=e=>{const n=getTheme(); n.boxes[nameEl.value][sliders[id]]=Number(e.target.value); saveTheme(n);});
+  document.querySelectorAll(".box[data-box]").forEach(el=>{
+    el.onpointerdown=e=>{
+      if(!isLogged()||!document.body.classList.contains("page-home")) return;
+      e.preventDefault(); const name=el.dataset.box; nameEl.value=name; fill();
+      const move=ev=>{const n=getTheme(); n.boxes[name].x=Math.round(Math.max(8,Math.min(92,ev.clientX/innerWidth*100))); n.boxes[name].y=Math.round(Math.max(4,Math.min(92,ev.clientY/innerHeight*100))); saveTheme(n); fill();};
+      const up=()=>{window.removeEventListener("pointermove",move); window.removeEventListener("pointerup",up);};
+      window.addEventListener("pointermove",move); window.addEventListener("pointerup",up);
+    };
+  });
+  document.getElementById("reset").onclick=()=>{const f=clone(DEFAULT_THEME); saveTheme(f); Object.keys(idMap).forEach(id=>{const el=document.getElementById(id); if(el) el.value=f[idMap[id]];}); fill();};
+}
+
+let tView=new Date(), cView=new Date(), tDay=null, tHour=null, cDay=null;
+tView.setDate(1); cView.setDate(1);
+function paintDays(box, view, picked, onPick){
+  const first=new Date(view.getFullYear(),view.getMonth(),1);
+  const start=(first.getDay()+6)%7;
+  const last=new Date(view.getFullYear(),view.getMonth()+1,0).getDate();
+  box.innerHTML="";
+  for(let i=0;i<start;i++) box.appendChild(document.createElement("div"));
+  for(let d=1;d<=last;d++){
+    const date=new Date(view.getFullYear(),view.getMonth(),d), id=isoDay(date);
+    const b=document.createElement("button"); b.type="button"; b.className="day "+dayStatus(id); b.textContent=d;
+    if(picked===id) b.classList.add("sel");
+    b.onclick=()=>onPick(id,date);
+    box.appendChild(b);
+  }
+}
+function renderTurno(){
+  document.getElementById("tLabel").textContent=MONTHS[tView.getMonth()]+" "+tView.getFullYear();
+  paintDays(document.getElementById("tDays"), tView, tDay, (id,date)=>{
+    tDay=id; tHour=null;
+    document.getElementById("tDatos").classList.remove("show");
+    document.getElementById("tHours").classList.add("show");
+    document.getElementById("tDayTitle").textContent=date.toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"});
+    const free=freeHours(id), list=getAgenda().available[id]||[], slots=document.getElementById("tSlots");
+    slots.innerHTML="";
+    if(!list.length){ slots.innerHTML="<p>Este día no está disponible.</p>"; renderTurno(); return; }
+    list.forEach(h=>{
+      const b=document.createElement("button"); b.type="button"; b.className="slot "+(free.includes(h)?"ok":"off"); b.textContent=h;
+      if(free.includes(h)) b.onclick=()=>{ tHour=h; document.querySelectorAll("#tSlots .slot").forEach(x=>x.style.outline=""); b.style.outline="2px solid #2c4a38"; document.getElementById("tDatos").classList.add("show"); };
+      slots.appendChild(b);
+    });
+    renderTurno();
+  });
+}
+function renderCal(){
+  document.getElementById("cLabel").textContent=MONTHS[cView.getMonth()]+" "+cView.getFullYear();
+  paintDays(document.getElementById("cDays"), cView, cDay, (id,date)=>{
+    cDay=id;
+    document.getElementById("cTitle").textContent=date.toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"});
+    const cur=getAgenda().available[id]||[], slots=document.getElementById("cSlots");
+    slots.innerHTML="";
+    HOURS.forEach(h=>{ const b=document.createElement("button"); b.type="button"; b.className="slot"+(cur.includes(h)?" on":""); b.textContent=h; b.onclick=()=>b.classList.toggle("on"); slots.appendChild(b); });
+    renderCal();
+  });
+}
+function renderHist(){
+  const list=document.getElementById("pList"), patients=listPatients();
+  list.innerHTML="";
+  if(!patients.length){ list.innerHTML="<div class='card'>Todavía no hay pacientes.</div>"; return; }
+  patients.forEach(p=>{
+    const card=document.createElement("div"); card.className="pac";
+    card.innerHTML="<button class='name' type='button'></button><div class='actions'><button class='act-h' type='button'>Historial</button><button class='act-c' type='button'>Contacto</button></div><div class='detail hist'></div><div class='detail cont'></div>";
+    card.querySelector(".name").textContent=p.nombre;
+    card.querySelector(".hist").innerHTML=p.visitas.map(v=>v.date+" · "+v.hour+(v.nota?" · "+v.nota:"")).join("<br>")||"Sin visitas.";
+    card.querySelector(".cont").textContent=p.telefono?("Teléfono: "+p.telefono):"Sin teléfono.";
+    card.querySelector(".name").onclick=()=>card.classList.toggle("open");
+    card.querySelector(".act-h").onclick=()=>{card.classList.add("open","show-h"); card.classList.remove("show-c");};
+    card.querySelector(".act-c").onclick=()=>{card.classList.add("open","show-c"); card.classList.remove("show-h");};
+    list.appendChild(card);
+  });
+}
+
+document.getElementById("tPrev").onclick=()=>{tView.setMonth(tView.getMonth()-1); renderTurno();};
+document.getElementById("tNext").onclick=()=>{tView.setMonth(tView.getMonth()+1); renderTurno();};
+document.getElementById("cPrev").onclick=()=>{cView.setMonth(cView.getMonth()-1); renderCal();};
+document.getElementById("cNext").onclick=()=>{cView.setMonth(cView.getMonth()+1); renderCal();};
+document.getElementById("cSave").onclick=()=>{
+  if(!cDay) return;
+  const hours=Array.from(document.querySelectorAll("#cSlots .slot.on")).map(b=>b.textContent);
+  const a=getAgenda(); if(hours.length) a.available[cDay]=hours; else delete a.available[cDay]; saveAgenda(a);
+  document.getElementById("cToast").classList.add("show"); renderCal();
+};
+document.getElementById("tDatos").onsubmit=e=>{
+  e.preventDefault();
+  if(!tDay||!tHour) return;
+  const ok=bookSlot(tDay,tHour,document.getElementById("tNombre").value.trim(),document.getElementById("tTel").value.trim());
+  const toast=document.getElementById("tToast"); toast.textContent=ok?("Turno guardado "+tDay+" "+tHour):"Ese horario ya no está libre."; toast.classList.add("show");
+  if(ok){ e.target.reset(); document.getElementById("tDatos").classList.remove("show"); renderTurno(); }
+};
+
+applyTheme();
+bindNav();
+if(isLogged()) bindEditor();
+document.querySelectorAll(".branch").forEach(el=>el.addEventListener("animationend",()=>{el.style.opacity=getComputedStyle(el).opacity; el.style.transform="none"; el.classList.add("is-sway");},{once:true}));
+</script>
 </body>
 </html>
