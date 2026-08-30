@@ -20,16 +20,9 @@
       width: min(780px, 92vw);
       transform: translate(-50%, -50%);
       opacity: 0;
-      animation: formBouquet 2.8s ease forwards, floatBouquet 10s ease-in-out 2.8s infinite;
-      mix-blend-mode: multiply;
+      animation: formBouquet 2.4s ease forwards, floatBouquet 12s ease-in-out 2.4s infinite;
     }
-    .fly { position: absolute; height: 170px; width: auto; opacity: 0; z-index: 2; }
-    .fly-a { animation: inA 2.2s ease forwards; }
-    .fly-b { animation: inB 2.3s ease forwards .1s; }
-    .fly-c { animation: inC 2.2s ease forwards .15s; }
-    .fly-d { animation: inD 2.4s ease forwards .05s; }
-    .fly-e { animation: inE 2.3s ease forwards .2s; }
-    .fly-f { animation: inF 2.5s ease forwards .12s; }
+    .fly, .flowers, .flo, .flower { display: none !important; }
     .stage {
       position: relative; z-index: 5; min-height: 100vh;
       display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
@@ -63,31 +56,18 @@
     .editor .ed-row.col { flex-direction: column; align-items: stretch; }
     .bot-mar { display: none !important; }
     @keyframes formBouquet {
-      0% { opacity: 0; transform: translate(-50%, -46%) scale(.94); }
-      60% { opacity: 0; }
-      100% { opacity: .62; transform: translate(-50%, -50%) scale(1); }
+      0% { opacity: 0; transform: translate(-50%, -46%) scale(.96); }
+      100% { opacity: .55; transform: translate(-50%, -50%) scale(1); }
     }
     @keyframes floatBouquet {
       0%,100% { transform: translate(-50%, -50%); }
-      50% { transform: translate(-50%, -52%); }
+      50% { transform: translate(-50%, -51.5%); }
     }
-    @keyframes inA { 0%{left:-25%;top:-20%;opacity:0} 40%{opacity:.7} 100%{left:36%;top:30%;opacity:0} }
-    @keyframes inB { 0%{right:-25%;top:-18%;opacity:0} 40%{opacity:.7} 100%{right:34%;top:32%;opacity:0} }
-    @keyframes inC { 0%{left:-25%;top:70%;opacity:0} 40%{opacity:.65} 100%{left:30%;top:44%;opacity:0} }
-    @keyframes inD { 0%{right:-25%;top:72%;opacity:0} 40%{opacity:.65} 100%{right:30%;top:42%;opacity:0} }
-    @keyframes inE { 0%{left:45%;top:-22%;opacity:0} 40%{opacity:.6} 100%{left:47%;top:26%;opacity:0} }
-    @keyframes inF { 0%{left:20%;bottom:-22%;opacity:0} 40%{opacity:.6} 100%{left:40%;top:48%;opacity:0} }
   </style>
 </head>
 <body class="home">
   <div class="bloom">
-    <img class="bouquet" src="bouquet.jpg" alt="" />
-    <img class="fly fly-a" src="sage-poppy.png" alt="" />
-    <img class="fly fly-b" src="sage-yellow.png" alt="" />
-    <img class="fly fly-c" src="sage-blue.png" alt="" />
-    <img class="fly fly-d" src="sage-daisy.png" alt="" />
-    <img class="fly fly-e" src="sage-lupine.png" alt="" />
-    <img class="fly fly-f" src="sage-thistle.png" alt="" />
+    <img class="bouquet" src="bouquet.png" alt="" />
   </div>
   <aside class="editor" id="editor">
     <h2>Editar en vivo</h2>

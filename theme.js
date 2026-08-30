@@ -62,18 +62,7 @@ function logout() {
 }
 
 function injectFlowers() {
-  if (document.querySelector(".flowers")) return;
-  const layer = document.createElement("div");
-  layer.className = "flowers";
-  layer.setAttribute("aria-hidden", "true");
-  const marks = ["❀","✿","❀","✿","❀","✿","❀","✿"];
-  marks.forEach((mark, i) => {
-    const el = document.createElement("div");
-    el.className = "flower f" + (i + 1);
-    el.textContent = mark;
-    layer.appendChild(el);
-  });
-  document.body.prepend(layer);
+  return;
 }
 
 function hexToRgb(hex) {
