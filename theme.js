@@ -1,4 +1,4 @@
-const THEME_KEY = "mar_theme_v3";
+const THEME_KEY = "mar_theme_v4";
 const AUTH_KEY = "mar_auth";
 
 const DEFAULT_THEME = {
@@ -99,38 +99,7 @@ function contrastOk(a, b) {
 }
 
 function startBot() {
-  if (!isLogged() || document.querySelector(".bot-mar")) return;
-  const box = document.createElement("aside");
-  box.className = "bot-mar";
-  box.innerHTML = "<h3><span class='bot-dot'></span>Bot Mar</h3><p id='botMsg'>Revisando fluidez y contraste...</p>";
-  document.body.appendChild(box);
-  const msg = box.querySelector("#botMsg");
-  const jobs = [
-    "Suavizando transiciones de color",
-    "Acomodando el ritmo de las flores",
-    "Revisando contraste de botones",
-    "Ajustando sombras de las tarjetas",
-    "Controlando tamaño del logo",
-    "Manteniendo la página fluida"
-  ];
-  let i = 0;
-  const tick = () => {
-    const theme = getTheme();
-    if (!contrastOk(theme.btn1, theme.bg)) {
-      theme.btn1 = "#234634";
-      saveTheme(theme);
-      msg.textContent = "Subí el contraste del botón Agendá para que se lea mejor.";
-    } else if (theme.logoSize > 340) {
-      theme.logoSize = 280;
-      saveTheme(theme);
-      msg.textContent = "Reduje un poco el logo para que no tape los botones.";
-    } else {
-      msg.textContent = jobs[i % jobs.length] + ".";
-      i += 1;
-    }
-  };
-  tick();
-  setInterval(tick, 7000);
+  return;
 }
 
 function enableLogoDrag() {
