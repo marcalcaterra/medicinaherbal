@@ -99,9 +99,9 @@
     .cal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
     .cal-head strong { font-family:var(--display); font-size:20px; font-weight:600; }
     .cal-head button { border:0; background:var(--sand); color:#5c6f4e; border-radius:50%; width:36px; height:36px; }
-    .week,.days { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+    .week,.days { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; width:100%; }
     .week { font-size:11px; font-weight:700; text-align:center; color:#8a7b6a; margin-bottom:6px; letter-spacing:.08em; }
-    .day { min-height:42px; border:0; border-radius:14px; font-weight:700; background:#edd7d2; color:#9a5a52; }
+    .day { width:100%; min-width:0; min-height:44px; border:0; border-radius:12px; font-weight:700; background:#edd7d2; color:#9a5a52; -webkit-appearance:none; appearance:none; }
     .day.green { background:#d7e3cc; color:#4e6144; }
     .day.sun { background:#eee7de; color:#b2a89c; }
     .day.sel { outline:2px solid #5c6f4e; }
@@ -164,6 +164,8 @@
       .btn-main b { font-size:13px; letter-spacing:.12em; }
       .btn-main small { font-size:10px; }
       .view h1 { font-size:28px; }
+      .days { min-height:240px; gap:4px; }
+      .day { min-height:46px; font-size:15px; }
       .grid { grid-template-columns:1fr; }
       .editor { width:calc(100% - 24px); left:12px; right:12px; }
     }
@@ -233,7 +235,7 @@
 
   <main class="stage" id="home">
     <div class="box" id="box-logo" data-box="logo"><img src="logo.png" alt="Mar"></div>
-    <button class="box btn-main dark guest-only" id="box-turno" data-box="turno" data-go="turno" type="button"><b>Agendá tu turno</b><small>Primera consulta o seguimiento</small></button>
+    <button class="box btn-main dark guest-only" id="box-turno" data-box="turno" data-go="turno" type="button"><b>Agendá tu turno</b><small>No hace falta crear usuario</small></button>
     <button class="box btn-main light guest-only" id="box-cuenta" data-box="cuenta" data-go="login" type="button"><b>Ingresá a tu cuenta</b><small>Consultá o modificá turnos</small></button>
     <button class="box login-pill guest-only" id="box-login" data-box="login" data-go="login" type="button">Login</button>
     <button class="box btn-main dark admin-only" id="box-cal" data-go="cal" type="button"><b>Organizar calendario</b><small>Días y horarios para el cliente</small></button>
@@ -246,6 +248,7 @@
     <div class="wrap">
       <div class="top"><button type="button" data-go="home">← Inicio</button></div>
       <h1>Login</h1>
+      <p class="lead">Para sacar un turno no hace falta cuenta. Entrá acá solo por guías y recetas.</p>
       <div class="card">
         <div class="field"><label>Usuario</label><input id="usuario" type="text" autocomplete="username"></div>
         <div class="field"><label>Contraseña</label><input id="clave" type="password" autocomplete="current-password"></div>
@@ -287,13 +290,14 @@
     <div class="wrap">
       <div class="top"><button type="button" data-go="home">← Inicio</button></div>
       <h1>Agendá tu turno</h1>
-      <p class="lead">Verde: día con horarios. Rojo: sin horarios o completo. Domingos cerrados.</p>
+      <p class="lead">No hace falta crear usuario. Elegí día, hora y tus datos. Verde: hay lugar. Rojo: sin horarios o completo.</p>
       <div class="card">
         <div class="cal-head"><button type="button" id="tPrev">‹</button><strong id="tLabel"></strong><button type="button" id="tNext">›</button></div>
         <div class="week"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
         <div class="days" id="tDays"></div>
         <div class="hours" id="tHours" style="display:none;margin-top:14px"><p id="tDayTitle"></p><div class="slots" id="tSlots"></div></div>
         <form id="tDatos" style="display:none;margin-top:14px">
+          <p style="margin:0 0 10px;font-size:13px;color:#6b5c4c">Reservás sin registrarte. La cuenta es solo para guías y recetas.</p>
           <div class="field"><label>Tipo de consulta</label>
             <div class="tipos" id="tTipos">
               <button class="tipo" type="button" data-tipo="Primera consulta">1. Primera consulta</button>
@@ -324,7 +328,7 @@
         <p id="cTitle">Elegí un día</p>
         <div class="slots" id="cSlots"></div>
         <div class="row-add">
-          <input id="cHour" placeholder="Ej: 14:30">
+          <input id="cHour" type="time" step="300" value="09:00">
           <button class="save" type="button" id="cAdd">Agregar</button>
         </div>
         <button class="save" type="button" id="cSave">Guardar día</button>
@@ -550,32 +554,36 @@ function paintDays(box, view, picked, onPick){
     box.appendChild(b);
   }
 }
+function onTurnoDay(id,date){
+  tDay=id; tHour=null;
+  document.getElementById("tLabel").textContent=MONTHS[tView.getMonth()]+" "+tView.getFullYear();
+  paintDays(document.getElementById("tDays"), tView, tDay, onTurnoDay);
+  document.getElementById("tDatos").style.display="none";
+  document.getElementById("tHours").style.display="block";
+  document.getElementById("tDayTitle").textContent=date.toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"});
+  const free=freeHours(id), list=hoursOf(id), slots=document.getElementById("tSlots");
+  slots.innerHTML="";
+  if(!list.length){ slots.innerHTML="<p>Este día todavía no tiene horarios cargados.</p>"; return; }
+  list.forEach(h=>{
+    const b=document.createElement("button"); b.type="button"; b.className="slot"+(free.includes(h)?"":" off"); b.textContent=h;
+    if(free.includes(h)) b.onclick=()=>{ tHour=h; document.querySelectorAll("#tSlots .slot").forEach(x=>x.style.outline=""); b.style.outline="2px solid #96ab82"; document.getElementById("tDatos").style.display="block"; };
+    slots.appendChild(b);
+  });
+}
 function renderTurno(){
   document.getElementById("tLabel").textContent=MONTHS[tView.getMonth()]+" "+tView.getFullYear();
-  paintDays(document.getElementById("tDays"), tView, tDay, (id,date)=>{
-    tDay=id; tHour=null;
-    document.getElementById("tDatos").style.display="none";
-    document.getElementById("tHours").style.display="block";
-    document.getElementById("tDayTitle").textContent=date.toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"});
-    const free=freeHours(id), list=hoursOf(id), slots=document.getElementById("tSlots");
-    slots.innerHTML="";
-    if(!list.length){ slots.innerHTML="<p>Sin horarios.</p>"; }
-    list.forEach(h=>{
-      const b=document.createElement("button"); b.type="button"; b.className="slot"+(free.includes(h)?"":" off"); b.textContent=h;
-      if(free.includes(h)) b.onclick=()=>{ tHour=h; document.querySelectorAll("#tSlots .slot").forEach(x=>x.style.outline=""); b.style.outline="2px solid #96ab82"; document.getElementById("tDatos").style.display="block"; };
-      slots.appendChild(b);
-    });
-    renderTurno();
-  });
+  paintDays(document.getElementById("tDays"), tView, tDay, onTurnoDay);
+}
+function onCalDay(id,date){
+  cDay=id;
+  document.getElementById("cLabel").textContent=MONTHS[cView.getMonth()]+" "+cView.getFullYear();
+  paintDays(document.getElementById("cDays"), cView, cDay, onCalDay);
+  document.getElementById("cTitle").textContent=date.toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"});
+  drawCSlots();
 }
 function renderCal(){
   document.getElementById("cLabel").textContent=MONTHS[cView.getMonth()]+" "+cView.getFullYear();
-  paintDays(document.getElementById("cDays"), cView, cDay, (id,date)=>{
-    cDay=id;
-    document.getElementById("cTitle").textContent=date.toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"});
-    drawCSlots();
-    renderCal();
-  });
+  paintDays(document.getElementById("cDays"), cView, cDay, onCalDay);
 }
 function drawCSlots(){
   const slots=document.getElementById("cSlots"); slots.innerHTML="";
@@ -720,7 +728,7 @@ document.getElementById("cAdd").onclick=()=>{
   if(/^\d{1,2}$/.test(h)) h=h.padStart(2,"0")+":00";
   if(/^\d{1,2}:\d{2}$/.test(h)) h=h.replace(/^(\d):/,"0$1:");
   const a=getAgenda(); const list=hoursOf(cDay); if(!list.includes(h)) list.push(h); list.sort(); a.available[cDay]=list; saveAgenda(a);
-  document.getElementById("cHour").value=""; drawCSlots(); renderCal();
+  document.getElementById("cHour").value="09:00"; drawCSlots(); renderCal();
 };
 document.getElementById("cSave").onclick=()=>{ document.getElementById("cToast").classList.add("show"); };
 let tTipo="";
