@@ -40,11 +40,18 @@
     body.is-admin:not(.edit-mode) .admin-only { display:flex; }
     body.edit-mode .admin-only { display:none !important; }
     body.edit-mode .guest-only { display:flex !important; }
-    .estetica,.guardar { display:none; position:fixed; z-index:90; border:0; border-radius:999px; padding:8px 14px; font:800 12px Nunito,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
+    .estetica,.guardar,.dueno { display:none; position:fixed; z-index:90; border:0; border-radius:999px; padding:8px 14px; font:800 12px Nunito,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
     .estetica { top:12px; right:12px; background:#2c4a38; color:#fff; }
+    .dueno { top:12px; left:12px; background:#fff; color:#2c4a38; }
     .guardar { top:12px; left:12px; background:#fff; color:#2c4a38; }
-    body.is-admin.page-home:not(.edit-mode) .estetica { display:block; }
+    body.is-admin.page-home:not(.edit-mode) .estetica,
+    body.is-admin.page-home:not(.edit-mode) .dueno { display:block; }
     body.edit-mode .guardar { display:block; }
+    .tipos { display:grid; gap:8px; margin:8px 0 12px; }
+    .tipo { border:1px solid #2c4a38; background:#fff; color:#2c4a38; min-height:42px; font-weight:800; text-align:left; padding:8px 12px; }
+    .tipo.on { background:#2c4a38; color:#fff; }
+    .pac .more { display:none; padding:0 16px 14px; font-size:14px; color:#4d5f52; }
+    .pac.open .more { display:block; }
     .editor { display:none; position:fixed; top:52px; right:12px; width:280px; max-height:calc(100vh - 70px); overflow:auto; background:#fff; border-radius:16px; padding:14px; z-index:80; box-shadow:0 12px 28px rgba(0,0,0,.16); }
     body.edit-mode .editor { display:block; }
     .editor h2 { font-size:16px; margin:0 0 6px; }
@@ -56,7 +63,7 @@
     .editor input[type="range"] { width:100%; }
     .view { display:none; position:relative; z-index:6; padding:16px; min-height:100vh; }
     .view.on { display:flex; align-items:center; justify-content:center; }
-    #view-turno.on,#view-cal.on,#view-hist.on,#view-ficha.on { align-items:flex-start; padding-top:6vh; }
+    #view-turno.on,#view-cal.on,#view-hist.on,#view-ficha.on,#view-owner.on { align-items:flex-start; padding-top:6vh; }
     .top { display:flex; justify-content:space-between; margin-bottom:12px; }
     .top button { border:0; background:transparent; font:800 14px Nunito,sans-serif; color:#2c4a38; }
     .wrap { width:min(520px,92vw); margin:0 auto; }
@@ -134,6 +141,7 @@
     <div class="branch b5"><img src="branch-5.png" alt=""></div>
   </div>
   <button class="estetica" id="btnEstetica" type="button">Estética</button>
+  <button class="dueno" id="btnDueno" type="button" data-go="owner">Datos de dueño</button>
   <button class="guardar" id="btnGuardar" type="button">Guardar</button>
   <aside class="editor" id="editor">
     <h2>Editar en vivo</h2>
@@ -202,8 +210,17 @@
         <div class="days" id="tDays"></div>
         <div class="hours" id="tHours" style="display:none;margin-top:14px"><p id="tDayTitle"></p><div class="slots" id="tSlots"></div></div>
         <form id="tDatos" style="display:none;margin-top:14px">
+          <div class="field"><label>Tipo de consulta</label>
+            <div class="tipos" id="tTipos">
+              <button class="tipo" type="button" data-tipo="Primera consulta">1. Primera consulta</button>
+              <button class="tipo" type="button" data-tipo="Seguimiento">2. Seguimiento</button>
+              <button class="tipo" type="button" data-tipo="Flores de Bach">3. Flores de Bach</button>
+              <button class="tipo" type="button" data-tipo="Ayurveda">4. Ayurveda</button>
+              <button class="tipo" type="button" data-tipo="Integral-Herbal">5. Integral-Herbal</button>
+            </div>
+          </div>
           <div class="field"><label>Nombre completo</label><input id="tNombre" required></div>
-          <div class="field"><label>Teléfono</label><input id="tTel" required></div>
+          <div class="field"><label>Teléfono / contacto</label><input id="tTel" required></div>
           <button class="save" type="submit">Guardar turno</button>
           <div class="toast" id="tToast"></div>
         </form>
@@ -246,6 +263,19 @@
     </div>
   </section>
 
+  <section class="view" id="view-owner">
+    <div class="wrap">
+      <div class="top"><button type="button" data-go="home">← Inicio</button><button type="button" class="do-salir">Salir</button></div>
+      <h1>Datos de dueño</h1>
+      <p class="lead">Acá se envían los turnos por WhatsApp.</p>
+      <div class="card">
+        <div class="field"><label>Nombre</label><input id="owNombre" type="text" placeholder="Javier"></div>
+        <div class="field"><label>WhatsApp (con código de país)</label><input id="owTel" type="tel" placeholder="5493401555555"></div>
+        <button class="save" type="button" id="owSave">Guardar datos</button>
+        <div class="toast" id="owToast">Datos guardados.</div>
+      </div>
+    </div>
+  </section>
   <section class="view" id="view-ficha">
     <div class="wrap">
       <div class="top"><button type="button" data-go="hist">← Pacientes</button><button type="button" class="do-salir">Salir</button></div>
@@ -254,7 +284,7 @@
   </section>
 
 <script>
-const THEME_KEY="mar_theme_v8", AUTH_KEY="mar_auth", AGENDA_KEY="mar_agenda_v3", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1";
+const THEME_KEY="mar_theme_v8", AUTH_KEY="mar_auth", AGENDA_KEY="mar_agenda_v3", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1", OWNER_KEY="mar_owner_v1";
 const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const DEFAULT_THEME={bg:"#96ab82",btn1:"#2c4a38",btn2:"#ffffff",login:"#ffffff",font:'"Nunito", sans-serif',fontSize:13,sway:7,enter:14,boxes:{logo:{x:50,y:14,w:240,h:190,r:0},turno:{x:50,y:46,w:520,h:58,r:2},cuenta:{x:50,y:56,w:520,h:58,r:2},login:{x:50,y:66,w:140,h:40,r:40}}};
 const DEFAULT_HOURS=["09:00","10:00","11:00","16:00","17:00"];
@@ -304,10 +334,11 @@ function go(name){
   document.getElementById("home").style.display=name==="home"?"block":"none";
   document.body.classList.toggle("page-home",name==="home");
   if(name!=="home") document.getElementById("view-"+name).classList.add("on");
-  if(name==="cal"||name==="hist"||name==="ficha"){ if(!isLogged()) return go("login"); }
+  if(name==="cal"||name==="hist"||name==="ficha"||name==="owner"){ if(!isLogged()) return go("login"); }
   if(name==="cal") renderCal();
   if(name==="hist") renderHist();
   if(name==="turno") renderTurno();
+  if(name==="owner") renderOwner();
   window.scrollTo(0,0);
 }
 
@@ -399,15 +430,22 @@ function drawCSlots(){
     slots.appendChild(b);
   });
 }
+function getOwner(){try{return JSON.parse(localStorage.getItem(OWNER_KEY))||{nombre:"Javier",whatsapp:""};}catch(e){return{nombre:"Javier",whatsapp:""};}}
+function saveOwner(o){localStorage.setItem(OWNER_KEY,JSON.stringify(o));}
+function waDigits(n){return String(n||"").replace(/\D/g,"");}
+function renderOwner(){const o=getOwner(); document.getElementById("owNombre").value=o.nombre||""; document.getElementById("owTel").value=o.whatsapp||"";}
 function renderHist(){
   const list=document.getElementById("pList"), pacs=getPacs();
   list.innerHTML="";
   if(!pacs.length) list.innerHTML="<div class='card'>Todavía no hay pacientes.</div>";
   pacs.forEach(p=>{
     const card=document.createElement("div"); card.className="pac";
-    card.innerHTML="<button class='name' type='button'></button>";
-    card.querySelector(".name").textContent=p.nombre+(p.telefono?" · "+p.telefono:"");
-    card.querySelector(".name").onclick=()=>{ currentPac=p.id; renderFicha(); go("ficha"); };
+    const last=(p.visitas&&p.visitas[0])||(p.ficha&&p.ficha.tipo)||"";
+    card.innerHTML="<button class='name' type='button'></button><div class='more'></div>";
+    card.querySelector(".name").textContent=p.nombre;
+    card.querySelector(".more").innerHTML="Contacto: "+(p.telefono||"-")+(p.ficha&&p.ficha.tipo?"<br>Última consulta: "+p.ficha.tipo:"")+"<br><button class='save' type='button'>Abrir ficha</button>";
+    card.querySelector(".name").onclick=()=>card.classList.toggle("open");
+    card.querySelector(".more .save").onclick=()=>{ currentPac=p.id; renderFicha(); go("ficha"); };
     list.appendChild(card);
   });
 }
@@ -482,13 +520,25 @@ document.getElementById("cAdd").onclick=()=>{
   document.getElementById("cHour").value=""; drawCSlots(); renderCal();
 };
 document.getElementById("cSave").onclick=()=>{ document.getElementById("cToast").classList.add("show"); };
+let tTipo="";
+document.querySelectorAll("#tTipos .tipo").forEach(b=>b.onclick=()=>{ tTipo=b.dataset.tipo; document.querySelectorAll("#tTipos .tipo").forEach(x=>x.classList.remove("on")); b.classList.add("on"); });
 document.getElementById("tDatos").onsubmit=e=>{
   e.preventDefault(); if(!tDay||!tHour) return;
+  if(!tTipo){ document.getElementById("tToast").textContent="Elegí el tipo de consulta."; document.getElementById("tToast").classList.add("show"); return; }
   const a=getAgenda(); a.booked[tDay]=a.booked[tDay]||[]; a.booked[tDay].push(tHour); saveAgenda(a);
   const nombre=document.getElementById("tNombre").value.trim(), tel=document.getElementById("tTel").value.trim();
-  upsertPac({id:"p"+Date.now(),nombre,telefono:tel,ficha:{nombre,telefono:tel}});
+  upsertPac({id:"p"+Date.now(),nombre,telefono:tel,ficha:{nombre,telefono:tel,tipo:tTipo},visitas:[{date:tDay,hour:tHour,tipo:tTipo}]});
+  const msg="Nuevo turno Mar%0ANombre: "+encodeURIComponent(nombre)+"%0AContacto: "+encodeURIComponent(tel)+"%0ADía: "+tDay+"%0AHora: "+tHour+"%0ATipo: "+encodeURIComponent(tTipo);
+  const wa=waDigits(getOwner().whatsapp);
   document.getElementById("tToast").textContent="Turno guardado "+tDay+" "+tHour; document.getElementById("tToast").classList.add("show");
-  e.target.reset(); document.getElementById("tDatos").style.display="none"; renderTurno();
+  e.target.reset(); tTipo=""; document.querySelectorAll("#tTipos .tipo").forEach(x=>x.classList.remove("on"));
+  document.getElementById("tDatos").style.display="none"; renderTurno();
+  if(wa) window.open("https://wa.me/"+wa+"?text="+msg,"_blank");
+  else alert("Turno guardado. Cargá el WhatsApp en Datos de dueño para enviarlo.");
+};
+document.getElementById("owSave").onclick=()=>{
+  saveOwner({nombre:document.getElementById("owNombre").value.trim(),whatsapp:waDigits(document.getElementById("owTel").value)});
+  document.getElementById("owToast").classList.add("show");
 };
 document.getElementById("addPac").onclick=()=>{
   const nombre=document.getElementById("nuevoNombre").value.trim(); if(!nombre) return;
