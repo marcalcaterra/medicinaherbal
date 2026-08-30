@@ -68,7 +68,7 @@
     .editor input[type="range"] { width:100%; }
     .view { display:none; position:relative; z-index:6; padding:16px; min-height:100vh; }
     .view.on { display:flex; align-items:center; justify-content:center; }
-    #view-turno.on,#view-cal.on,#view-hist.on,#view-ficha.on,#view-owner.on,#view-conf.on { align-items:flex-start; padding-top:6vh; }
+    #view-turno.on,#view-cal.on,#view-hist.on,#view-ficha.on,#view-owner.on,#view-conf.on,#view-portal.on { align-items:flex-start; padding-top:6vh; }
     .top { display:flex; justify-content:space-between; margin-bottom:12px; }
     .top button { border:0; background:transparent; font:600 14px "Cormorant Garamond",serif; color:#4a5740; }
     .wrap { width:min(520px,92vw); margin:0 auto; }
@@ -131,6 +131,14 @@
     .xbtn { position:absolute; right:8px; top:28px; width:22px; height:22px; border:0; border-radius:4px; background:#ececec; color:#666; font-size:11px; }
     .tools { display:flex; flex-wrap:wrap; gap:8px; margin:8px 14px 16px; }
     .tools button { border:0; background:#5c6f4e; color:#f7f1e8; border-radius:999px; padding:8px 14px; font-size:12px; font-weight:600; font-family:var(--display); letter-spacing:.06em; }
+    .welcome { font-family:var(--display); font-size:20px; line-height:1.45; color:#f7f1e8; margin:0 0 18px; text-align:center; }
+    body.portal-edit .welcome { color:var(--ink); }
+    .tabs { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+    .tab { min-height:56px; border:0; border-radius:16px; background:var(--btn2); color:var(--btn1); font-family:var(--display); font-size:16px; letter-spacing:.08em; text-transform:uppercase; }
+    .tab.on { background:var(--btn1); color:#f7f1e8; }
+    .file-card { background:#fbf6ef; border-radius:16px; padding:12px 14px; margin:0 0 10px; }
+    .file-card a { color:#5c6f4e; font-weight:700; }
+    .file-card img { max-width:100%; border-radius:12px; display:block; margin-top:8px; }
     @media (max-width:720px) {
       .bloom { top:28%; width:92vw; height:42vh; }
       .wrap { width:92vw; max-width:520px; }
@@ -180,7 +188,13 @@
   <button class="guardar" id="btnGuardar" type="button">Guardar</button>
   <aside class="editor" id="editor">
     <h2>Editar en vivo</h2>
-    <p>Ves el inicio real. Guardar vuelve al menú.</p>
+    <p>Elegí qué pantalla editar. Guardar vuelve al menú.</p>
+    <div class="ed-row"><span>Pantalla</span>
+      <select id="editTarget">
+        <option value="home">Inicio</option>
+        <option value="portal">Menú interno de usuario</option>
+      </select>
+    </div>
     <div class="ed-row"><span>Fondo</span><input id="bg" type="color"></div>
     <div class="ed-row"><span>Botón Agendá</span><input id="btn1" type="color"></div>
     <div class="ed-row"><span>Botón Ingresá</span><input id="btn2" type="color"></div>
@@ -293,12 +307,29 @@
       <div class="card" id="altaBox">
         <div class="field"><label>Nombre del paciente</label><input id="nuevoNombre" type="text" placeholder="Nombre y apellido"></div>
         <div class="field"><label>Teléfono</label><input id="nuevoTel" type="tel" placeholder="WhatsApp o teléfono"></div>
+        <div class="field"><label>Usuario del paciente</label><input id="nuevoUser" type="text" placeholder="ej. ana"></div>
+        <div class="field"><label>Contraseña del paciente</label><input id="nuevoPass" type="text" placeholder="ej. 1234"></div>
         <button class="save" type="button" id="addPac">Agregar paciente</button>
       </div>
       <div id="pList" style="margin-top:12px"></div>
     </div>
   </section>
 
+  <section class="view" id="view-portal">
+    <div class="wrap">
+      <div class="top"><button type="button" data-go="home">← Inicio</button><button type="button" id="salirPac">Salir</button></div>
+      <p class="welcome" id="welcomeTxt">Te doy la bienvenida a este espacio creado para vos. Un lugar pensado para que encuentres tus guías, recetas y propuestas mensuales, acompañando mes a mes el recorrido hacia tu equilibrio.</p>
+      <div class="tabs">
+        <button class="tab on" type="button" data-lib="guia">Guía mensual</button>
+        <button class="tab" type="button" data-lib="recetas">Recetas</button>
+      </div>
+      <div class="card admin-upload" id="upBox" style="display:none;margin-bottom:12px">
+        <label>Cargar archivo (PDF, imagen u otro)</label>
+        <input id="fileIn" type="file" accept=".pdf,image/*,.doc,.docx,.png,.jpg,.jpeg,.webp">
+      </div>
+      <div id="libList"></div>
+    </div>
+  </section>
   <section class="view" id="view-conf">
     <div class="wrap">
       <div class="top"><button type="button" data-go="home">← Inicio</button><button type="button" class="do-salir">Salir</button></div>
@@ -331,7 +362,7 @@
   </section>
 
 <script>
-const THEME_KEY="mar_theme_v8", AUTH_KEY="mar_auth", AGENDA_KEY="mar_agenda_v3", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1", OWNER_KEY="mar_owner_v1", INBOX_KEY="mar_inbox_v1";
+const THEME_KEY="mar_theme_v8", AUTH_KEY="mar_auth", PAC_SESS="mar_pac_sess", AGENDA_KEY="mar_agenda_v3", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1", OWNER_KEY="mar_owner_v1", INBOX_KEY="mar_inbox_v1", FILES_KEY="mar_files_v1";
 const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const DEFAULT_THEME={bg:"#96ab82",btn1:"#2c4a38",btn2:"#ffffff",login:"#ffffff",font:'"Nunito", sans-serif',fontSize:13,sway:7,enter:14,boxes:{logo:{x:50,y:14,w:240,h:190,r:0},turno:{x:50,y:46,w:520,h:58,r:2},cuenta:{x:50,y:56,w:520,h:58,r:2},login:{x:50,y:66,w:140,h:40,r:40}}};
 const DEFAULT_HOURS=["09:00","10:00","11:00","16:00","17:00"];
@@ -351,6 +382,10 @@ function saveTheme(t){localStorage.setItem(THEME_KEY,JSON.stringify(t));applyThe
 function applyTheme(theme){const t=theme||getTheme();const r=document.documentElement;[["--bg",t.bg],["--btn1",t.btn1],["--btn2",t.btn2],["--login",t.login],["--font",t.font],["--font-size",t.fontSize+"px"],["--sway",t.sway+"s"],["--enter",(Number(t.enter)/10)+"s"]].forEach(([k,v])=>r.style.setProperty(k,v));document.body.style.background=t.bg;Object.keys(t.boxes).forEach(name=>{const el=document.getElementById("box-"+name);if(!el)return;const b=t.boxes[name];el.style.left="50%";el.style.top=b.y+"%";el.style.transform="translate(-50%,0)";if(innerWidth>720){el.style.width=b.w+"px";el.style.height=b.h+"px";}else{el.style.width="";el.style.height="";}el.style.setProperty("border-radius",(b.r||0)+"px","important");});}
 function isLogged(){try{return sessionStorage.getItem(AUTH_KEY)==="ok";}catch(e){return false;}}
 function loginOk(u,p){return String(u).trim().toLowerCase()==="javier"&&String(p)==="1234";}
+function currentPacUser(){try{return JSON.parse(sessionStorage.getItem(PAC_SESS));}catch(e){return null;}}
+function findPacLogin(u,p){u=String(u).trim().toLowerCase();p=String(p);return getPacs().find(x=>String(x.user||"").toLowerCase()===u&&String(x.pass||"")===p)||null;}
+function getFiles(){try{return JSON.parse(localStorage.getItem(FILES_KEY))||{guia:[],recetas:[]};}catch(e){return{guia:[],recetas:[]};}}
+function saveFiles(f){localStorage.setItem(FILES_KEY,JSON.stringify(f));}
 function pad(n){return String(n).padStart(2,"0");}
 function isoDay(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
 function isSunday(date){return new Date(date+"T12:00:00").getDay()===0;}
@@ -382,29 +417,45 @@ function go(name){
   document.body.classList.toggle("page-home",name==="home");
   if(name!=="home") document.getElementById("view-"+name).classList.add("on");
   if(name==="cal"||name==="hist"||name==="ficha"||name==="owner"||name==="conf"){ if(!isLogged()) return go("login"); }
+  if(name==="portal" && !isLogged() && !currentPacUser()) return go("login");
   if(name==="cal") renderCal();
   if(name==="hist") renderHist();
   if(name==="turno") renderTurno();
   if(name==="owner") renderOwner();
   if(name==="conf") renderConf();
+  if(name==="portal") renderPortal();
   window.scrollTo(0,0);
 }
 
 function bindNav(){
   document.querySelectorAll("[data-go]").forEach(el=>el.addEventListener("click",()=>{ if(document.body.classList.contains("edit-mode")) return; go(el.dataset.go); }));
   document.getElementById("doLogin").onclick=()=>{
-    if(loginOk(document.getElementById("usuario").value,document.getElementById("clave").value)){
-      sessionStorage.setItem(AUTH_KEY,"ok"); document.body.classList.add("is-admin"); go("home"); bindEditor();
-    } else document.getElementById("toastLogin").classList.add("show");
+    const u=document.getElementById("usuario").value, p=document.getElementById("clave").value;
+    if(loginOk(u,p)){
+      sessionStorage.setItem(AUTH_KEY,"ok"); sessionStorage.removeItem(PAC_SESS);
+      document.body.classList.add("is-admin"); go("home"); bindEditor();
+    } else {
+      const pac=findPacLogin(u,p);
+      if(pac){ sessionStorage.setItem(PAC_SESS,JSON.stringify(pac)); sessionStorage.removeItem(AUTH_KEY); document.body.classList.remove("is-admin"); go("portal"); }
+      else document.getElementById("toastLogin").classList.add("show");
+    }
   };
-  document.querySelectorAll(".do-salir, #box-salir").forEach(el=>el.addEventListener("click",()=>{ sessionStorage.removeItem(AUTH_KEY); document.body.classList.remove("is-admin","edit-mode"); go("home"); }));
-  document.getElementById("btnEstetica").onclick=()=>{ document.body.classList.add("edit-mode"); go("home"); document.body.classList.add("edit-mode"); };
-  document.getElementById("btnGuardar").onclick=()=>{ document.body.classList.remove("edit-mode"); go("home"); };
+  document.querySelectorAll(".do-salir, #box-salir, #salirPac").forEach(el=>el.addEventListener("click",()=>{ sessionStorage.removeItem(AUTH_KEY); sessionStorage.removeItem(PAC_SESS); document.body.classList.remove("is-admin","edit-mode","portal-edit"); go("home"); }));
+  document.getElementById("btnEstetica").onclick=()=>{ document.getElementById("editTarget").value="home"; document.body.classList.remove("portal-edit"); document.body.classList.add("edit-mode"); go("home"); document.body.classList.add("edit-mode"); };
+  document.getElementById("btnGuardar").onclick=()=>{ document.body.classList.remove("edit-mode","portal-edit"); go("home"); };
 }
 
 function bindEditor(){
   if(!isLogged()) return;
   document.body.classList.add("is-admin");
+  const target=document.getElementById("editTarget");
+  if(target && !target._bound){
+    target._bound=true;
+    target.onchange=()=>{
+      if(target.value==="portal"){ document.body.classList.add("edit-mode","portal-edit"); go("portal"); document.body.classList.add("edit-mode","portal-edit"); }
+      else { document.body.classList.remove("portal-edit"); go("home"); document.body.classList.add("edit-mode"); }
+    };
+  }
   const idMap={bg:"bg",btn1:"btn1",btn2:"btn2",loginColor:"login",font:"font",fontSize:"fontSize",sway:"sway",enter:"enter"};
   Object.keys(idMap).forEach(id=>{
     const el=document.getElementById(id); if(!el) return;
@@ -596,7 +647,6 @@ document.getElementById("tDatos").onsubmit=e=>{
   if(!tTipo){ document.getElementById("tToast").textContent="Elegí el tipo de consulta."; document.getElementById("tToast").classList.add("show"); return; }
   const a=getAgenda(); a.booked[tDay]=a.booked[tDay]||[]; a.booked[tDay].push(tHour); saveAgenda(a);
   const nombre=document.getElementById("tNombre").value.trim(), tel=document.getElementById("tTel").value.trim();
-  upsertPac({id:"p"+Date.now(),nombre,telefono:tel,ficha:{nombre,telefono:tel,tipo:tTipo},visitas:[{date:tDay,hour:tHour,tipo:tTipo}]});
   botAviso({nombre,tel,dia:tDay,hora:tHour,tipo:tTipo});
   document.getElementById("tToast").textContent="Turno confirmado. El estudio ya recibió tu reserva.";
   document.getElementById("tToast").classList.add("show");
@@ -610,8 +660,36 @@ document.getElementById("owSave").onclick=()=>{
 document.getElementById("addPac").onclick=()=>{
   const nombre=document.getElementById("nuevoNombre").value.trim(); if(!nombre) return;
   const telefono=document.getElementById("nuevoTel").value.trim();
-  upsertPac({id:"p"+Date.now(),nombre,telefono,ficha:{nombre,telefono}});
-  document.getElementById("nuevoNombre").value=""; document.getElementById("nuevoTel").value=""; renderHist();
+  const user=document.getElementById("nuevoUser").value.trim();
+  const pass=document.getElementById("nuevoPass").value.trim();
+  upsertPac({id:"p"+Date.now(),nombre,telefono,user,pass,ficha:{nombre,telefono}});
+  document.getElementById("nuevoNombre").value=""; document.getElementById("nuevoTel").value="";
+  document.getElementById("nuevoUser").value=""; document.getElementById("nuevoPass").value="";
+  renderHist();
+};
+let libTab="guia";
+function renderPortal(){
+  document.getElementById("upBox").style.display=isLogged()?"block":"none";
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on", t.dataset.lib===libTab));
+  const files=getFiles()[libTab]||[];
+  const box=document.getElementById("libList");
+  if(!files.length){ box.innerHTML="<div class='card'>Todavía no hay archivos en esta sección.</div>"; return; }
+  box.innerHTML=files.map(f=>{
+    const del=isLogged()?" <button type='button' class='save' data-del='"+f.id+"' style='width:auto;height:34px;padding:0 12px;margin:8px 0 0'>Quitar</button>":"";
+    if((f.type||"").indexOf("image/")===0) return "<div class='file-card'><b>"+f.name+"</b><img src='"+f.data+"' alt=''>"+del+"</div>";
+    return "<div class='file-card'><a href='"+f.data+"' target='_blank' rel='noopener'>"+f.name+"</a>"+del+"</div>";
+  }).join("");
+  box.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
+    const all=getFiles(); all[libTab]=(all[libTab]||[]).filter(x=>x.id!==b.dataset.del); saveFiles(all); renderPortal();
+  });
+}
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{ libTab=t.dataset.lib; renderPortal(); });
+document.getElementById("fileIn").onchange=e=>{
+  const file=e.target.files&&e.target.files[0]; if(!file||!isLogged()) return;
+  if(file.size>1500000){ alert("El archivo es grande. Probá uno de hasta 1,5 MB."); e.target.value=""; return; }
+  const reader=new FileReader();
+  reader.onload=()=>{ const all=getFiles(); all[libTab]=all[libTab]||[]; all[libTab].push({id:"f"+Date.now(),name:file.name,type:file.type,data:reader.result}); saveFiles(all); renderPortal(); };
+  reader.readAsDataURL(file); e.target.value="";
 };
 
 applyTheme();
