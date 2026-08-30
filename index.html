@@ -372,7 +372,7 @@
   <section class="view" id="view-ok">
     <div class="wrap">
       <div class="card" style="text-align:center;padding:32px 22px">
-        <h1 style="color:#5c6f4e;font-size:32px;letter-spacing:.04em">Reserva realizada con éxito</h1>
+        <h1 style="color:#5c6f4e;font-size:32px;letter-spacing:.04em">Reserva confirmada con éxito</h1>
         <button class="save" type="button" data-go="home">Volver al inicio</button>
       </div>
     </div>
@@ -993,7 +993,17 @@ document.getElementById("doInstallNow").onclick=async()=>{
   if(ios) return;
   alert("En Chrome o Edge: menú de la barra de direcciones → Instalar Mar.");
 };
-if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    return Promise.all(regs.map(function(r){ return r.unregister(); }));
+  }).then(function(){
+    return caches.keys();
+  }).then(function(keys){
+    return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+  }).then(function(){
+    return navigator.serviceWorker.register("sw.js?v=3");
+  }).catch(function(){});
+}
 </script>
 </body>
 </html>
