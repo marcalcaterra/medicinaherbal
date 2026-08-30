@@ -90,10 +90,9 @@
     .editor input[type="color"] { width:42px; height:28px; padding:0; border:0; background:none; }
     .editor input,.editor select { width:130px; height:28px; }
     .editor input[type="range"] { width:100%; }
-    .view { display:none; position:relative; z-index:6; padding:16px; min-height:100vh; }
-    .view.on { display:flex; align-items:center; justify-content:center; }
-    #view-turno.on,#view-cal.on,#view-hist.on,#view-ficha.on,#view-owner.on,#view-conf.on,#view-registro.on,#view-recupero.on,#view-users.on { align-items:flex-start; padding-top:6vh; padding-bottom:8vh; overflow:auto; }
-    #view-portal.on { align-items:center; justify-content:center; padding-top:4vh; padding-bottom:4vh; }
+    .view { display:none; position:relative; z-index:6; padding:16px; min-height:100vh; min-height:100dvh; }
+    .view.on { display:flex; align-items:center; justify-content:center; overflow:auto; padding-top:max(16px, 8vh); padding-bottom:max(16px, 8vh); }
+    #view-turno.on,#view-cal.on,#view-hist.on,#view-ficha.on,#view-owner.on,#view-conf.on,#view-registro.on,#view-recupero.on,#view-users.on,#view-portal.on,#view-login.on,#view-ok.on { align-items:center; justify-content:center; }
     .top { display:flex; justify-content:space-between; margin-bottom:12px; }
     .top button { border:0; background:transparent; font:600 14px "Cormorant Garamond",serif; color:#4a5740; }
     .wrap { width:min(520px,92vw); margin:0 auto; }
@@ -649,7 +648,12 @@ function listenCloud(){
     localStorage.setItem(AGENDA_KEY, JSON.stringify(incoming));
     refreshOpenViews();
   });
-  fbDb.ref("meta/owner").on("value", function(s){ const v=s.val(); if(!v) return; localStorage.setItem(OWNER_KEY, JSON.stringify(v)); refreshOpenViews(); });
+  fbDb.ref("meta/owner").on("value", function(s){
+    const v=s.val(); if(!v) return;
+    if(String(v.user||"").toLowerCase()==="javier") v.user="marianela";
+    localStorage.setItem(OWNER_KEY, JSON.stringify(v));
+    refreshOpenViews();
+  });
   fbDb.ref("meta/theme").on("value", function(s){ const v=s.val(); if(!v) return; localStorage.setItem(THEME_KEY, JSON.stringify(v)); applyTheme(); });
   fbDb.ref("meta/files").on("value", function(s){ const v=s.val(); if(!v) return; localStorage.setItem(FILES_KEY, JSON.stringify(v)); refreshOpenViews(); });
   fbDb.ref("inbox").on("value", function(s){
@@ -699,9 +703,10 @@ function getTheme(){try{const s=JSON.parse(localStorage.getItem(THEME_KEY))||{};
 function saveTheme(t){localStorage.setItem(THEME_KEY,JSON.stringify(t));applyTheme(t); cloudPut("meta","theme", t);}
 function applyTheme(theme){const t=theme||getTheme();const r=document.documentElement;[["--bg",t.bg],["--btn1",t.btn1],["--btn2",t.btn2],["--login",t.login],["--font",t.font],["--font-size",t.fontSize+"px"],["--sway",t.sway+"s"],["--enter",(Number(t.enter)/10)+"s"]].forEach(([k,v])=>r.style.setProperty(k,v));document.body.style.background=t.bg;const pills={turno:1,cuenta:1,cal:1,hist:1,conf:1,login:1,salir:1};Object.keys(t.boxes).forEach(name=>{const el=document.getElementById("box-"+name);if(!el)return;const b=t.boxes[name];el.style.left="50%";el.style.top=b.y+"%";el.style.transform="translate(-50%,0)";if(innerWidth>720){el.style.width=b.w+"px";el.style.height=b.h+"px";}else{el.style.width="";el.style.height="";}el.style.setProperty("border-radius",pills[name]?"999px":((b.r||0)+"px"),"important");});}
 function isLogged(){try{return sessionStorage.getItem(AUTH_KEY)==="ok"||localStorage.getItem(AUTH_KEY)==="ok";}catch(e){return false;}}
-function adminUser(){const o=getOwner(); return String(o.user||"javier").trim().toLowerCase();}
+function adminUser(){const o=getOwner(); return String(o.user||"marianela").trim().toLowerCase();}
 function adminPass(){const o=getOwner(); return String(o.pass||"1234");}
-function loginOk(u,p){return String(u).trim().toLowerCase()===adminUser()&&String(p)===adminPass();}
+function isAdminName(u){ u=String(u||"").trim().toLowerCase(); return u==="marianela"||u==="mar"||u===adminUser(); }
+function loginOk(u,p){return isAdminName(u)&&String(p)===adminPass();}
 function currentPacUser(){try{return JSON.parse(sessionStorage.getItem(PAC_SESS)||localStorage.getItem(PAC_SESS));}catch(e){return null;}}
 function getAcc(){try{return JSON.parse(localStorage.getItem(ACC_KEY))||[];}catch(e){return [];}}
 function saveAcc(a){
@@ -765,7 +770,11 @@ function go(name){
   if(name==="conf") renderConf();
   if(name==="portal") renderPortal();
   if(name==="users") renderUsers();
-  window.scrollTo(0,0);
+  window.scrollTo({top:0,left:0,behavior:"auto"});
+  const view=name==="home"?document.getElementById("home"):document.getElementById("view-"+name);
+  if(view) view.scrollTop=0;
+  const wrap=view&&view.querySelector(".wrap");
+  if(wrap) wrap.scrollIntoView({block:"center",inline:"center",behavior:"auto"});
 }
 
 function bindNav(){
@@ -774,6 +783,7 @@ function bindNav(){
     const u=document.getElementById("usuario").value, p=document.getElementById("clave").value;
     const rec=document.getElementById("recordar").checked;
     if(loginOk(u,p)){
+      const ow=getOwner(); ow.user="marianela"; saveOwner(ow);
       sessionStorage.setItem(AUTH_KEY,"ok"); sessionStorage.removeItem(PAC_SESS); localStorage.removeItem(PAC_SESS);
       if(rec) localStorage.setItem(AUTH_KEY,"ok"); else localStorage.removeItem(AUTH_KEY);
       document.body.classList.add("is-admin"); go("home"); bindEditor();
@@ -892,7 +902,7 @@ function drawCSlots(){
     slots.appendChild(b);
   });
 }
-function getOwner(){try{return Object.assign({nombre:"Mar",user:"javier",pass:"1234",whatsapp:"",apikey:""}, JSON.parse(localStorage.getItem(OWNER_KEY))||{});}catch(e){return{nombre:"Mar",user:"javier",pass:"1234",whatsapp:"",apikey:""};}}
+function getOwner(){try{const o=Object.assign({nombre:"Mar",user:"marianela",pass:"1234",whatsapp:"",apikey:""}, JSON.parse(localStorage.getItem(OWNER_KEY))||{}); if(String(o.user||"").toLowerCase()==="javier") o.user="marianela"; return o;}catch(e){return{nombre:"Mar",user:"marianela",pass:"1234",whatsapp:"",apikey:""};}}
 function saveOwner(o){localStorage.setItem(OWNER_KEY,JSON.stringify(o)); cloudPut("meta","owner", o);}
 function waDigits(n){return String(n||"").replace(/\D/g,"");}
 function waIntl(n){
@@ -976,7 +986,7 @@ function renderConf(){
 function renderOwner(){
   const o=getOwner();
   document.getElementById("owNombre").value=o.nombre||"";
-  document.getElementById("owUser").value=o.user||"javier";
+  document.getElementById("owUser").value=o.user||"marianela";
   document.getElementById("owPass").value=o.pass||"1234";
   document.getElementById("owTel").value=o.whatsapp||"";
   document.getElementById("owKey").value=o.apikey||"";
@@ -1074,9 +1084,11 @@ document.getElementById("tNext").onclick=()=>shiftMonth("t",1);
 document.getElementById("cPrev").onclick=()=>shiftMonth("c",-1);
 document.getElementById("cNext").onclick=()=>shiftMonth("c",1);
 document.getElementById("cAdd").onclick=()=>{
-  if(!cDay||isSunday(cDay)) return;
+  if(!isLogged()){ go("login"); return; }
+  if(!cDay){ alert("Primero tocá un día del calendario."); return; }
+  if(isSunday(cDay)){ alert("Los domingos no se habilitan."); return; }
   let h=document.getElementById("cHour").value.trim();
-  if(!h) return;
+  if(!h){ alert("Elegí un horario."); return; }
   if(/^\d{1,2}$/.test(h)) h=h.padStart(2,"0")+":00";
   if(/^\d{1,2}:\d{2}$/.test(h)) h=h.replace(/^(\d):/,"0$1:");
   const a=getAgenda(); const list=hoursOf(cDay); if(!list.includes(h)) list.push(h); list.sort(); a.available[cDay]=list; saveAgenda(a);
@@ -1112,7 +1124,7 @@ document.getElementById("tDatos").onsubmit=e=>{
 document.getElementById("owSave").onclick=()=>{
   saveOwner({
     nombre:document.getElementById("owNombre").value.trim(),
-    user:document.getElementById("owUser").value.trim()||"javier",
+    user:document.getElementById("owUser").value.trim()||"marianela",
     pass:document.getElementById("owPass").value.trim()||"1234",
     whatsapp:waDigits(document.getElementById("owTel").value),
     apikey:document.getElementById("owKey").value.trim()
@@ -1307,7 +1319,7 @@ document.getElementById("doRegistro").onclick=()=>{
   const user=document.getElementById("regUser").value.trim();
   const pass=document.getElementById("regPass").value.trim();
   if(!nombre||!user||!pass){ alert("Completá nombre, usuario y contraseña."); return; }
-  if(findPacLogin(user,pass) || getAcc().some(x=>String(x.user).toLowerCase()===user.toLowerCase()) || user.toLowerCase()==="javier"){
+  if(isAdminName(user) || findPacLogin(user,pass) || getAcc().some(x=>String(x.user).toLowerCase()===user.toLowerCase()) || user.toLowerCase()==="javier"){
     alert("Ese usuario ya existe."); return;
   }
   upsertAcc({nombre,telefono,user,pass});
@@ -1320,9 +1332,22 @@ document.getElementById("doRecupero").onclick=()=>{
   if(wa) window.location.href=waHref(wa, "Hola Mar, quiero recuperar la contraseña de mi cuenta. Usuario: "+user);
   else alert("Cargá el WhatsApp del dueño en Datos de dueño para habilitar el recupero.");
 };
+function purgeJavier(){
+  try{
+    const acc=getAcc().filter(function(x){ return String(x.user||"").toLowerCase()!=="javier"; });
+    if(acc.length!==getAcc().length) saveAcc(acc);
+    const pacs=getPacs().filter(function(x){ return String(x.user||"").toLowerCase()!=="javier"; });
+    if(pacs.length!==getPacs().length) savePacs(pacs);
+    cloudDel("acc","javier");
+    const ow=getOwner();
+    if(String(ow.user||"").toLowerCase()==="javier"){ ow.user="marianela"; saveOwner(ow); }
+  }catch(e){}
+}
 applyTheme();
 bindNav();
+purgeJavier();
 if(isLogged()) bindEditor();
+if(isLogged()) document.body.classList.add("is-admin");
 (function waitFb(){
   if(typeof firebase!=="undefined"){ startFirebase(); return; }
   setTimeout(waitFb, 250);
@@ -1389,7 +1414,7 @@ if("serviceWorker" in navigator){
   }).then(function(keys){
     return Promise.all(keys.map(function(k){ return caches.delete(k); }));
   }).then(function(){
-    return navigator.serviceWorker.register("sw.js?v=11");
+    return navigator.serviceWorker.register("sw.js?v=12");
   }).catch(function(){});
 }
 document.addEventListener("click",function(e){
