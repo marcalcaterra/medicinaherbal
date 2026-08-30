@@ -85,17 +85,23 @@
     .row-add button { width:auto; padding:0 14px; margin:0; }
     .pac { background:#fff; border-radius:16px; margin:0 0 10px; overflow:hidden; }
     .pac .name { width:100%; border:0; background:#fff; text-align:left; padding:16px; font:800 16px Nunito,sans-serif; }
-    .ficha { background:#fff; border-radius:16px; overflow:hidden; }
-    .ficha h2 { margin:0; padding:16px; font-size:22px; letter-spacing:.04em; color:#3aa6b5; }
-    .sec { margin:0 0 12px; }
-    .sec-h { background:var(--teal); color:#fff; padding:8px 12px; font-weight:800; display:flex; justify-content:space-between; gap:8px; }
-    .sec-h input { height:28px; min-height:28px; background:transparent; border:0; color:#fff; font-weight:800; }
+    .ficha-shell { background:#8ea67c; padding:10px; border-radius:6px; }
+    .ficha { background:#fff; overflow:hidden; }
+    .ficha h2 { margin:0; padding:18px 18px 6px; font-size:22px; font-weight:700; letter-spacing:.06em; color:#2fa3b4; }
+    .sec { margin:0 14px 12px; border:1px solid #d8eef2; }
+    .sec-h { background:#2fa3b4; color:#fff; padding:8px 12px; font-weight:800; display:flex; justify-content:space-between; align-items:center; }
+    .sec-h .ttl { border:0; background:transparent; color:#fff; font-weight:800; width:100%; }
     .grid { display:grid; grid-template-columns:1fr 1fr; }
-    .cell { background:var(--row); border:1px solid #fff; padding:8px; }
-    .cell span { display:block; font-size:11px; font-weight:800; color:#2c4a38; }
-    .cell input,.cell textarea { min-height:32px; background:#fff; border:1px solid #d5e8ef; }
-    .tools { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 16px; }
-    .tools button { border:0; background:#2c4a38; color:#fff; border-radius:999px; padding:6px 10px; font-size:11px; font-weight:800; }
+    .cell { background:#eaf6fb; border:1px solid #fff; padding:8px 10px; position:relative; }
+    .cell.full { grid-column:1 / -1; }
+    .cell span { display:block; font-size:11px; font-weight:800; color:#2c4a38; margin-bottom:4px; }
+    .cell input { min-height:34px; background:#fff; border:1px solid #d3e7ee; border-radius:4px; }
+    .cell textarea { min-height:150px; background:#fff; border:1px solid #d3e7ee; border-radius:4px; line-height:1.55; resize:vertical; }
+    .xbtn,.edit-only { display:none; }
+    .customizing .xbtn,.customizing .edit-only { display:inline-flex; }
+    .xbtn { position:absolute; right:8px; top:28px; width:22px; height:22px; border:0; border-radius:4px; background:#ececec; color:#666; font-size:11px; }
+    .tools { display:flex; flex-wrap:wrap; gap:8px; margin:8px 14px 16px; }
+    .tools button { border:0; background:#2c4a38; color:#fff; border-radius:999px; padding:8px 12px; font-size:11px; font-weight:800; }
     @media (max-width:720px) {
       .bloom { top:30%; width:100vw; height:50vh; }
       #box-logo { width:min(230px,62vw)!important; height:190px!important; top:7%!important; }
@@ -236,20 +242,20 @@
   <section class="view" id="view-ficha">
     <div class="wrap">
       <div class="top"><button type="button" data-go="hist">← Pacientes</button><button type="button" class="do-salir">Salir</button></div>
-      <h1>Ficha médica</h1>
-      <div class="ficha" id="fichaBox"></div>
+      <div class="ficha-shell"><div class="ficha" id="fichaBox"></div></div>
     </div>
   </section>
 
 <script>
-const THEME_KEY="mar_theme_v6", AUTH_KEY="mar_auth", AGENDA_KEY="mar_agenda_v2", FICHA_KEY="mar_ficha_v1", PAC_KEY="mar_pac_v1";
+const THEME_KEY="mar_theme_v6", AUTH_KEY="mar_auth", AGENDA_KEY="mar_agenda_v2", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1";
 const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const DEFAULT_THEME={bg:"#96ab82",btn1:"#2c4a38",btn2:"#ffffff",login:"#ffffff",font:'"Nunito", sans-serif',fontSize:13,sway:7,enter:14,boxes:{logo:{x:50,y:10,w:260,h:210,r:0},turno:{x:50,y:68,w:520,h:58,r:2},cuenta:{x:50,y:78,w:520,h:58,r:2},login:{x:50,y:90,w:120,h:38,r:40}}};
 const DEFAULT_HOURS=["09:00","10:00","11:00","16:00","17:00"];
 const DEFAULT_FICHA=[
   {id:"datos",title:"Datos personales",fields:[{k:"nombre",l:"Nombre"},{k:"fnac",l:"Fecha de nacimiento"},{k:"edad",l:"Edad"},{k:"sexo",l:"Sexo"},{k:"civil",l:"Estado civil"},{k:"ocupacion",l:"Ocupación"},{k:"telefono",l:"Teléfono"},{k:"direccion",l:"Dirección"}]},
+  {id:"med",title:"Medicación",type:"list",fields:[{k:"medicacion",l:"Anotar un medicamento por línea"}]},
   {id:"hf",title:"Antecedentes heredofamiliares",fields:[{k:"hf_diabetes",l:"Diabetes"},{k:"hf_cancer",l:"Cáncer"},{k:"hf_disli",l:"Dislipidemia"},{k:"hf_anemia",l:"Anemia"},{k:"hf_hta",l:"Hipertensión arterial"},{k:"hf_renal",l:"Enfermedades renales"},{k:"hf_otros",l:"Otros"}]},
-  {id:"pp",title:"Antecedentes personales patológicos",fields:[{k:"pp_diabetes",l:"Diabetes"},{k:"pp_hta",l:"Hipertensión arterial"},{k:"pp_cancer",l:"Cáncer"},{k:"pp_obesidad",l:"Obesidad"},{k:"pp_disli",l:"Dislipidemia"},{k:"pp_renal",l:"Enfermedades renales"},{k:"pp_anemia",l:"Anemia"},{k:"pp_cirugias",l:"Cirugías o fracturas"},{k:"pp_otros",l:"Otros"},{k:"pp_meds",l:"Medicamentos actuales"}]},
+  {id:"pp",title:"Antecedentes personales patológicos",fields:[{k:"pp_diabetes",l:"Diabetes"},{k:"pp_hta",l:"Hipertensión arterial"},{k:"pp_cancer",l:"Cáncer"},{k:"pp_obesidad",l:"Obesidad"},{k:"pp_disli",l:"Dislipidemia"},{k:"pp_renal",l:"Enfermedades renales"},{k:"pp_anemia",l:"Anemia"},{k:"pp_cirugias",l:"Cirugías o fracturas"},{k:"pp_otros",l:"Otros"}]},
   {id:"np",title:"Antecedentes personales no patológicos",fields:[{k:"np_ejercicio",l:"Ejercicio o deporte"},{k:"np_frec",l:"Frecuencia y horario"},{k:"np_toxico",l:"Toxicomanías"},{k:"np_toxico_f",l:"Frecuencia"}]},
   {id:"go",title:"Antecedentes gineco-obstétricos",fields:[{k:"go_g",l:"G"},{k:"go_p",l:"P"},{k:"go_c",l:"C"},{k:"go_fum",l:"FUM"},{k:"go_fupc",l:"FUP/C"},{k:"go_sdg",l:"SDG"},{k:"go_ppg",l:"PPG"},{k:"go_anti",l:"Anticonceptivos"}]},
   {id:"gi",title:"Trastornos gastrointestinales",fields:[{k:"gi_vomito",l:"Vómito"},{k:"gi_reflujo",l:"Reflujo"},{k:"gi_diarrea",l:"Diarrea"},{k:"gi_disfagia",l:"Disfagia"},{k:"gi_estreni",l:"Estreñimiento"},{k:"gi_flat",l:"Flatulencias"},{k:"gi_colitis",l:"Colitis"},{k:"gi_dist",l:"Distensión"},{k:"gi_gastritis",l:"Gastritis"},{k:"gi_pirosis",l:"Pirosis"},{k:"gi_nauseas",l:"Náuseas"}]},
@@ -270,7 +276,16 @@ function saveAgenda(a){localStorage.setItem(AGENDA_KEY,JSON.stringify(a));}
 function hoursOf(date){if(isSunday(date)) return []; const a=getAgenda(); return a.available[date] || DEFAULT_HOURS.slice();}
 function freeHours(date){return hoursOf(date).filter(h=>!((getAgenda().booked[date]||[]).includes(h)));}
 function dayStatus(date){if(isSunday(date)) return "sun"; return freeHours(date).length?"green":"red";}
-function getFichaTpl(){try{return JSON.parse(localStorage.getItem(FICHA_KEY))||clone(DEFAULT_FICHA);}catch(e){return clone(DEFAULT_FICHA);}}
+function getFichaTpl(){
+  let t;
+  try { t = JSON.parse(localStorage.getItem(FICHA_KEY)); } catch(e) { t = null; }
+  if (!t) t = clone(DEFAULT_FICHA);
+  const listSec = {id:"med",title:"Medicación",type:"list",fields:[{k:"medicacion",l:"Anotar un medicamento por línea"}]};
+  const i = t.findIndex(s => s.id==="med" || /medic/i.test(s.title||""));
+  if (i >= 0) t[i] = Object.assign(t[i], listSec, {fields:listSec.fields, type:"list", title: t[i].title && /medic/i.test(t[i].title) ? t[i].title : "Medicación"});
+  else t.splice(1, 0, listSec);
+  return t;
+}
 function saveFichaTpl(t){localStorage.setItem(FICHA_KEY,JSON.stringify(t));}
 function getPacs(){try{return JSON.parse(localStorage.getItem(PAC_KEY))||[];}catch(e){return [];}}
 function savePacs(p){localStorage.setItem(PAC_KEY,JSON.stringify(p));}
@@ -389,34 +404,45 @@ function renderHist(){
     list.appendChild(card);
   });
 }
+function isListSec(sec){ return sec.type==="list" || sec.id==="med" || /medic/i.test(sec.title||""); }
 function renderFicha(){
   const p=getPacs().find(x=>x.id===currentPac); if(!p) return go("hist");
   const tpl=getFichaTpl();
   const box=document.getElementById("fichaBox");
-  box.innerHTML="<h2>HISTORIA CLÍNICA NUTRICIONAL</h2><div class='tools'><button type='button' id='addSec'>Agregar recuadro</button><button type='button' id='saveFicha'>Guardar ficha</button></div>";
+  const custom = box.classList.contains("customizing");
+  box.innerHTML="<h2>HISTORIA CLÍNICA NUTRICIONAL</h2><div class='tools'><button type='button' id='toggleCustom'>Personalizar</button><button type='button' id='addSec' class='edit-only'>Agregar recuadro</button><button type='button' id='saveFicha'>Guardar ficha</button></div>";
+  if(custom) box.classList.add("customizing");
   tpl.forEach((sec,si)=>{
+    const list=isListSec(sec);
     const wrap=document.createElement("div"); wrap.className="sec";
-    wrap.innerHTML="<div class='sec-h'><input data-si='"+si+"' class='sec-title' value=''><button type='button' data-del='"+si+"'>Quitar</button></div><div class='grid'></div><div class='tools'><button type='button' data-addf='"+si+"'>+ Campo</button></div>";
-    wrap.querySelector(".sec-title").value=sec.title;
+    wrap.innerHTML="<div class='sec-h'><input class='ttl' data-si='"+si+"'><button class='edit-only' type='button' data-del='"+si+"'>Quitar</button></div><div class='grid'></div><div class='tools edit-only'><button type='button' data-addf='"+si+"' "+(list?"disabled":"")+">+ Campo</button></div>";
+    wrap.querySelector(".ttl").value=sec.title;
     const grid=wrap.querySelector(".grid");
-    sec.fields.forEach((f,fi)=>{
-      const cell=document.createElement("div"); cell.className="cell";
-      cell.innerHTML="<span contenteditable='true'></span><input data-k='"+f.k+"'><button type='button' data-df='"+si+","+fi+"'>x</button>";
+    if(list){
+      const f=sec.fields[0]||{k:"medicacion",l:"Anotar un medicamento por línea"};
+      const cell=document.createElement("div"); cell.className="cell full";
+      cell.innerHTML="<span></span><textarea data-k='"+f.k+"' placeholder='1. ...&#10;2. ...&#10;3. ...'></textarea>";
       cell.querySelector("span").textContent=f.l;
-      cell.querySelector("input").value=(p.ficha&&p.ficha[f.k])||"";
+      cell.querySelector("textarea").value=(p.ficha&&p.ficha[f.k])||"";
       grid.appendChild(cell);
-    });
+    } else {
+      sec.fields.forEach((f,fi)=>{
+        const cell=document.createElement("div"); cell.className="cell";
+        cell.innerHTML="<span></span><input data-k='"+f.k+"'><button class='xbtn' type='button' data-df='"+si+","+fi+"'>x</button>";
+        cell.querySelector("span").textContent=f.l;
+        cell.querySelector("input").value=(p.ficha&&p.ficha[f.k])||"";
+        grid.appendChild(cell);
+      });
+    }
     box.appendChild(wrap);
   });
-  box.querySelector("#addSec").onclick=()=>{ const t=getFichaTpl(); t.push({id:"s"+Date.now(),title:"Nuevo recuadro",fields:[{k:"c"+Date.now(),l:"Nuevo dato"}]}); saveFichaTpl(t); renderFicha(); };
+  box.querySelector("#toggleCustom").onclick=()=>{ box.classList.toggle("customizing"); };
+  box.querySelector("#addSec").onclick=()=>{ const t=getFichaTpl(); t.push({id:"s"+Date.now(),title:"Nuevo recuadro",fields:[{k:"c"+Date.now(),l:"Nuevo dato"}]}); saveFichaTpl(t); if(custom) box.classList.add("customizing"); renderFicha(); };
   box.querySelector("#saveFicha").onclick=saveCurrentFicha;
-  box.querySelectorAll(".sec-title").forEach(inp=>inp.oninput=()=>{ const t=getFichaTpl(); t[+inp.dataset.si].title=inp.value; saveFichaTpl(t); });
+  box.querySelectorAll(".ttl").forEach(inp=>inp.oninput=()=>{ const t=getFichaTpl(); t[+inp.dataset.si].title=inp.value; saveFichaTpl(t); });
   box.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{ const t=getFichaTpl(); t.splice(+b.dataset.del,1); saveFichaTpl(t); renderFicha(); });
-  box.querySelectorAll("[data-addf]").forEach(b=>b.onclick=()=>{ const t=getFichaTpl(); t[+b.dataset.addf].fields.push({k:"c"+Date.now(),l:"Nuevo campo"}); saveFichaTpl(t); renderFicha(); });
+  box.querySelectorAll("[data-addf]").forEach(b=>b.onclick=()=>{ if(b.disabled) return; const t=getFichaTpl(); t[+b.dataset.addf].fields.push({k:"c"+Date.now(),l:"Nuevo campo"}); saveFichaTpl(t); renderFicha(); });
   box.querySelectorAll("[data-df]").forEach(b=>b.onclick=()=>{ const [si,fi]=b.dataset.df.split(",").map(Number); const t=getFichaTpl(); t[si].fields.splice(fi,1); saveFichaTpl(t); renderFicha(); });
-  box.querySelectorAll(".cell span").forEach((sp,idx)=>{
-    sp.onblur=()=>{ const t=getFichaTpl(); let n=0; t.forEach(s=>s.fields.forEach(f=>{ if(n++===idx) f.l=sp.textContent; })); saveFichaTpl(t); };
-  });
 }
 function saveCurrentFicha(){
   const p=getPacs().find(x=>x.id===currentPac); if(!p) return;
