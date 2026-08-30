@@ -291,13 +291,16 @@
     <div class="wrap">
       <div class="top"><button type="button" data-go="home">← Inicio</button><button type="button" class="do-salir">Salir</button></div>
       <h1>Datos de dueño</h1>
-      <p class="lead">Acá se envían los turnos por WhatsApp.</p>
+      <p class="lead">El bot avisa acá cada turno nuevo. El cliente no sale de la página.</p>
       <div class="card">
         <div class="field"><label>Nombre</label><input id="owNombre" type="text" placeholder="Javier"></div>
-        <div class="field"><label>WhatsApp (con código de país)</label><input id="owTel" type="tel" placeholder="5493401555555"></div>
+        <div class="field"><label>WhatsApp (solo referencia)</label><input id="owTel" type="tel" placeholder="5493401555555"></div>
+        <p class="lead" style="color:#6b5c4c">Los avisos quedan en esta pantalla cuando Javier entra.</p>
         <button class="save" type="button" id="owSave">Guardar datos</button>
         <div class="toast" id="owToast">Datos guardados.</div>
       </div>
+      <h1 style="margin-top:22px">Avisos del bot</h1>
+      <div id="inboxList"></div>
     </div>
   </section>
   <section class="view" id="view-ficha">
@@ -308,7 +311,7 @@
   </section>
 
 <script>
-const THEME_KEY="mar_theme_v8", AUTH_KEY="mar_auth", AGENDA_KEY="mar_agenda_v3", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1", OWNER_KEY="mar_owner_v1";
+const THEME_KEY="mar_theme_v8", AUTH_KEY="mar_auth", AGENDA_KEY="mar_agenda_v3", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1", OWNER_KEY="mar_owner_v1", INBOX_KEY="mar_inbox_v1";
 const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const DEFAULT_THEME={bg:"#96ab82",btn1:"#2c4a38",btn2:"#ffffff",login:"#ffffff",font:'"Nunito", sans-serif',fontSize:13,sway:7,enter:14,boxes:{logo:{x:50,y:14,w:240,h:190,r:0},turno:{x:50,y:46,w:520,h:58,r:2},cuenta:{x:50,y:56,w:520,h:58,r:2},login:{x:50,y:66,w:140,h:40,r:40}}};
 const DEFAULT_HOURS=["09:00","10:00","11:00","16:00","17:00"];
@@ -457,7 +460,22 @@ function drawCSlots(){
 function getOwner(){try{return JSON.parse(localStorage.getItem(OWNER_KEY))||{nombre:"Javier",whatsapp:""};}catch(e){return{nombre:"Javier",whatsapp:""};}}
 function saveOwner(o){localStorage.setItem(OWNER_KEY,JSON.stringify(o));}
 function waDigits(n){return String(n||"").replace(/\D/g,"");}
-function renderOwner(){const o=getOwner(); document.getElementById("owNombre").value=o.nombre||""; document.getElementById("owTel").value=o.whatsapp||"";}
+function getInbox(){try{return JSON.parse(localStorage.getItem(INBOX_KEY))||[];}catch(e){return [];}}
+function saveInbox(list){localStorage.setItem(INBOX_KEY,JSON.stringify(list));}
+function botAviso(turno){
+  const list=getInbox();
+  list.unshift({id:"a"+Date.now(),leido:false,...turno});
+  saveInbox(list);
+}
+function renderOwner(){
+  const o=getOwner();
+  document.getElementById("owNombre").value=o.nombre||"";
+  document.getElementById("owTel").value=o.whatsapp||"";
+  const box=document.getElementById("inboxList");
+  const list=getInbox();
+  if(!list.length){ box.innerHTML="<div class='card'>Todavía no hay avisos del bot.</div>"; return; }
+  box.innerHTML=list.map(a=>"<div class='card' style='margin:10px 0'><b>"+(a.nombre||"")+"</b><p>Contacto: "+(a.tel||"-")+"<br>Día: "+(a.dia||"-")+" · "+(a.hora||"-")+"<br>Tipo: "+(a.tipo||"-")+"</p></div>").join("");
+}
 function renderHist(){
   const list=document.getElementById("pList"), pacs=getPacs();
   list.innerHTML="";
@@ -552,13 +570,11 @@ document.getElementById("tDatos").onsubmit=e=>{
   const a=getAgenda(); a.booked[tDay]=a.booked[tDay]||[]; a.booked[tDay].push(tHour); saveAgenda(a);
   const nombre=document.getElementById("tNombre").value.trim(), tel=document.getElementById("tTel").value.trim();
   upsertPac({id:"p"+Date.now(),nombre,telefono:tel,ficha:{nombre,telefono:tel,tipo:tTipo},visitas:[{date:tDay,hour:tHour,tipo:tTipo}]});
-  const msg="Nuevo turno Mar%0ANombre: "+encodeURIComponent(nombre)+"%0AContacto: "+encodeURIComponent(tel)+"%0ADía: "+tDay+"%0AHora: "+tHour+"%0ATipo: "+encodeURIComponent(tTipo);
-  const wa=waDigits(getOwner().whatsapp);
-  document.getElementById("tToast").textContent="Turno guardado "+tDay+" "+tHour; document.getElementById("tToast").classList.add("show");
+  botAviso({nombre,tel,dia:tDay,hora:tHour,tipo:tTipo});
+  document.getElementById("tToast").textContent="Turno confirmado. El estudio ya recibió tu reserva.";
+  document.getElementById("tToast").classList.add("show");
   e.target.reset(); tTipo=""; document.querySelectorAll("#tTipos .tipo").forEach(x=>x.classList.remove("on"));
   document.getElementById("tDatos").style.display="none"; renderTurno();
-  if(wa) window.open("https://wa.me/"+wa+"?text="+msg,"_blank");
-  else alert("Turno guardado. Cargá el WhatsApp en Datos de dueño para enviarlo.");
 };
 document.getElementById("owSave").onclick=()=>{
   saveOwner({nombre:document.getElementById("owNombre").value.trim(),whatsapp:waDigits(document.getElementById("owTel").value)});
