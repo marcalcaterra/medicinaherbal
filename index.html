@@ -391,7 +391,7 @@
     <div class="wrap">
       <div class="top"><button type="button" data-go="home">← Inicio</button></div>
       <h1>Agendá tu turno</h1>
-      <p class="lead">No hace falta crear usuario. Elegí día, hora y tus datos. Verde: hay lugar. Rojo: sin horarios o completo.</p>
+      <p class="lead">No hace falta crear usuario. Elegí día, hora y tus datos. Verde: hay lugar. Rojo: sin horarios o completo. <span id="turnoNube"></span></p>
       <div class="card">
         <div class="cal-head"><button type="button" id="tPrev">‹</button><strong id="tLabel"></strong><button type="button" id="tNext">›</button></div>
         <div class="week"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
@@ -550,7 +550,22 @@ const DEFAULT_FICHA=[
 ];
 const clone=o=>JSON.parse(JSON.stringify(o));
 let fbDb=null, fbSt=null, fbReady=false, fbListen=false;
-function getFbCfg(){try{return Object.assign({apiKey:"",authDomain:"",projectId:"",storageBucket:"",messagingSenderId:"",appId:""}, JSON.parse(localStorage.getItem(FB_KEY)||"{}"));}catch(e){return {apiKey:"",authDomain:"",projectId:"",storageBucket:"",messagingSenderId:"",appId:""};}}
+const FB_DEFAULT={
+  apiKey:"AIzaSyCAdt0XyG6s5Wb0CjJG4AyoOuj9tURyaKE",
+  authDomain:"mar-medicina.firebaseapp.com",
+  projectId:"mar-medicina",
+  storageBucket:"mar-medicina.firebasestorage.app",
+  messagingSenderId:"14464886100",
+  appId:""
+};
+function getFbCfg(){
+  const base=Object.assign({}, FB_DEFAULT);
+  try{
+    const s=JSON.parse(localStorage.getItem(FB_KEY)||"{}")||{};
+    Object.keys(s).forEach(function(k){ if(s[k]) base[k]=s[k]; });
+  }catch(e){}
+  return base;
+}
 function saveFbCfg(c){localStorage.setItem(FB_KEY,JSON.stringify(c));}
 function parseFbPaste(text){
   const out={apiKey:"",authDomain:"",projectId:"",storageBucket:"",messagingSenderId:"",appId:""};
@@ -802,6 +817,8 @@ function onTurnoDay(id,date){
 function renderTurno(){
   document.getElementById("tLabel").textContent=MONTHS[tView.getMonth()]+" "+tView.getFullYear();
   paintDays(document.getElementById("tDays"), tView, tDay, onTurnoDay);
+  const nube=document.getElementById("turnoNube");
+  if(nube) nube.textContent=fbOn()?"Nube activa.":"Nube no conectada: este celular todavía no comparte el calendario.";
 }
 function onCalDay(id,date){
   cDay=id;
@@ -1254,7 +1271,10 @@ document.getElementById("doRecupero").onclick=()=>{
 applyTheme();
 bindNav();
 if(isLogged()) bindEditor();
-startFirebase();
+(function waitFb(){
+  if(typeof firebase!=="undefined"){ startFirebase(); return; }
+  setTimeout(waitFb, 250);
+})();
 function updateWa(show){
   const a=document.getElementById("waFloat"); if(!a) return;
   const n=waIntl(getOwner().whatsapp||getOwner().tel||"");
@@ -1317,7 +1337,7 @@ if("serviceWorker" in navigator){
   }).then(function(keys){
     return Promise.all(keys.map(function(k){ return caches.delete(k); }));
   }).then(function(){
-    return navigator.serviceWorker.register("sw.js?v=7");
+    return navigator.serviceWorker.register("sw.js?v=8");
   }).catch(function(){});
 }
 document.addEventListener("click",function(e){
