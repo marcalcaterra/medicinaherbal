@@ -209,8 +209,7 @@
 <body class="page-home">
   <div class="popup" id="popOk">
     <div class="boxp">
-      <h3>Turno confirmado</h3>
-      <p id="popTxt">Tu reserva ya quedó cargada.</p>
+      <h3>Reserva realizada con éxito</h3>
       <button class="save" type="button" id="popClose">Listo</button>
     </div>
   </div>
@@ -373,9 +372,7 @@
   <section class="view" id="view-ok">
     <div class="wrap">
       <div class="card" style="text-align:center;padding:32px 22px">
-        <h1 style="color:#5c6f4e;font-size:32px">Turno reservado con éxito</h1>
-        <p id="okDetalle" style="color:#4a5740;font-size:17px;line-height:1.5"></p>
-        <p id="okAviso" style="color:#5c6f4e;font-size:15px;line-height:1.5;margin:0 0 18px">El aviso ya se envió al consultorio.</p>
+        <h1 style="color:#5c6f4e;font-size:32px;letter-spacing:.04em">Reserva realizada con éxito</h1>
         <button class="save" type="button" data-go="home">Volver al inicio</button>
       </div>
     </div>
@@ -849,12 +846,7 @@ document.getElementById("tDatos").onsubmit=e=>{
   botAviso({nombre,tel,dia:tDay,hora:tHour,tipo:tTipo,user:acc&&acc.user?acc.user:""});
   const ow=getOwner();
   const detalle="Nuevo turno Mar\nNombre: "+nombre+"\nContacto: "+tel+"\nDía: "+tDay+"\nHora: "+tHour+"\nTipo: "+tTipo;
-  const phone=waDigits(ow.whatsapp||ow.tel||"");
-  const enviado=sendWa(phone, detalle);
-  document.getElementById("okDetalle").textContent="Reservaste el "+tDay+" a las "+tHour+" · "+tTipo+".";
-  document.getElementById("okAviso").textContent=enviado
-    ? "El bot ya avisó a Mar por WhatsApp con el detalle de tu reserva."
-    : "Tu turno quedó cargado. Mar lo ve en Turnos confirmados.";
+  sendWa(waDigits(ow.whatsapp||ow.tel||""), detalle);
   e.target.reset(); tTipo=""; document.querySelectorAll("#tTipos .tipo").forEach(x=>x.classList.remove("on"));
   document.getElementById("tDatos").style.display="none";
   go("ok");
