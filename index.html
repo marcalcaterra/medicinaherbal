@@ -4,6 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mar | Terapia y Medicina Herbal</title>
+  <meta name="theme-color" content="#96ab82" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Mar" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     :root { --bg:#96ab82; --btn1:#5c6f4e; --btn2:#fff; --login:#fff; --font:"Nunito",sans-serif; --display:"Cormorant Garamond",serif; --font-size:13px; --sway:7s; --enter:1.4s; --sand:#E6D7C6; --sand-deep:#D4C4B0; --ink:#4a5740; --row:#F4EBE0; }
@@ -143,15 +151,23 @@
     .tab.on { background:var(--btn1); color:#f7f1e8; }
     .file-card { background:#fbf6ef; border-radius:16px; padding:12px 14px; margin:0 0 10px; }
     .file-card a { color:#5c6f4e; font-weight:700; }
-    .file-card img { max-width:100%; border-radius:12px; display:block; margin-top:8px; }
+    .install-pill { display:none; position:fixed; left:18px; bottom:18px; z-index:100; border:1px solid #d8cbb8; background:#fbf6ef; color:#5c6f4e; border-radius:999px; padding:10px 16px; font:600 12px Nunito,sans-serif; letter-spacing:.08em; text-transform:uppercase; box-shadow:0 8px 22px rgba(74,87,64,.12); }
+    body.page-home:not(.is-admin):not(.edit-mode) .install-pill { display:block; }
+    body.standalone .install-pill { display:none !important; }
+    .install-sheet { display:none; position:fixed; inset:0; background:rgba(74,87,64,.45); z-index:130; align-items:center; justify-content:center; padding:20px; }
+    .install-sheet.on { display:flex; }
+    .install-sheet .boxp { width:min(420px,92vw); background:#fbf6ef; border-radius:22px; padding:26px 22px; text-align:left; color:#4a5740; }
+    .install-sheet h3 { font-family:var(--display); font-size:26px; margin:0 0 10px; color:#5c6f4e; text-align:center; }
+    .install-sheet ol { margin:0 0 16px; padding-left:18px; line-height:1.55; }
+    .install-sheet li { margin:6px 0; }
     .popup { display:none; position:fixed; inset:0; background:rgba(74,87,64,.45); z-index:120; align-items:center; justify-content:center; padding:20px; }
     .popup.on { display:flex; }
     .popup .boxp { width:min(420px,92vw); background:#fbf6ef; border-radius:22px; padding:28px 22px; text-align:center; }
     .popup h3 { font-family:var(--display); font-size:28px; margin:0 0 8px; color:#5c6f4e; }
-    .wa-float { position:fixed; right:18px; bottom:18px; z-index:100; width:58px; height:58px; border-radius:50%; background:linear-gradient(180deg,#2BE158,#22c55e); display:none; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 10px 24px rgba(34,197,94,.38); border:3px solid #f7f1e8; }
+    .wa-float { position:fixed; right:18px; bottom:18px; z-index:100; width:54px; height:54px; border-radius:50%; background:#fbf6ef; display:flex; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 8px 22px rgba(74,87,64,.14); border:1px solid #d8cbb8; }
     .wa-float.on { display:flex; }
-    .wa-float:hover { transform:scale(1.06); }
-    .wa-float svg { width:28px; height:28px; fill:#fff; }
+    .wa-float:hover { transform:scale(1.04); background:#f7f1e8; }
+    .wa-float svg { width:26px; height:26px; fill:#5c6f4e; }
     @media (max-width:720px) {
       .bloom { top:28%; width:92vw; height:42vh; }
       .wrap { width:92vw; max-width:520px; }
@@ -199,8 +215,31 @@
     </div>
   </div>
   <a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="WhatsApp">
-    <svg viewBox="0 0 24 24"><path d="M20.5 3.5A11 11 0 0 0 2.1 17.8L1 23l5.3-1.1A11 11 0 0 0 12 23a11 11 0 0 0 8.5-19.5zM12 21a9 9 0 0 1-4.6-1.3l-.3-.2-3.2.7.7-3.1-.2-.3A9 9 0 1 1 12 21zm5-6.7c-.3-.1-1.6-.8-1.8-.9s-.4-.1-.6.1-.7.9-.8 1-.3.2-.6.1a7.4 7.4 0 0 1-2.2-1.4 8.2 8.2 0 0 1-1.5-1.9c-.2-.3 0-.4.1-.6l.3-.3.1-.3a.5.5 0 0 0 0-.5c0-.1-.6-1.4-.8-1.9s-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.9 2.9 0 0 0-.9 2.2 5 5 0 0 0 1.1 2.7 11.6 11.6 0 0 0 4.4 4 14 14 0 0 0 1.4.5 3.4 3.4 0 0 0 1.5.1 2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .1-1.2c-.1-.2-.3-.2-.6-.3z"/></svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.4c-5.1 0-9.2 4-9.2 9 0 1.6.4 3.1 1.2 4.4L3 21.6l5.9-1.5c1.3.7 2.7 1 4.1 1 5.1 0 9.2-4 9.2-9s-4.1-9.1-10.2-9.1zm0 16.5c-1.3 0-2.5-.3-3.6-.9l-.3-.1-3.5.9.9-3.4-.2-.3A7.2 7.2 0 1 1 12 18.9zm4.1-5.3c-.2-.1-1.3-.6-1.5-.7-.2-.1-.3-.1-.5.1s-.6.7-.7.8-.3.2-.5.1a6 6 0 0 1-1.8-1.1 6.5 6.5 0 0 1-1.2-1.5c-.1-.2 0-.3.1-.5l.2-.2.1-.2c0-.1 0-.3 0-.4C10 9.4 9.6 8.4 9.4 8s-.3-.3-.5-.3h-.4c-.2 0-.5.1-.6.3-.6.6-.8 1.5-.8 2.3 0 .8.3 1.6.9 2.2a9.4 9.4 0 0 0 3.6 3.2c.4.2.9.4 1.1.4.5.1 1 0 1.3-.1.4-.2.9-.6 1-1.1.1-.4 0-.7-.1-1-.1-.1-.2-.2-.5-.3z"/></svg>
   </a>
+  <button class="install-pill" id="btnInstall" type="button">Instalar app</button>
+  <div class="install-sheet" id="installSheet">
+    <div class="boxp">
+      <h3>Guardar Mar en el inicio</h3>
+      <div id="instIos">
+        <ol>
+          <li>En iPhone o iPad, abrí esta página con <b>Safari</b>.</li>
+          <li>Tocá el botón <b>Compartir</b> (el cuadrado con la flecha).</li>
+          <li>Elegí <b>Agregar a pantalla de inicio</b>.</li>
+          <li>Confirmá <b>Agregar</b>. El ícono de Mar queda en el inicio, como una app.</li>
+        </ol>
+      </div>
+      <div id="instPc">
+        <ol>
+          <li>En la computadora usá Chrome o Edge.</li>
+          <li>Tocá <b>Instalar</b> si aparece en la barra, o el ícono ⊕ / instalar de la dirección.</li>
+          <li>También podés usar el botón de abajo. Queda en el menú de apps y en el escritorio.</li>
+        </ol>
+      </div>
+      <button class="save" type="button" id="doInstallNow">Instalar ahora</button>
+      <button class="save add light" type="button" id="closeInstall" style="background:#e6d7c6;color:#4a5740">Cerrar</button>
+    </div>
+  </div>
   <div class="bloom">
     <div class="branch b1"><img src="branch-1.png" alt=""></div>
     <div class="branch b2"><img src="branch-2.png" alt=""></div>
@@ -939,7 +978,9 @@ bindNav();
 if(isLogged()) bindEditor();
 function updateWa(){
   const n=waDigits(getOwner().whatsapp), a=document.getElementById("waFloat");
-  if(n){ a.href="https://wa.me/"+n; a.classList.add("on"); } else { a.classList.remove("on"); a.href="#"; }
+  a.classList.add("on");
+  if(n) a.href="https://wa.me/"+n;
+  else a.href="#";
 }
 document.getElementById("popClose").onclick=()=>document.getElementById("popOk").classList.remove("on");
 document.getElementById("popOk").addEventListener("click",e=>{ if(e.target.id==="popOk") e.currentTarget.classList.remove("on"); });
@@ -947,6 +988,21 @@ updateWa();
 processReminders();
 setInterval(processReminders, 60000);
 document.querySelectorAll(".branch").forEach(el=>el.addEventListener("animationend",()=>{el.style.opacity=getComputedStyle(el).opacity;el.classList.add("is-sway");},{once:true}));
+if(window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) document.body.classList.add("standalone");
+let deferredInstall=null;
+window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); deferredInstall=e; });
+const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+document.getElementById("instIos").style.display=ios?"block":"none";
+document.getElementById("instPc").style.display=ios?"none":"block";
+document.getElementById("btnInstall").onclick=()=>document.getElementById("installSheet").classList.add("on");
+document.getElementById("closeInstall").onclick=()=>document.getElementById("installSheet").classList.remove("on");
+document.getElementById("installSheet").addEventListener("click",e=>{ if(e.target.id==="installSheet") e.currentTarget.classList.remove("on"); });
+document.getElementById("doInstallNow").onclick=async()=>{
+  if(deferredInstall){ deferredInstall.prompt(); await deferredInstall.userChoice; deferredInstall=null; document.getElementById("installSheet").classList.remove("on"); return; }
+  if(ios) return;
+  alert("En Chrome o Edge: menú de la barra de direcciones → Instalar Mar.");
+};
+if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 </script>
 </body>
 </html>
