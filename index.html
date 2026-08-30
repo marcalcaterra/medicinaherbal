@@ -103,12 +103,12 @@
     .tools { display:flex; flex-wrap:wrap; gap:8px; margin:8px 14px 16px; }
     .tools button { border:0; background:#2c4a38; color:#fff; border-radius:999px; padding:8px 12px; font-size:11px; font-weight:800; }
     @media (max-width:720px) {
-      .bloom { top:30%; width:100vw; height:50vh; }
-      #box-logo { width:min(230px,62vw)!important; height:190px!important; top:7%!important; }
-      #box-turno,#box-cuenta,#box-cal,#box-hist { width:100vw!important; left:50%!important; height:70px!important; }
-      #box-turno,#box-cal { top:auto!important; bottom:148px!important; }
-      #box-cuenta,#box-hist { top:auto!important; bottom:76px!important; }
-      #box-login,#box-salir { top:auto!important; bottom:18px!important; width:140px!important; height:42px!important; }
+      .bloom { top:28%; width:92vw; height:46vh; }
+      #box-logo { width:min(220px,58vw)!important; height:170px!important; top:12%!important; left:50%!important; }
+      #box-turno,#box-cuenta,#box-cal,#box-hist { width:min(520px,88vw)!important; left:50%!important; height:64px!important; }
+      #box-turno,#box-cal { top:46%!important; bottom:auto!important; }
+      #box-cuenta,#box-hist { top:58%!important; bottom:auto!important; }
+      #box-login,#box-salir { top:70%!important; bottom:auto!important; width:140px!important; height:42px!important; left:50%!important; }
       .grid { grid-template-columns:1fr; }
       .editor { width:calc(100% - 24px); left:12px; right:12px; }
     }
@@ -188,7 +188,7 @@
     <div class="wrap">
       <div class="top"><button type="button" data-go="home">← Inicio</button></div>
       <h1>Agendá tu turno</h1>
-      <p class="lead">Verde: hay lugar. Rojo: ocupado. Domingos cerrados.</p>
+      <p class="lead">Verde: día con horarios. Rojo: sin horarios o completo. Domingos cerrados.</p>
       <div class="card">
         <div class="cal-head"><button type="button" id="tPrev">‹</button><strong id="tLabel"></strong><button type="button" id="tNext">›</button></div>
         <div class="week"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
@@ -208,7 +208,7 @@
     <div class="wrap">
       <div class="top"><button type="button" data-go="home">← Inicio</button><button type="button" class="do-salir">Salir</button></div>
       <h1>Organizar calendario</h1>
-      <p class="lead">Todos los días excepto domingo. Escribí el horario y agregalo.</p>
+      <p class="lead">Empieza todo en rojo. Cargá horarios a mano y el día pasa a verde. Domingos cerrados.</p>
       <div class="card">
         <div class="cal-head"><button type="button" id="cPrev">‹</button><strong id="cLabel"></strong><button type="button" id="cNext">›</button></div>
         <div class="week"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
@@ -247,7 +247,7 @@
   </section>
 
 <script>
-const THEME_KEY="mar_theme_v6", AUTH_KEY="mar_auth", AGENDA_KEY="mar_agenda_v2", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1";
+const THEME_KEY="mar_theme_v6", AUTH_KEY="mar_auth", AGENDA_KEY="mar_agenda_v3", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1";
 const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const DEFAULT_THEME={bg:"#96ab82",btn1:"#2c4a38",btn2:"#ffffff",login:"#ffffff",font:'"Nunito", sans-serif',fontSize:13,sway:7,enter:14,boxes:{logo:{x:50,y:10,w:260,h:210,r:0},turno:{x:50,y:68,w:520,h:58,r:2},cuenta:{x:50,y:78,w:520,h:58,r:2},login:{x:50,y:90,w:120,h:38,r:40}}};
 const DEFAULT_HOURS=["09:00","10:00","11:00","16:00","17:00"];
@@ -270,10 +270,10 @@ function loginOk(u,p){return String(u).trim().toLowerCase()==="javier"&&String(p
 function pad(n){return String(n).padStart(2,"0");}
 function isoDay(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
 function isSunday(date){return new Date(date+"T12:00:00").getDay()===0;}
-function defaultAgenda(){const available={},start=new Date();start.setHours(0,0,0,0);for(let i=0;i<60;i++){const d=new Date(start);d.setDate(start.getDate()+i);if(d.getDay()!==0) available[isoDay(d)]=DEFAULT_HOURS.slice();}return{available,booked:{},hoursCustom:{}};}
+function defaultAgenda(){return{available:{},booked:{}};}
 function getAgenda(){try{const s=JSON.parse(localStorage.getItem(AGENDA_KEY));if(s&&s.available)return s;}catch(e){}const f=defaultAgenda();localStorage.setItem(AGENDA_KEY,JSON.stringify(f));return f;}
 function saveAgenda(a){localStorage.setItem(AGENDA_KEY,JSON.stringify(a));}
-function hoursOf(date){if(isSunday(date)) return []; const a=getAgenda(); return a.available[date] || DEFAULT_HOURS.slice();}
+function hoursOf(date){if(isSunday(date)) return []; return (getAgenda().available[date]||[]).slice();}
 function freeHours(date){return hoursOf(date).filter(h=>!((getAgenda().booked[date]||[]).includes(h)));}
 function dayStatus(date){if(isSunday(date)) return "sun"; return freeHours(date).length?"green":"red";}
 function getFichaTpl(){
