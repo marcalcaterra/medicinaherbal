@@ -28,7 +28,12 @@
     #box-logo img { width:100%; height:100%; object-fit:contain; object-position:center; pointer-events:none; margin:0 auto; display:block; }
     #box-turno,#box-cal { left:50%; top:46%; width:min(520px,92vw); height:58px; }
     #box-cuenta,#box-hist { left:50%; top:56%; width:min(520px,92vw); height:58px; }
-    #box-login,#box-salir { left:50%; top:66%; width:140px; height:40px; }
+    #box-conf { left:50%; top:66%; width:min(520px,92vw); height:58px; }
+    #box-login { left:50%; top:66%; width:140px; height:40px; }
+    #box-salir { left:50%; top:76%; width:140px; height:40px; }
+    body.is-admin:not(.edit-mode) #box-cal { top:42%; }
+    body.is-admin:not(.edit-mode) #box-hist { top:52%; }
+    body.is-admin:not(.edit-mode) #box-conf { top:62%; }
     .btn-main,.login-pill { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; border:0; background:transparent; color:inherit; text-align:center; cursor:pointer; padding:0 16px; }
     .btn-main b { font-family:var(--display); font-size:15px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; }
     .btn-main small { font-family:var(--font); font-size:11px; font-weight:500; opacity:.85; margin-top:3px; letter-spacing:.02em; }
@@ -63,7 +68,7 @@
     .editor input[type="range"] { width:100%; }
     .view { display:none; position:relative; z-index:6; padding:16px; min-height:100vh; }
     .view.on { display:flex; align-items:center; justify-content:center; }
-    #view-turno.on,#view-cal.on,#view-hist.on,#view-ficha.on,#view-owner.on { align-items:flex-start; padding-top:6vh; }
+    #view-turno.on,#view-cal.on,#view-hist.on,#view-ficha.on,#view-owner.on,#view-conf.on { align-items:flex-start; padding-top:6vh; }
     .top { display:flex; justify-content:space-between; margin-bottom:12px; }
     .top button { border:0; background:transparent; font:600 14px "Cormorant Garamond",serif; color:#4a5740; }
     .wrap { width:min(520px,92vw); margin:0 auto; }
@@ -130,13 +135,19 @@
       .bloom { top:28%; width:92vw; height:42vh; }
       .wrap { width:92vw; max-width:520px; }
       #box-logo { width:min(200px,52vw)!important; height:150px!important; top:14%!important; left:50%!important; transform:translate(-50%,0)!important; }
-      #box-turno,#box-cuenta,#box-cal,#box-hist {
-        width:92vw !important; max-width:520px; left:50%!important; height:72px!important;
+      #box-turno,#box-cuenta,#box-cal,#box-hist,#box-conf {
+        width:92vw !important; max-width:520px; left:50%!important; height:68px!important;
         transform:translate(-50%,0)!important;
       }
       #box-turno,#box-cal { top:44%!important; bottom:auto!important; }
       #box-cuenta,#box-hist { top:56%!important; bottom:auto!important; }
-      #box-login,#box-salir { top:68%!important; bottom:auto!important; width:132px!important; height:40px!important; left:50%!important; transform:translate(-50%,0)!important; }
+      #box-conf { top:68%!important; }
+      #box-login { top:68%!important; bottom:auto!important; width:132px!important; height:40px!important; left:50%!important; transform:translate(-50%,0)!important; }
+      #box-salir { top:80%!important; bottom:auto!important; width:132px!important; height:40px!important; left:50%!important; transform:translate(-50%,0)!important; }
+      body.is-admin:not(.edit-mode) #box-cal { top:40%!important; }
+      body.is-admin:not(.edit-mode) #box-hist { top:51%!important; }
+      body.is-admin:not(.edit-mode) #box-conf { top:62%!important; }
+      body.is-admin:not(.edit-mode) #box-salir { top:74%!important; }
       .btn-main b { font-size:13px; letter-spacing:.12em; }
       .btn-main small { font-size:10px; }
       .view h1 { font-size:28px; }
@@ -207,6 +218,7 @@
     <button class="box login-pill guest-only" id="box-login" data-box="login" data-go="login" type="button">Login</button>
     <button class="box btn-main dark admin-only" id="box-cal" data-go="cal" type="button"><b>Organizar calendario</b><small>Días y horarios para el cliente</small></button>
     <button class="box btn-main light admin-only" id="box-hist" data-go="hist" type="button"><b>Historial clínico</b><small>Pacientes y ficha médica</small></button>
+    <button class="box btn-main dark admin-only" id="box-conf" data-go="conf" type="button"><b>Turnos confirmados</b><small>Reservas que carga el cliente</small></button>
     <button class="box login-pill admin-only" id="box-salir" type="button">Salir</button>
   </main>
 
@@ -287,6 +299,14 @@
     </div>
   </section>
 
+  <section class="view" id="view-conf">
+    <div class="wrap">
+      <div class="top"><button type="button" data-go="home">← Inicio</button><button type="button" class="do-salir">Salir</button></div>
+      <h1>Turnos confirmados</h1>
+      <p class="lead">Todos los turnos que carga el cliente.</p>
+      <div id="confList"></div>
+    </div>
+  </section>
   <section class="view" id="view-owner">
     <div class="wrap">
       <div class="top"><button type="button" data-go="home">← Inicio</button><button type="button" class="do-salir">Salir</button></div>
@@ -361,11 +381,12 @@ function go(name){
   document.getElementById("home").style.display=name==="home"?"block":"none";
   document.body.classList.toggle("page-home",name==="home");
   if(name!=="home") document.getElementById("view-"+name).classList.add("on");
-  if(name==="cal"||name==="hist"||name==="ficha"||name==="owner"){ if(!isLogged()) return go("login"); }
+  if(name==="cal"||name==="hist"||name==="ficha"||name==="owner"||name==="conf"){ if(!isLogged()) return go("login"); }
   if(name==="cal") renderCal();
   if(name==="hist") renderHist();
   if(name==="turno") renderTurno();
   if(name==="owner") renderOwner();
+  if(name==="conf") renderConf();
   window.scrollTo(0,0);
 }
 
@@ -466,6 +487,12 @@ function botAviso(turno){
   const list=getInbox();
   list.unshift({id:"a"+Date.now(),leido:false,...turno});
   saveInbox(list);
+}
+function renderConf(){
+  const box=document.getElementById("confList");
+  const list=getInbox();
+  if(!list.length){ box.innerHTML="<div class='card'>Todavía no hay turnos confirmados.</div>"; return; }
+  box.innerHTML=list.map(a=>"<div class='card' style='margin:0 0 10px'><b>"+(a.nombre||"")+"</b><p>Contacto: "+(a.tel||"-")+"<br>Día: "+(a.dia||"-")+" · Hora: "+(a.hora||"-")+"<br>Tipo: "+(a.tipo||"-")+"</p></div>").join("");
 }
 function renderOwner(){
   const o=getOwner();
