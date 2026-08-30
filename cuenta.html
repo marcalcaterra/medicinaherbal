@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ingresá a tu cuenta | Mar</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="logo.png" />
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <a class="back" href="index.html">← Inicio</a>
+      <img class="mini-logo" src="logo.png" alt="Mar" />
+    </div>
+
+    <section class="card">
+      <h1>Ingresá a tu cuenta</h1>
+      <p class="lead">Accedé para ver tus turnos, tratamientos y próximas consultas.</p>
+
+      <form id="form-cuenta">
+        <div class="form-grid">
+          <div class="field full">
+            <label for="email-cuenta">Correo electrónico</label>
+            <input id="email-cuenta" type="email" required placeholder="tu@correo.com" />
+          </div>
+          <div class="field full">
+            <label for="pass-cuenta">Contraseña</label>
+            <input id="pass-cuenta" type="password" required placeholder="••••••••" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-dark" type="submit">Ingresar</button>
+        </div>
+        <div class="toast" id="toast-cuenta">Vista previa del acceso. El login real se conecta en el próximo paso.</div>
+      </form>
+    </section>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>
