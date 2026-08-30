@@ -1,35 +1,10 @@
-const CACHE = "mar-app-v2";
-const CORE = [
-  "./index.html",
-  "./logo.png",
-  "./manifest.webmanifest",
-  "./icon-192.png",
-  "./icon-512.png",
-  "./icon-180.png",
-  "./icon-maskable-192.png",
-  "./icon-maskable-512.png"
-];
-
-self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(CORE)).then(() => self.skipWaiting()));
-});
-
+const CACHE = "mar-app-v4";
+self.addEventListener("install", (event) => { self.skipWaiting(); });
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())
+    caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).then(() => self.clients.claim())
   );
 });
-
 self.addEventListener("fetch", (event) => {
-  const req = event.request;
-  if (req.method !== "GET") return;
-  event.respondWith(
-    caches.match(req).then((hit) => hit || fetch(req).then((res) => {
-      const copy = res.clone();
-      if (res.ok && req.url.startsWith(self.location.origin)) {
-        caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => {});
-      }
-      return res;
-    }).catch(() => caches.match("./index.html")))
-  );
+  event.respondWith(fetch(event.request, { cache: "no-store" }).catch(() => caches.match("./index.html")));
 });

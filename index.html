@@ -2,6 +2,18 @@
 <html lang="es-AR">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <script>
+    (function(){
+      try{
+        if(navigator.serviceWorker){
+          navigator.serviceWorker.getRegistrations().then(function(rs){ rs.forEach(function(r){ r.unregister(); }); });
+        }
+        if(window.caches){ caches.keys().then(function(ks){ ks.forEach(function(k){ caches.delete(k); }); }); }
+      }catch(e){}
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mar | Terapia y Medicina Herbal</title>
   <meta name="theme-color" content="#96ab82" />
@@ -164,7 +176,7 @@
     .popup.on { display:flex; }
     .popup .boxp { width:min(420px,92vw); background:#fbf6ef; border-radius:22px; padding:28px 22px; text-align:center; }
     .popup h3 { font-family:var(--display); font-size:28px; margin:0 0 8px; color:#5c6f4e; }
-    .wa-float { position:fixed; right:18px; bottom:18px; z-index:100; width:54px; height:54px; border-radius:50%; background:#fbf6ef; display:flex; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 8px 22px rgba(74,87,64,.14); border:1px solid #d8cbb8; }
+    .wa-float { position:fixed; right:18px; bottom:18px; z-index:100; width:54px; height:54px; border-radius:50%; background:#fbf6ef; display:none; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 8px 22px rgba(74,87,64,.14); border:1px solid #d8cbb8; }
     .wa-float.on { display:flex; }
     .wa-float:hover { transform:scale(1.04); background:#f7f1e8; }
     .wa-float svg { width:26px; height:26px; fill:#5c6f4e; }
@@ -534,6 +546,8 @@ function go(name){
   document.getElementById("home").style.display=name==="home"?"block":"none";
   document.body.classList.toggle("page-home",name==="home");
   if(name!=="home") document.getElementById("view-"+name).classList.add("on");
+  const waBtn=document.getElementById("waFloat");
+  if(waBtn){ if(name==="home") waBtn.classList.add("on"); else { waBtn.classList.remove("on"); waBtn.removeAttribute("href"); } }
   if(name==="cal"||name==="hist"||name==="ficha"||name==="owner"||name==="conf"||name==="users"){ if(!isLogged()) return go("login"); }
   if(name==="portal" && !isLogged() && !currentPacUser()) return go("login");
   if(name==="cal") renderCal();
@@ -688,11 +702,9 @@ function botAviso(turno){
 }
 function sendWa(phone, text){
   phone=waDigits(phone); if(!phone||!text) return false;
-  const key=getOwner().apikey;
-  if(!key) return false;
+  const key=getOwner().apikey; if(!key) return false;
   const url="https://api.callmebot.com/whatsapp.php?phone="+encodeURIComponent(phone)+"&text="+encodeURIComponent(text)+"&apikey="+encodeURIComponent(key);
-  try{ fetch(url,{mode:"no-cors",keepalive:true}).catch(()=>{}); }catch(e){}
-  try{ const img=new Image(); img.src=url; }catch(e){}
+  try{ fetch(url,{mode:"no-cors",keepalive:true,cache:"no-store"}).catch(function(){}); }catch(e){}
   return true;
 }
 function turnoCuando(t){
@@ -837,7 +849,7 @@ document.getElementById("tTel").addEventListener("input",()=>{
   } else hint.textContent="";
 });
 document.getElementById("tDatos").onsubmit=e=>{
-  e.preventDefault(); if(!tDay||!tHour) return;
+  e.preventDefault(); e.stopPropagation(); if(!tDay||!tHour) return;
   if(!tTipo){ document.getElementById("tToast").textContent="Elegí el tipo de consulta."; document.getElementById("tToast").classList.add("show"); return; }
   const a=getAgenda(); a.booked[tDay]=a.booked[tDay]||[]; a.booked[tDay].push(tHour); saveAgenda(a);
   const nombre=document.getElementById("tNombre").value.trim(), tel=document.getElementById("tTel").value.trim();
@@ -969,9 +981,11 @@ bindNav();
 if(isLogged()) bindEditor();
 function updateWa(){
   const n=waDigits(getOwner().whatsapp), a=document.getElementById("waFloat");
-  a.classList.add("on");
-  if(n) a.href="https://wa.me/"+n;
-  else a.href="#";
+  if(!a) return;
+  if(n) a.setAttribute("href","https://wa.me/"+n);
+  else a.setAttribute("href","#");
+  if(document.body.classList.contains("page-home")) a.classList.add("on");
+  else a.classList.remove("on");
 }
 document.getElementById("popClose").onclick=()=>document.getElementById("popOk").classList.remove("on");
 document.getElementById("popOk").addEventListener("click",e=>{ if(e.target.id==="popOk") e.currentTarget.classList.remove("on"); });
@@ -1001,9 +1015,14 @@ if("serviceWorker" in navigator){
   }).then(function(keys){
     return Promise.all(keys.map(function(k){ return caches.delete(k); }));
   }).then(function(){
-    return navigator.serviceWorker.register("sw.js?v=3");
+    return navigator.serviceWorker.register("sw.js?v=4");
   }).catch(function(){});
 }
+document.addEventListener("click",function(e){
+  if(!document.getElementById("view-ok")||!document.getElementById("view-ok").classList.contains("on")) return;
+  const a=e.target.closest("a");
+  if(a && /wa\.me|whatsapp/i.test(String(a.getAttribute("href")||a.href||""))){ e.preventDefault(); e.stopPropagation(); }
+}, true);
 </script>
 </body>
 </html>

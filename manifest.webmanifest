@@ -5,7 +5,7 @@
   "description": "Terapia de medicina herbal: turnos, guías y recetas.",
   "lang": "es-AR",
   "dir": "ltr",
-  "start_url": "./index.html",
+  "start_url": "./index.html?v=4",
   "scope": "./",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
