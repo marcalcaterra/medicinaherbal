@@ -577,8 +577,14 @@ function parseFbPaste(text){
   });
   return out;
 }
+const FB_WRITE_KEY="mar_nube_7f3k9q2p";
 function fbOn(){return !!(fbReady && fbDb);}
-function cloudPut(col,id,data){ if(!fbOn()) return Promise.resolve(); try{ return fbDb.ref(col+"/"+id).set(JSON.parse(JSON.stringify(data))); }catch(e){ return Promise.resolve(); } }
+function withKey(data){
+  const o=JSON.parse(JSON.stringify(data==null?{}:data));
+  o.k=FB_WRITE_KEY;
+  return o;
+}
+function cloudPut(col,id,data){ if(!fbOn()) return Promise.resolve(); try{ return fbDb.ref(col+"/"+id).set(withKey(data)); }catch(e){ return Promise.resolve(); } }
 function cloudDel(col,id){ if(!fbOn()) return Promise.resolve(); try{ return fbDb.ref(col+"/"+id).remove(); }catch(e){ return Promise.resolve(); } }
 function cloudObjToList(val){
   if(!val) return [];
