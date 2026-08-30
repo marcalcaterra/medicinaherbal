@@ -66,13 +66,13 @@ function injectFlowers() {
   const layer = document.createElement("div");
   layer.className = "flowers";
   layer.setAttribute("aria-hidden", "true");
-  const svg = '<svg viewBox="0 0 64 64" fill="currentColor"><path d="M32 30c6-12 16-14 16-6s-8 10-16 10c8 0 16 2 16 10s-10 6-16-6c0 12-8 14-16 6s2-10 10-10c-8 0-18-2-10-10s10 6 16 6z"/><circle cx="32" cy="32" r="5"/></svg>';
-  for (let i = 1; i <= 6; i++) {
+  const marks = ["❀","✿","❀","✿","❀","✿","❀","✿"];
+  marks.forEach((mark, i) => {
     const el = document.createElement("div");
-    el.className = "flower f" + i;
-    el.innerHTML = svg;
+    el.className = "flower f" + (i + 1);
+    el.textContent = mark;
     layer.appendChild(el);
-  }
+  });
   document.body.prepend(layer);
 }
 
@@ -157,10 +157,48 @@ function enableLogoDrag() {
   });
 }
 
+function bindEditor() {
+  const editor = document.getElementById("editor");
+  if (!editor || !isLogged()) return;
+  document.body.classList.add("is-admin");
+  const theme = getTheme();
+  const fields = ["bg","card","btn1","btn2","login","font","logoX","logoY","logoSize"];
+  const colors = ["bg","card","btn1","btn2","login"];
+  fields.forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = theme[id];
+    el.addEventListener("input", () => {
+      const next = getTheme();
+      next[id] = id === "font" ? el.value : (colors.includes(id) ? el.value : Number(el.value));
+      saveTheme(next);
+    });
+  });
+  const reset = document.getElementById("reset");
+  if (reset) {
+    reset.addEventListener("click", () => {
+      saveTheme(DEFAULT_THEME);
+      fields.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.value = DEFAULT_THEME[id];
+      });
+    });
+  }
+  const salir = document.getElementById("salir");
+  if (salir) {
+    salir.addEventListener("click", (e) => {
+      e.preventDefault();
+      logout();
+      window.location.href = "index.html";
+    });
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   applyTheme();
   injectFlowers();
   enableLogoDrag();
+  bindEditor();
   startBot();
 });
 

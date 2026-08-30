@@ -8,6 +8,41 @@
   <link rel="icon" href="logo-dark.png" />
 </head>
 <body>
+  <div class="flowers" aria-hidden="true">
+    <div class="flower f1">❀</div>
+    <div class="flower f2">✿</div>
+    <div class="flower f3">❀</div>
+    <div class="flower f4">✿</div>
+    <div class="flower f5">❀</div>
+    <div class="flower f6">✿</div>
+    <div class="flower f7">❀</div>
+    <div class="flower f8">✿</div>
+  </div>
+
+  <aside class="editor" id="editor">
+    <h2>Editar en vivo</h2>
+    <p>Los cambios se ven ahora en esta misma página.</p>
+    <label>Fondo<input id="bg" type="color" /></label>
+    <label>Tarjetas<input id="card" type="color" /></label>
+    <label>Botón Agendá<input id="btn1" type="color" /></label>
+    <label>Botón Ingresá<input id="btn2" type="color" /></label>
+    <label>Login<input id="login" type="color" /></label>
+    <label>Fuente
+      <select id="font">
+        <option value='"Nunito", sans-serif'>Nunito</option>
+        <option value='"Manrope", sans-serif'>Manrope</option>
+        <option value='"Montserrat", sans-serif'>Montserrat</option>
+        <option value='"Playfair Display", serif'>Playfair Display</option>
+        <option value='"Lora", serif'>Lora</option>
+      </select>
+    </label>
+    <label>Logo horizontal<input id="logoX" type="range" min="10" max="90" /></label>
+    <label>Logo vertical<input id="logoY" type="range" min="10" max="90" /></label>
+    <label>Tamaño logo<input id="logoSize" type="range" min="120" max="360" /></label>
+    <button type="button" id="reset">Restablecer</button>
+    <a href="#" id="salir">Salir</a>
+  </aside>
+
   <main class="wrap">
     <section class="card logo-card">
       <div class="logo-wrap" id="logoWrap">

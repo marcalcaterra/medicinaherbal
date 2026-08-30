@@ -193,21 +193,39 @@ textarea { height: 92px; padding: 12px 14px; resize: vertical; }
   overflow: hidden;
   z-index: 0;
 }
+body::before {
+  content: "";
+  position: fixed;
+  inset: -25%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255,255,255,.4), transparent 36%),
+    radial-gradient(circle at 85% 75%, rgba(255,255,255,.28), transparent 40%);
+  animation: floatBg 16s ease-in-out infinite;
+}
+@keyframes floatBg {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-4%, 3%) scale(1.08); }
+}
+
 .flower {
   position: absolute;
-  width: 88px;
-  height: 88px;
-  opacity: 0.14;
-  color: #fff;
-  filter: blur(0.2px);
+  font-size: 46px;
+  line-height: 1;
+  color: rgba(255,255,255,.45);
+  text-shadow: 0 0 12px rgba(255,255,255,.35);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
-.flower svg { width: 100%; height: 100%; display: block; }
-.f1 { top: 8%; left: -10%; animation: crossA 26s linear infinite; }
-.f2 { top: 42%; left: -15%; animation: crossB 32s linear infinite; animation-delay: -8s; }
-.f3 { top: 70%; left: -12%; animation: crossA 29s linear infinite; animation-delay: -14s; }
-.f4 { top: 18%; right: -12%; animation: crossC 34s linear infinite; }
-.f5 { top: 58%; right: -10%; animation: crossC 24s linear infinite; animation-delay: -6s; }
-.f6 { top: 86%; left: -8%; animation: crossB 36s linear infinite; animation-delay: -18s; }
+.f1 { top: 6%; left: -8%; animation: crossA 18s infinite; }
+.f2 { top: 28%; left: -12%; animation: crossB 22s infinite; animation-delay: -4s; }
+.f3 { top: 58%; left: -10%; animation: crossA 20s infinite; animation-delay: -9s; }
+.f4 { top: 12%; right: -8%; animation: crossC 24s infinite; }
+.f5 { top: 46%; right: -10%; animation: crossC 17s infinite; animation-delay: -6s; }
+.f6 { top: 78%; left: -8%; animation: crossB 26s infinite; animation-delay: -12s; }
+.f7 { top: 88%; right: -6%; animation: crossA 21s infinite; animation-delay: -3s; }
+.f8 { top: 36%; left: 40%; animation: crossB 19s infinite; animation-delay: -7s; }
 
 @keyframes crossA {
   0% { transform: translate(-40px, 0) rotate(0deg); }
@@ -259,6 +277,48 @@ textarea { height: 92px; padding: 12px 14px; resize: vertical; }
 @media (max-width: 720px) {
   .form-grid, .panel-grid { grid-template-columns: 1fr; }
   .form-actions .btn-submit { width: 100%; }
+}
+
+.editor {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  width: min(280px, calc(100% - 24px));
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  background: rgba(255,255,255,.94);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(28,51,40,.16);
+  padding: 14px;
+  z-index: 30;
+}
+body.is-admin .editor { display: block; }
+body.is-admin .wrap { padding-left: 0; }
+@media (min-width: 980px) {
+  body.is-admin .wrap { margin-left: 300px; width: min(820px, calc(100% - 328px)); }
+}
+.editor h2 { font-size: 18px; margin-bottom: 4px; }
+.editor p { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.editor label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+}
+.editor input[type="color"] { width: 42px; height: 28px; padding: 0; border: 0; background: none; }
+.editor input[type="range"], .editor select { width: 140px; height: 28px; }
+.editor button, .editor a {
+  display: inline-block;
+  margin-top: 8px;
+  margin-right: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--btn1);
 }
 
 .bot-mar {

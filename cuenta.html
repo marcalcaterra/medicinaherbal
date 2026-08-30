@@ -33,12 +33,12 @@
   </div>
   <script src="theme.js"></script>
   <script>
-    if (isLogged()) window.location.href = "panel.html";
+    if (isLogged()) window.location.href = "index.html";
     document.getElementById("form-cuenta").addEventListener("submit", (e) => {
       e.preventDefault();
       const user = document.getElementById("usuario").value.trim();
       const pass = document.getElementById("clave").value;
-      if (login(user, pass)) window.location.href = "panel.html";
+      if (login(user, pass)) window.location.href = "index.html";
       else document.getElementById("toast-cuenta").classList.add("show");
     });
   </script>
