@@ -332,6 +332,15 @@
       </div>
     </div>
   </section>
+  <section class="view" id="view-ok">
+    <div class="wrap">
+      <div class="card" style="text-align:center;padding:32px 22px">
+        <h1 style="color:#5c6f4e;font-size:32px">Turno reservado con éxito</h1>
+        <p id="okDetalle" style="color:#4a5740;font-size:17px;line-height:1.5"></p>
+        <button class="save" type="button" data-go="home">Volver al inicio</button>
+      </div>
+    </div>
+  </section>
 
   <section class="view" id="view-cal">
     <div class="wrap">
@@ -792,13 +801,13 @@ document.getElementById("tDatos").onsubmit=e=>{
   const acc=logged||findAccByPhone(tel);
   botAviso({nombre,tel,dia:tDay,hora:tHour,tipo:tTipo,user:acc&&acc.user?acc.user:""});
   const ow=getOwner();
-  sendWa(ow.whatsapp, "Nuevo turno Mar\nNombre: "+nombre+"\nContacto: "+tel+"\nDía: "+tDay+"\nHora: "+tHour+"\nTipo: "+tTipo);
-  document.getElementById("tToast").textContent="Turno confirmado. El estudio ya recibió tu reserva.";
-  document.getElementById("tToast").classList.add("show");
-  document.getElementById("popTxt").textContent="Reservaste el "+tDay+" a las "+tHour+" ("+tTipo+").";
-  document.getElementById("popOk").classList.add("on");
+  const detalle="Nuevo turno Mar\nNombre: "+nombre+"\nContacto: "+tel+"\nDía: "+tDay+"\nHora: "+tHour+"\nTipo: "+tTipo;
+  sendWa(ow.whatsapp, detalle);
+  if(ow.whatsapp) window.open("https://wa.me/"+waDigits(ow.whatsapp)+"?text="+encodeURIComponent(detalle),"_blank");
+  document.getElementById("okDetalle").textContent="Reservaste el "+tDay+" a las "+tHour+" · "+tTipo+".";
   e.target.reset(); tTipo=""; document.querySelectorAll("#tTipos .tipo").forEach(x=>x.classList.remove("on"));
-  document.getElementById("tDatos").style.display="none"; renderTurno();
+  document.getElementById("tDatos").style.display="none";
+  go("ok");
 };
 document.getElementById("owSave").onclick=()=>{
   saveOwner({nombre:document.getElementById("owNombre").value.trim(),whatsapp:waDigits(document.getElementById("owTel").value),apikey:document.getElementById("owKey").value.trim()});
