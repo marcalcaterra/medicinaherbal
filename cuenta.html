@@ -11,31 +11,41 @@
   <div class="page">
     <div class="topbar">
       <a class="back" href="index.html">← Inicio</a>
-      <img class="mini-logo" src="logo.png" alt="Mar" />
     </div>
-
     <section class="card">
       <h1>Ingresá a tu cuenta</h1>
-      <p class="lead">Accedé para ver tus turnos, tratamientos y próximas consultas.</p>
-
+      <p class="lead">Usá tu usuario para entrar al panel y ajustar la estética del sitio.</p>
       <form id="form-cuenta">
         <div class="form-grid">
           <div class="field full">
-            <label for="email-cuenta">Correo electrónico</label>
-            <input id="email-cuenta" type="email" required placeholder="tu@correo.com" />
+            <label for="usuario">Usuario</label>
+            <input id="usuario" required placeholder="usuario" />
           </div>
           <div class="field full">
-            <label for="pass-cuenta">Contraseña</label>
-            <input id="pass-cuenta" type="password" required placeholder="••••••••" />
+            <label for="clave">Contraseña</label>
+            <input id="clave" type="password" required placeholder="••••" />
           </div>
         </div>
         <div class="form-actions">
-          <button class="btn btn-dark" type="submit">Ingresar</button>
+          <button class="btn-submit" type="submit">Ingresar</button>
         </div>
-        <div class="toast" id="toast-cuenta">Vista previa del acceso. El login real se conecta en el próximo paso.</div>
+        <div class="toast" id="toast-cuenta">Usuario o contraseña incorrectos.</div>
       </form>
     </section>
   </div>
-  <script src="main.js"></script>
+  <script src="theme.js"></script>
+  <script>
+    if (isLogged()) window.location.href = "panel.html";
+    document.getElementById("form-cuenta").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const user = document.getElementById("usuario").value.trim();
+      const pass = document.getElementById("clave").value;
+      if (login(user, pass)) {
+        window.location.href = "panel.html";
+      } else {
+        document.getElementById("toast-cuenta").classList.add("show");
+      }
+    });
+  </script>
 </body>
 </html>

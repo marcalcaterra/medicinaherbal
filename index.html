@@ -9,17 +9,48 @@
 </head>
 <body>
   <main class="landing">
-    <div class="brand">
-      <img class="logo" src="logo.png" alt="Logo Mar Terapia y Medicina Herbal" />
-      <p>Terapia y medicina herbal</p>
+    <div class="logo-wrap" id="logoWrap">
+      <img src="logo.png" alt="Mar" />
+      <div class="logo-caption">Terapia & Medicina Herbal</div>
     </div>
 
     <div class="actions">
-      <a class="btn btn-dark" href="turno.html">Agendá tu turno</a>
-      <a class="btn btn-light" href="cuenta.html">Ingresá a tu cuenta</a>
+      <a class="pill pill-dark" href="turno.html">
+        <b>Agendá tu turno</b>
+        <small>Primera consulta o seguimiento</small>
+      </a>
+      <a class="pill pill-light" href="cuenta.html">
+        <b>Ingresá a tu cuenta</b>
+        <small>Consultá o modificá turnos</small>
+      </a>
     </div>
 
-    <p class="landing-foot">Mar · Espacio de terapia y medicina herbal</p>
+    <a class="login-only" href="cuenta.html">Login</a>
   </main>
+
+  <script src="theme.js"></script>
+  <script>
+    const wrap = document.getElementById("logoWrap");
+    if (isLogged()) {
+      wrap.classList.add("draggable");
+      let dragging = false;
+      wrap.addEventListener("pointerdown", (e) => {
+        dragging = true;
+        wrap.classList.add("dragging");
+        wrap.setPointerCapture(e.pointerId);
+      });
+      wrap.addEventListener("pointerup", () => {
+        dragging = false;
+        wrap.classList.remove("dragging");
+      });
+      wrap.addEventListener("pointermove", (e) => {
+        if (!dragging) return;
+        const theme = getTheme();
+        theme.logoX = Math.max(8, Math.min(92, (e.clientX / window.innerWidth) * 100));
+        theme.logoY = Math.max(2, Math.min(70, (e.clientY / window.innerHeight) * 100));
+        saveTheme(theme);
+      });
+    }
+  </script>
 </body>
 </html>

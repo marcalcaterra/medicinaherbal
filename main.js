@@ -12,11 +12,3 @@ if (formTurno) {
     showToast("toast-turno");
   });
 }
-
-const formCuenta = document.getElementById("form-cuenta");
-if (formCuenta) {
-  formCuenta.addEventListener("submit", (e) => {
-    e.preventDefault();
-    showToast("toast-cuenta");
-  });
-}

@@ -11,47 +11,39 @@
   <div class="page">
     <div class="topbar">
       <a class="back" href="index.html">← Inicio</a>
-      <img class="mini-logo" src="logo.png" alt="Mar" />
     </div>
-
     <section class="card">
       <h1>Agendá tu turno</h1>
       <p class="lead">Reservá tu consulta de medicina herbal. Te confirmamos el horario.</p>
-
       <form id="form-turno">
         <div class="form-grid">
           <div class="field">
             <label for="nombre">Nombre y apellido</label>
-            <input id="nombre" name="nombre" type="text" required placeholder="Tu nombre" />
+            <input id="nombre" required placeholder="Tu nombre" />
           </div>
           <div class="field">
             <label for="telefono">Teléfono / WhatsApp</label>
-            <input id="telefono" name="telefono" type="tel" required placeholder="Ej: 3401 555555" />
+            <input id="telefono" required placeholder="Ej: 3401 555555" />
           </div>
           <div class="field">
             <label for="fecha">Fecha</label>
-            <input id="fecha" name="fecha" type="date" required />
+            <input id="fecha" type="date" required />
           </div>
           <div class="field">
             <label for="hora">Horario</label>
-            <select id="hora" name="hora" required>
+            <select id="hora" required>
               <option value="">Elegí un horario</option>
               <option>09:00</option>
-              <option>09:30</option>
               <option>10:00</option>
-              <option>10:30</option>
               <option>11:00</option>
-              <option>11:30</option>
               <option>16:00</option>
-              <option>16:30</option>
               <option>17:00</option>
-              <option>17:30</option>
               <option>18:00</option>
             </select>
           </div>
           <div class="field full">
             <label for="servicio">Tipo de consulta</label>
-            <select id="servicio" name="servicio" required>
+            <select id="servicio" required>
               <option value="">Seleccioná una opción</option>
               <option>Primera consulta</option>
               <option>Seguimiento de tratamiento</option>
@@ -61,16 +53,17 @@
           </div>
           <div class="field full">
             <label for="motivo">Motivo de la consulta (opcional)</label>
-            <textarea id="motivo" name="motivo" placeholder="Contanos brevemente qué te gustaría trabajar"></textarea>
+            <textarea id="motivo" placeholder="Contanos brevemente qué te gustaría trabajar"></textarea>
           </div>
         </div>
         <div class="form-actions">
-          <button class="btn btn-dark" type="submit">Confirmar turno</button>
+          <button class="btn-submit" type="submit">Confirmar turno</button>
         </div>
-        <div class="toast" id="toast-turno">Listo. Recibimos tu pedido de turno. Te confirmamos por WhatsApp.</div>
+        <div class="toast" id="toast-turno">Listo. Recibimos tu pedido de turno.</div>
       </form>
     </section>
   </div>
+  <script src="theme.js"></script>
   <script src="main.js"></script>
 </body>
 </html>

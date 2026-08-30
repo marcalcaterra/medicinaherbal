@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de estética | Mar</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="logo.png" />
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <a class="back" href="index.html">← Ver sitio</a>
+      <a class="back" href="#" id="salir">Salir</a>
+    </div>
+    <section class="card">
+      <h1>Control de estética</h1>
+      <p class="lead">Cambiá colores, fuente y posición del logo. El logo se mueve aparte del fondo.</p>
+
+      <form id="form-theme" class="panel-grid">
+        <p class="hint">Usuario activo: javier. En el inicio, arrastrá el logo para moverlo.</p>
+
+        <div class="field">
+          <label for="bg">Color de fondo</label>
+          <input id="bg" type="color" />
+        </div>
+        <div class="field">
+          <label for="btn1">Color botón Agendá</label>
+          <input id="btn1" type="color" />
+        </div>
+        <div class="field">
+          <label for="btn2">Color botón Ingresá</label>
+          <input id="btn2" type="color" />
+        </div>
+        <div class="field">
+          <label for="font">Fuente</label>
+          <select id="font">
+            <option value='"Manrope", sans-serif'>Manrope</option>
+            <option value='"Montserrat", sans-serif'>Montserrat</option>
+            <option value='"Playfair Display", serif'>Playfair Display</option>
+            <option value='"Cormorant Garamond", serif'>Cormorant Garamond</option>
+            <option value='"Lora", serif'>Lora</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="logoX">Logo horizontal</label>
+          <input id="logoX" type="range" min="10" max="90" />
+        </div>
+        <div class="field">
+          <label for="logoY">Logo vertical</label>
+          <input id="logoY" type="range" min="2" max="60" />
+        </div>
+        <div class="field full">
+          <label for="logoSize">Tamaño del logo</label>
+          <input id="logoSize" type="range" min="140" max="420" />
+        </div>
+        <div class="form-actions field full">
+          <button class="btn-submit" type="button" id="reset">Restablecer</button>
+        </div>
+      </form>
+    </section>
+  </div>
+  <script src="theme.js"></script>
+  <script>
+    if (!isLogged()) window.location.href = "cuenta.html";
+
+    const theme = getTheme();
+    const fields = ["bg", "btn1", "btn2", "font", "logoX", "logoY", "logoSize"];
+    fields.forEach((id) => {
+      const el = document.getElementById(id);
+      el.value = theme[id];
+      el.addEventListener("input", () => {
+        const next = getTheme();
+        next[id] = id === "font" ? el.value : (["bg","btn1","btn2"].includes(id) ? el.value : Number(el.value));
+        saveTheme(next);
+      });
+    });
+
+    document.getElementById("reset").addEventListener("click", () => {
+      saveTheme(DEFAULT_THEME);
+      fields.forEach((id) => document.getElementById(id).value = DEFAULT_THEME[id]);
+    });
+
+    document.getElementById("salir").addEventListener("click", (e) => {
+      e.preventDefault();
+      logout();
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>
