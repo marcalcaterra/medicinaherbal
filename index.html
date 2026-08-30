@@ -4,44 +4,65 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mar | Terapia y Medicina Herbal</title>
-  <link rel="stylesheet" href="style.css" />
   <style>
+    * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
-    body.home {
+    body {
       font-family: Nunito, "Segoe UI", sans-serif;
-      background: #96ab82 !important;
+      background: #96ab82;
       overflow: hidden;
       color: #2c4a38;
     }
-    body.home::before { display: none !important; }
     .bloom {
-      position: fixed; left: 50%; top: 40%;
-      width: min(640px, 88vw); height: 70vh;
+      position: fixed;
+      left: 50%;
+      top: 38%;
+      width: min(620px, 86vw);
+      height: 68vh;
       transform: translate(-50%, -50%);
-      pointer-events: none; z-index: 1;
+      pointer-events: none;
+      z-index: 1;
     }
     .branch {
-      position: absolute; bottom: 0; opacity: 0;
-      transform-origin: 50% 100%;
-      animation: appear .9s ease forwards;
+      position: absolute;
+      bottom: 0;
+      opacity: 0;
+      animation: fadeIn .8s ease forwards;
     }
-    .b1 { left: 2%; height: 78%; animation-delay: .1s; animation-name: appear, sway1; animation-duration: .9s, 6s; animation-timing-function: ease, ease-in-out; animation-iteration-count: 1, infinite; animation-delay: .05s, 1s; }
-    .b2 { left: 18%; height: 88%; animation-name: appear, sway2; animation-duration: .9s, 7s; animation-timing-function: ease, ease-in-out; animation-iteration-count: 1, infinite; animation-delay: .15s, 1.1s; }
-    .b3 { left: 38%; height: 94%; animation-name: appear, sway3; animation-duration: .9s, 8s; animation-timing-function: ease, ease-in-out; animation-iteration-count: 1, infinite; animation-delay: .25s, 1.2s; }
-    .b4 { left: 56%; height: 84%; animation-name: appear, sway2; animation-duration: .9s, 6.5s; animation-timing-function: ease, ease-in-out; animation-iteration-count: 1, infinite; animation-delay: .2s, 1.15s; }
-    .b5 { left: 74%; height: 72%; animation-name: appear, sway1; animation-duration: .9s, 7.4s; animation-timing-function: ease, ease-in-out; animation-iteration-count: 1, infinite; animation-delay: .3s, 1.3s; }
-    .branch img { height: 100%; width: auto; display: block; }
-    .fly, .flowers, .flo, .flower, .bot-mar { display: none !important; }
+    .branch img {
+      height: 100%;
+      width: auto;
+      display: block;
+      transform-origin: 50% 100%;
+      will-change: transform;
+    }
+    .b1 { left: 0; height: 80%; animation-delay: .05s; }
+    .b2 { left: 18%; height: 90%; animation-delay: .12s; }
+    .b3 { left: 36%; height: 96%; animation-delay: .18s; }
+    .b4 { left: 54%; height: 86%; animation-delay: .14s; }
+    .b5 { left: 72%; height: 74%; animation-delay: .22s; }
+    .b1 img { animation: swayA 6.2s ease-in-out 1s infinite; }
+    .b2 img { animation: swayB 7s ease-in-out 1.1s infinite; }
+    .b3 img { animation: swayC 8s ease-in-out 1.2s infinite; }
+    .b4 img { animation: swayB 6.6s ease-in-out 1.15s infinite; }
+    .b5 img { animation: swayA 7.4s ease-in-out 1.25s infinite; }
 
     .stage { position: relative; z-index: 5; min-height: 100vh; }
     .box {
       position: absolute;
-      box-sizing: border-box;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translate(-50%, 0);
+      transition: left .25s ease, top .25s ease, width .25s ease, height .25s ease;
     }
-    body.is-admin .box { outline: 1px dashed rgba(44,74,56,.45); cursor: grab; }
+    body.is-admin .box { outline: 1px dashed rgba(44,74,56,.4); cursor: grab; transition: none; }
     body.is-admin .box.dragging { cursor: grabbing; outline-color: #2c4a38; }
-    #box-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    #box-logo { left: 50%; top: 10%; width: 260px; height: 210px; }
+    #box-logo img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
+    #box-turno { left: 50%; top: 68%; width: min(520px, 92vw); height: 58px; }
+    #box-cuenta { left: 50%; top: 78%; width: min(520px, 92vw); height: 58px; }
+    #box-login { left: 50%; top: 90%; width: 120px; height: 38px; }
     .btn-main {
       width: 100%; height: 100%;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -57,28 +78,30 @@
       text-decoration: none; background: var(--login, #fff); color: #6f8464;
       border-radius: 999px; font-weight: 700;
     }
-
     .editor {
-      display: none !important; position: fixed !important; top: 12px !important; right: 12px !important;
-      width: 270px !important; max-height: calc(100vh - 24px); overflow: auto;
-      background: #fff !important; border-radius: 16px !important; padding: 14px !important; z-index: 80 !important;
-      box-shadow: 0 12px 28px rgba(0,0,0,.16) !important;
+      display: none;
+      position: fixed; top: 12px; right: 12px;
+      width: 270px; max-height: calc(100vh - 24px); overflow: auto;
+      background: #fff; border-radius: 16px; padding: 14px; z-index: 80;
+      box-shadow: 0 12px 28px rgba(0,0,0,.16);
     }
-    body.is-admin .editor { display: block !important; }
+    body.is-admin .editor { display: block; }
     .editor h2 { font-size: 16px; margin: 0 0 6px; }
     .editor p, .editor h3 { font-size: 12px; margin: 10px 0 6px; }
     .editor .ed-row { display: flex; justify-content: space-between; align-items: center; margin: 7px 0; font-size: 12px; font-weight: 700; }
     .editor .ed-row.col { flex-direction: column; align-items: stretch; gap: 4px; }
-    .editor input[type="color"] { width: 42px !important; height: 28px !important; max-width: 42px !important; padding: 0 !important; }
-    .editor input, .editor select { width: 120px !important; max-width: 120px !important; height: 28px !important; }
-    .editor input[type="range"] { width: 100% !important; max-width: 100% !important; }
-    @keyframes appear { from { opacity: 0; transform: translateY(16px); } to { opacity: .7; transform: none; } }
-    @keyframes sway1 { 0%,100% { transform: rotate(-1.4deg); } 50% { transform: rotate(1.6deg); } }
-    @keyframes sway2 { 0%,100% { transform: rotate(1.2deg); } 50% { transform: rotate(-1.8deg); } }
-    @keyframes sway3 { 0%,100% { transform: rotate(-.6deg); } 50% { transform: rotate(1.1deg); } }
+    .editor input[type="color"] { width: 42px; height: 28px; padding: 0; border: 0; background: none; }
+    .editor input, .editor select { width: 120px; height: 28px; }
+    .editor input[type="range"] { width: 100%; }
+    .editor button, .editor a { font-size: 13px; font-weight: 800; color: #2c4a38; margin-right: 8px; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: .72; } }
+    @keyframes swayA { 0%,100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.7deg); } }
+    @keyframes swayB { 0%,100% { transform: rotate(1.3deg); } 50% { transform: rotate(-1.8deg); } }
+    @keyframes swayC { 0%,100% { transform: rotate(-.5deg); } 50% { transform: rotate(1.2deg); } }
   </style>
 </head>
-<body class="home">
+<body>
   <div class="bloom">
     <div class="branch b1"><img src="branch-1.png" alt="" /></div>
     <div class="branch b2"><img src="branch-2.png" alt="" /></div>

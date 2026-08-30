@@ -15,16 +15,24 @@ const DEFAULT_THEME = {
   }
 };
 
+function cloneTheme(base) {
+  return JSON.parse(JSON.stringify(base));
+}
+
 function getTheme() {
   try {
     const saved = JSON.parse(localStorage.getItem(THEME_KEY)) || {};
-    return {
-      ...DEFAULT_THEME,
-      ...saved,
-      boxes: { ...DEFAULT_THEME.boxes, ...(saved.boxes || {}) }
-    };
+    const theme = cloneTheme(DEFAULT_THEME);
+    Object.assign(theme, saved);
+    theme.boxes = cloneTheme(DEFAULT_THEME.boxes);
+    if (saved.boxes) {
+      Object.keys(theme.boxes).forEach((key) => {
+        theme.boxes[key] = { ...theme.boxes[key], ...(saved.boxes[key] || {}) };
+      });
+    }
+    return theme;
   } catch (err) {
-    return JSON.parse(JSON.stringify(DEFAULT_THEME));
+    return cloneTheme(DEFAULT_THEME);
   }
 }
 
@@ -50,13 +58,14 @@ function applyBoxes(theme) {
 function applyTheme(theme) {
   const t = theme || getTheme();
   const root = document.documentElement;
+  if (!document.body) return;
   root.style.setProperty("--bg", t.bg);
   root.style.setProperty("--btn1", t.btn1);
   root.style.setProperty("--btn2", t.btn2);
   root.style.setProperty("--login", t.login);
   root.style.setProperty("--font", t.font);
   document.body.style.fontFamily = t.font;
-  if (document.body.classList.contains("home")) {
+  if (document.getElementById("box-logo")) {
     document.body.style.background = t.bg;
   }
   applyBoxes(t);
@@ -79,19 +88,16 @@ function logout() {
   sessionStorage.removeItem(AUTH_KEY);
 }
 
-function injectFlowers() { return; }
-function startBot() { return; }
-
 function bindEditor() {
   const editor = document.getElementById("editor");
   if (!editor || !isLogged()) return;
   document.body.classList.add("is-admin");
-  const theme = getTheme();
+
   const colorMap = { bg: "bg", btn1: "btn1", btn2: "btn2", loginColor: "login" };
   Object.keys(colorMap).forEach((id) => {
     const el = document.getElementById(id);
     if (!el) return;
-    el.value = theme[colorMap[id]];
+    el.value = getTheme()[colorMap[id]];
     el.addEventListener("input", () => {
       const next = getTheme();
       next[colorMap[id]] = el.value;
@@ -124,12 +130,14 @@ function bindEditor() {
       e.preventDefault();
       el.classList.add("dragging");
       const name = el.dataset.box;
+      nameEl.value = name;
+      fillSliders();
       const move = (ev) => {
         const next = getTheme();
-        next.boxes[name].x = Math.max(8, Math.min(92, (ev.clientX / window.innerWidth) * 100));
-        next.boxes[name].y = Math.max(4, Math.min(92, (ev.clientY / window.innerHeight) * 100));
+        next.boxes[name].x = Math.round(Math.max(8, Math.min(92, (ev.clientX / window.innerWidth) * 100)));
+        next.boxes[name].y = Math.round(Math.max(4, Math.min(92, (ev.clientY / window.innerHeight) * 100)));
         saveTheme(next);
-        if (nameEl.value === name) fillSliders();
+        fillSliders();
       };
       const up = () => {
         el.classList.remove("dragging");
@@ -142,13 +150,15 @@ function bindEditor() {
   });
 
   document.getElementById("reset").addEventListener("click", () => {
-    saveTheme(JSON.parse(JSON.stringify(DEFAULT_THEME)));
+    const fresh = cloneTheme(DEFAULT_THEME);
+    saveTheme(fresh);
     Object.keys(colorMap).forEach((id) => {
       const el = document.getElementById(id);
-      if (el) el.value = DEFAULT_THEME[colorMap[id]];
+      if (el) el.value = fresh[colorMap[id]];
     });
     fillSliders();
   });
+
   document.getElementById("salir").addEventListener("click", (e) => {
     e.preventDefault();
     logout();
@@ -160,4 +170,3 @@ document.addEventListener("DOMContentLoaded", () => {
   applyTheme();
   bindEditor();
 });
-applyTheme();
