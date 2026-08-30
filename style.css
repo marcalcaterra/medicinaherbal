@@ -356,3 +356,74 @@ body.is-admin .wrap { padding-left: 0; }
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: .4; transform: scale(.8); }
 }
+
+.editor {
+  display: none !important;
+  position: fixed !important;
+  top: 16px !important;
+  right: 16px !important;
+  left: auto !important;
+  width: 260px !important;
+  max-width: 260px !important;
+  max-height: calc(100vh - 32px) !important;
+  overflow: auto !important;
+  background: #fff !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,.16) !important;
+  padding: 14px !important;
+  z-index: 80 !important;
+}
+body.is-admin .editor { display: block !important; }
+body.is-admin .wrap {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  width: min(820px, calc(100% - 28px)) !important;
+}
+.editor .ed-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+.editor .ed-row.col { flex-direction: column; align-items: stretch; }
+.editor input,
+.editor select,
+.editor textarea {
+  width: 120px !important;
+  max-width: 120px !important;
+  height: 30px !important;
+  padding: 0 6px !important;
+}
+.editor input[type="color"] {
+  width: 46px !important;
+  max-width: 46px !important;
+  height: 30px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+.editor input[type="range"] {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+.editor .ed-actions { margin-top: 10px; }
+.editor button, .editor a { font-size: 13px; font-weight: 800; color: var(--btn1); }
+
+.flo {
+  position: absolute;
+  height: 160px;
+  width: auto;
+  opacity: .38;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.f1 { top: 4%; left: -12%; animation: crossA 16s infinite; }
+.f2 { top: 22%; left: -16%; animation: crossB 19s infinite; animation-delay: -3s; height: 140px; }
+.f3 { top: 48%; left: -14%; animation: crossA 18s infinite; animation-delay: -8s; height: 150px; }
+.f4 { top: 8%; right: -12%; animation: crossC 21s infinite; height: 130px; }
+.f5 { top: 40%; right: -14%; animation: crossC 17s infinite; animation-delay: -5s; height: 170px; }
+.f6 { top: 72%; left: -12%; animation: crossB 23s infinite; animation-delay: -10s; height: 150px; }
+.f7 { top: 82%; right: -10%; animation: crossA 20s infinite; animation-delay: -2s; height: 120px; }
+.f8 { top: 34%; left: 35%; animation: crossB 15s infinite; animation-delay: -6s; height: 110px; }
