@@ -92,7 +92,7 @@
     .editor input[type="range"] { width:100%; }
     .view { display:none; position:relative; z-index:6; padding:16px; min-height:100vh; }
     .view.on { display:flex; align-items:center; justify-content:center; }
-    #view-turno.on,#view-cal.on,#view-hist.on,#view-ficha.on,#view-owner.on,#view-conf.on,#view-registro.on,#view-recupero.on,#view-users.on { align-items:flex-start; padding-top:6vh; }
+    #view-turno.on,#view-cal.on,#view-hist.on,#view-ficha.on,#view-owner.on,#view-conf.on,#view-registro.on,#view-recupero.on,#view-users.on { align-items:flex-start; padding-top:6vh; padding-bottom:8vh; overflow:auto; }
     #view-portal.on { align-items:center; justify-content:center; padding-top:4vh; padding-bottom:4vh; }
     .top { display:flex; justify-content:space-between; margin-bottom:12px; }
     .top button { border:0; background:transparent; font:600 14px "Cormorant Garamond",serif; color:#4a5740; }
@@ -510,17 +510,14 @@
         <div class="toast" id="owToast">Datos guardados.</div>
       </div>
       <h1 style="margin-top:22px">Nube Firebase</h1>
-      <p class="lead">Para que el calendario, los turnos y los archivos se vean iguales en todos los celulares y computadoras.</p>
+      <p class="lead">Pegá acá el recuadro entero que te muestra Firebase (el que dice firebaseConfig). No hace falta separar casilla por casilla.</p>
       <div class="card">
         <p id="fbState" style="margin:0 0 12px;color:#4a5740">Todavía no está conectada.</p>
-        <div class="field"><label>apiKey</label><input id="fbApiKey" type="text" placeholder="AIza..."></div>
-        <div class="field"><label>authDomain</label><input id="fbAuth" type="text" placeholder="proyecto.firebaseapp.com"></div>
-        <div class="field"><label>projectId</label><input id="fbProject" type="text" placeholder="proyecto-id"></div>
-        <div class="field"><label>storageBucket</label><input id="fbBucket" type="text" placeholder="proyecto.appspot.com"></div>
-        <div class="field"><label>messagingSenderId</label><input id="fbSender" type="text" placeholder="123456789"></div>
-        <div class="field"><label>appId</label><input id="fbApp" type="text" placeholder="1:123:web:abc"></div>
-        <button class="save" type="button" id="fbConnect">Conectar y sincronizar</button>
-        <p style="margin:12px 0 0;color:#6b5c4c;font-size:13px;line-height:1.45">En Firebase: creá un proyecto → App web → copiá esa config. Activá Firestore y Storage. En reglas de ambos, para empezar: allow read, write: if true;</p>
+        <div class="field"><label>Pegá todo el bloque firebaseConfig</label>
+          <textarea id="fbPaste" rows="8" placeholder='const firebaseConfig = {&#10;  apiKey: "...",&#10;  authDomain: "...",&#10;  projectId: "...",&#10;  storageBucket: "...",&#10;  messagingSenderId: "...",&#10;  appId: "..."&#10;};' style="width:100%;min-height:160px;border:1px solid #d8cbb8;border-radius:22px;padding:14px 16px;background:#fffdf9;font:15px Nunito,sans-serif;color:#4a5740;resize:vertical;line-height:1.45"></textarea>
+        </div>
+        <button class="save" type="button" id="fbConnect">Guardar y conectar</button>
+        <p style="margin:12px 0 0;color:#6b5c4c;font-size:13px;line-height:1.45">También tenés que tener Firestore creado en modo prueba. Si no conecta, primero creá la base en Compilación → Firestore.</p>
       </div>
       <h1 style="margin-top:22px">Avisos del bot</h1>
       <div id="inboxList"></div>
@@ -555,6 +552,15 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 let fbDb=null, fbSt=null, fbReady=false, fbListen=false;
 function getFbCfg(){try{return Object.assign({apiKey:"",authDomain:"",projectId:"",storageBucket:"",messagingSenderId:"",appId:""}, JSON.parse(localStorage.getItem(FB_KEY)||"{}"));}catch(e){return {apiKey:"",authDomain:"",projectId:"",storageBucket:"",messagingSenderId:"",appId:""};}}
 function saveFbCfg(c){localStorage.setItem(FB_KEY,JSON.stringify(c));}
+function parseFbPaste(text){
+  const out={apiKey:"",authDomain:"",projectId:"",storageBucket:"",messagingSenderId:"",appId:""};
+  Object.keys(out).forEach(function(k){
+    const re=new RegExp(k+"\\s*:\\s*[\"']([^\"']+)[\"']");
+    const m=String(text||"").match(re);
+    if(m) out[k]=m[1].trim();
+  });
+  return out;
+}
 function fbOn(){return !!(fbReady && fbDb);}
 function cloudPut(col,id,data){ if(!fbOn()) return Promise.resolve(); return fbDb.collection(col).doc(id).set(data,{merge:true}).catch(function(){}); }
 function cloudDel(col,id){ if(!fbOn()) return Promise.resolve(); return fbDb.collection(col).doc(id).delete().catch(function(){}); }
@@ -906,9 +912,10 @@ function renderOwner(){
   document.getElementById("owTel").value=o.whatsapp||"";
   document.getElementById("owKey").value=o.apikey||"";
   const cfg=getFbCfg();
-  const setv=function(id,v){ const el=document.getElementById(id); if(el) el.value=v||""; };
-  setv("fbApiKey", cfg.apiKey); setv("fbAuth", cfg.authDomain); setv("fbProject", cfg.projectId);
-  setv("fbBucket", cfg.storageBucket); setv("fbSender", cfg.messagingSenderId); setv("fbApp", cfg.appId);
+  const paste=document.getElementById("fbPaste");
+  if(paste && !paste.value && cfg.apiKey){
+    paste.value="{\n  apiKey: \""+cfg.apiKey+"\",\n  authDomain: \""+(cfg.authDomain||"")+"\",\n  projectId: \""+(cfg.projectId||"")+"\",\n  storageBucket: \""+(cfg.storageBucket||"")+"\",\n  messagingSenderId: \""+(cfg.messagingSenderId||"")+"\",\n  appId: \""+(cfg.appId||"")+"\"\n}";
+  }
   const st=document.getElementById("fbState");
   if(st) st.textContent=fbOn()?"Conectada. Los cambios se ven en todos los dispositivos.":"Todavía no está conectada.";
   const box=document.getElementById("inboxList");
@@ -1045,16 +1052,20 @@ document.getElementById("owSave").onclick=()=>{
   updateWa();
 };
 document.getElementById("fbConnect").onclick=async ()=>{
-  saveFbCfg({
-    apiKey:document.getElementById("fbApiKey").value.trim(),
-    authDomain:document.getElementById("fbAuth").value.trim(),
-    projectId:document.getElementById("fbProject").value.trim(),
-    storageBucket:document.getElementById("fbBucket").value.trim(),
-    messagingSenderId:document.getElementById("fbSender").value.trim(),
-    appId:document.getElementById("fbApp").value.trim()
-  });
+  const st=document.getElementById("fbState");
+  const parsed=parseFbPaste(document.getElementById("fbPaste").value);
+  if(!parsed.apiKey || !parsed.projectId){
+    if(st) st.textContent="Pegá el recuadro completo. Falta apiKey o projectId.";
+    return;
+  }
+  if(!parsed.appId){
+    if(st) st.textContent="Falta appId. En Firebase bajá un poco el recuadro negro y copiá también esa línea.";
+    return;
+  }
+  saveFbCfg(parsed);
+  if(st) st.textContent="Conectando...";
   const ok=await startFirebase();
-  document.getElementById("fbState").textContent=ok?"Conectada. Los cambios se ven en todos los dispositivos.":"No conectó. Revisá la config y las reglas.";
+  if(st) st.textContent=ok?"Guardado y conectado. Ya se sincroniza en todos los dispositivos.":"Se guardó la config, pero Firestore todavía no responde. Creá la base: Compilación → Firestore → Crear (modo prueba).";
 };
 document.getElementById("addPac").onclick=()=>{
   const nombre=document.getElementById("nuevoNombre").value.trim(); if(!nombre) return;
