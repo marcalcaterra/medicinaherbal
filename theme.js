@@ -1,16 +1,16 @@
-const THEME_KEY = "mar_theme_v2";
+const THEME_KEY = "mar_theme_v3";
 const AUTH_KEY = "mar_auth";
 
 const DEFAULT_THEME = {
-  bg: "#e7eee3",
+  bg: "#96ab82",
   card: "#ffffff",
   btn1: "#2c4a38",
   btn2: "#ffffff",
-  login: "#dce7d4",
+  login: "#ffffff",
   font: '"Nunito", sans-serif',
   logoX: 50,
-  logoY: 50,
-  logoSize: 210
+  logoY: 18,
+  logoSize: 260
 };
 
 function getTheme() {

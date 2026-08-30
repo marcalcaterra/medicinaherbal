@@ -5,25 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mar | Terapia y Medicina Herbal</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="logo-dark.png" />
+  <link rel="icon" href="logo.png" />
 </head>
-<body>
-  <div class="flowers" aria-hidden="true">
-    <img class="flo f1" src="poppy.png" alt="" />
-    <img class="flo f2" src="yellow.png" alt="" />
-    <img class="flo f3" src="blue.png" alt="" />
-    <img class="flo f4" src="daisy.png" alt="" />
-    <img class="flo f5" src="lupine.png" alt="" />
-    <img class="flo f6" src="thistle.png" alt="" />
-    <img class="flo f7" src="yellow.png" alt="" />
-    <img class="flo f8" src="blue.png" alt="" />
+<body class="home">
+  <div class="bloom" aria-hidden="true">
+    <img class="bouquet" src="bouquet.jpg" alt="" />
+    <img class="fly fly-a" src="sage-poppy.png" alt="" />
+    <img class="fly fly-b" src="sage-yellow.png" alt="" />
+    <img class="fly fly-c" src="sage-blue.png" alt="" />
+    <img class="fly fly-d" src="sage-daisy.png" alt="" />
+    <img class="fly fly-e" src="sage-lupine.png" alt="" />
+    <img class="fly fly-f" src="sage-thistle.png" alt="" />
+    <img class="fly fly-g" src="sage-blue.png" alt="" />
+    <img class="fly fly-h" src="sage-daisy.png" alt="" />
   </div>
 
   <aside class="editor" id="editor">
     <h2>Editar en vivo</h2>
     <p>Los cambios se ven en esta misma página.</p>
     <div class="ed-row"><span>Fondo</span><input id="bg" type="color" /></div>
-    <div class="ed-row"><span>Tarjetas</span><input id="card" type="color" /></div>
     <div class="ed-row"><span>Botón Agendá</span><input id="btn1" type="color" /></div>
     <div class="ed-row"><span>Botón Ingresá</span><input id="btn2" type="color" /></div>
     <div class="ed-row"><span>Login</span><input id="login" type="color" /></div>
@@ -37,35 +37,30 @@
       </select>
     </div>
     <div class="ed-row col"><span>Logo horizontal</span><input id="logoX" type="range" min="10" max="90" /></div>
-    <div class="ed-row col"><span>Logo vertical</span><input id="logoY" type="range" min="10" max="90" /></div>
-    <div class="ed-row col"><span>Tamaño logo</span><input id="logoSize" type="range" min="120" max="360" /></div>
+    <div class="ed-row col"><span>Logo vertical</span><input id="logoY" type="range" min="8" max="60" /></div>
+    <div class="ed-row col"><span>Tamaño logo</span><input id="logoSize" type="range" min="140" max="420" /></div>
     <div class="ed-actions">
       <button type="button" id="reset">Restablecer</button>
       <a href="#" id="salir">Salir</a>
     </div>
   </aside>
 
-  <main class="wrap">
-    <section class="card logo-card">
-      <div class="logo-wrap" id="logoWrap">
-        <img src="logo-dark.png" alt="Mar Terapia y Medicina Herbal" onerror="this.onerror=null;this.src='logo.png';" />
-      </div>
-    </section>
-
-    <section class="actions">
-      <a class="pill pill-dark" href="turno.html">
+  <main class="stage">
+    <div class="logo-wrap" id="logoWrap">
+      <img src="logo.png" alt="Mar" onerror="this.src='logo-dark.png'" />
+    </div>
+    <div class="cta">
+      <a class="btn-main dark" href="turno.html">
         <b>Agendá tu turno</b>
         <small>Primera consulta o seguimiento</small>
       </a>
-      <a class="pill pill-light" href="cuenta.html">
+      <a class="btn-main light" href="cuenta.html">
         <b>Ingresá a tu cuenta</b>
         <small>Consultá o modificá turnos</small>
       </a>
-    </section>
-
-    <a class="login-bar" href="cuenta.html">Login</a>
+    </div>
+    <a class="login-pill" href="cuenta.html">Login</a>
   </main>
-
   <script src="theme.js"></script>
 </body>
 </html>
