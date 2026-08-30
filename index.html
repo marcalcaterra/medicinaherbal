@@ -632,7 +632,19 @@ function renderConf(){
   const box=document.getElementById("confList");
   const list=getInbox();
   if(!list.length){ box.innerHTML="<div class='card'>Todavía no hay turnos confirmados.</div>"; return; }
-  box.innerHTML=list.map(a=>"<div class='card' style='margin:0 0 10px'><b>"+(a.nombre||"")+"</b><p>Contacto: "+(a.tel||"-")+"<br>Día: "+(a.dia||"-")+" · Hora: "+(a.hora||"-")+"<br>Tipo: "+(a.tipo||"-")+"</p></div>").join("");
+  box.innerHTML=list.map(a=>"<div class='card' style='margin:0 0 10px'><b>"+(a.nombre||"")+"</b><p>Contacto: "+(a.tel||"-")+"<br>Día: "+(a.dia||"-")+" · Hora: "+(a.hora||"-")+"<br>Tipo: "+(a.tipo||"-")+"</p><button class='save' type='button' data-delturno='"+a.id+"' style='background:#9a5a52'>Eliminar turno</button></div>").join("");
+  box.querySelectorAll("[data-delturno]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.delturno;
+    const item=getInbox().find(x=>x.id===id);
+    if(!item||!confirm("¿Eliminar el turno de "+(item.nombre||"este paciente")+"?")) return;
+    saveInbox(getInbox().filter(x=>x.id!==id));
+    if(item.dia&&item.hora){
+      const ag=getAgenda();
+      ag.booked[item.dia]=(ag.booked[item.dia]||[]).filter(h=>h!==item.hora);
+      saveAgenda(ag);
+    }
+    renderConf();
+  });
 }
 function renderOwner(){
   const o=getOwner();
