@@ -45,12 +45,14 @@
     body.is-admin:not(.edit-mode) .admin-only { display:flex; }
     body.edit-mode .admin-only { display:none !important; }
     body.edit-mode .guest-only { display:flex !important; }
-    .estetica,.guardar,.dueno { display:none; position:fixed; z-index:90; border:0; border-radius:999px; padding:8px 14px; font:800 12px Nunito,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
+    .estetica,.guardar,.dueno,.users { display:none; position:fixed; z-index:90; border:0; border-radius:999px; padding:8px 14px; font:800 12px Nunito,sans-serif; letter-spacing:.08em; text-transform:uppercase; }
     .estetica { top:12px; right:12px; background:#2c4a38; color:#fff; }
     .dueno { top:12px; left:12px; background:#fff; color:#2c4a38; }
+    .users { top:52px; left:12px; background:#fff; color:#2c4a38; }
     .guardar { top:12px; left:12px; background:#fff; color:#2c4a38; }
     body.is-admin.page-home:not(.edit-mode) .estetica,
-    body.is-admin.page-home:not(.edit-mode) .dueno { display:block; }
+    body.is-admin.page-home:not(.edit-mode) .dueno,
+    body.is-admin.page-home:not(.edit-mode) .users { display:block; }
     body.edit-mode .guardar { display:block; }
     .tipos { display:grid; gap:8px; margin:8px 0 12px; }
     .tipo { border:1px solid var(--sand-deep); background:#fffdf9; color:var(--ink); min-height:44px; font-weight:600; text-align:left; padding:8px 14px; border-radius:12px; font-family:var(--display); font-size:17px; }
@@ -68,7 +70,8 @@
     .editor input[type="range"] { width:100%; }
     .view { display:none; position:relative; z-index:6; padding:16px; min-height:100vh; }
     .view.on { display:flex; align-items:center; justify-content:center; }
-    #view-turno.on,#view-cal.on,#view-hist.on,#view-ficha.on,#view-owner.on,#view-conf.on,#view-portal.on,#view-registro.on,#view-recupero.on { align-items:flex-start; padding-top:6vh; }
+    #view-turno.on,#view-cal.on,#view-hist.on,#view-ficha.on,#view-owner.on,#view-conf.on,#view-registro.on,#view-recupero.on,#view-users.on { align-items:flex-start; padding-top:6vh; }
+    #view-portal.on { align-items:center; justify-content:center; padding-top:4vh; padding-bottom:4vh; }
     .top { display:flex; justify-content:space-between; margin-bottom:12px; }
     .top button { border:0; background:transparent; font:600 14px "Cormorant Garamond",serif; color:#4a5740; }
     .wrap { width:min(520px,92vw); margin:0 auto; }
@@ -187,6 +190,7 @@
   </div>
   <button class="estetica" id="btnEstetica" type="button">Estética</button>
   <button class="dueno" id="btnDueno" type="button" data-go="owner">Datos de dueño</button>
+  <button class="users" id="btnUsers" type="button" data-go="users">Usuarios</button>
   <button class="guardar" id="btnGuardar" type="button">Guardar</button>
   <aside class="editor" id="editor">
     <h2>Editar en vivo</h2>
@@ -361,6 +365,14 @@
       <div id="libList"></div>
     </div>
   </section>
+  <section class="view" id="view-users">
+    <div class="wrap">
+      <div class="top"><button type="button" data-go="home">← Inicio</button><button type="button" class="do-salir">Salir</button></div>
+      <h1>Panel de usuarios</h1>
+      <p class="lead">Cuentas creadas, contraseñas y archivos de cada una.</p>
+      <div id="userPanel"></div>
+    </div>
+  </section>
   <section class="view" id="view-conf">
     <div class="wrap">
       <div class="top"><button type="button" data-go="home">← Inicio</button><button type="button" class="do-salir">Salir</button></div>
@@ -419,8 +431,9 @@ function getAcc(){try{return JSON.parse(localStorage.getItem(ACC_KEY))||[];}catc
 function saveAcc(a){localStorage.setItem(ACC_KEY,JSON.stringify(a));}
 function upsertAcc(a){const list=getAcc();const i=list.findIndex(x=>String(x.user||"").toLowerCase()===String(a.user||"").toLowerCase());if(i>=0)list[i]={...list[i],...a};else list.push(a);saveAcc(list);}
 function findPacLogin(u,p){u=String(u).trim().toLowerCase();p=String(p);return getAcc().find(x=>String(x.user||"").toLowerCase()===u&&String(x.pass||"")===p)||getPacs().find(x=>String(x.user||"").toLowerCase()===u&&String(x.pass||"")===p)||null;}
-function getFiles(){try{return JSON.parse(localStorage.getItem(FILES_KEY))||{guia:[],recetas:[]};}catch(e){return{guia:[],recetas:[]};}}
+function getFiles(){try{const f=JSON.parse(localStorage.getItem(FILES_KEY))||{}; return {guia:f.guia||[],recetas:f.recetas||[],users:f.users||{}};}catch(e){return{guia:[],recetas:[],users:{}};}}
 function saveFiles(f){localStorage.setItem(FILES_KEY,JSON.stringify(f));}
+function filesOf(user,tab){const f=getFiles(); if(!user) return f[tab]||[]; f.users[user]=f.users[user]||{guia:[],recetas:[]}; return f.users[user][tab]||[];}
 function pad(n){return String(n).padStart(2,"0");}
 function isoDay(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
 function isSunday(date){return new Date(date+"T12:00:00").getDay()===0;}
@@ -451,7 +464,7 @@ function go(name){
   document.getElementById("home").style.display=name==="home"?"block":"none";
   document.body.classList.toggle("page-home",name==="home");
   if(name!=="home") document.getElementById("view-"+name).classList.add("on");
-  if(name==="cal"||name==="hist"||name==="ficha"||name==="owner"||name==="conf"){ if(!isLogged()) return go("login"); }
+  if(name==="cal"||name==="hist"||name==="ficha"||name==="owner"||name==="conf"||name==="users"){ if(!isLogged()) return go("login"); }
   if(name==="portal" && !isLogged() && !currentPacUser()) return go("login");
   if(name==="cal") renderCal();
   if(name==="hist") renderHist();
@@ -459,6 +472,7 @@ function go(name){
   if(name==="owner") renderOwner();
   if(name==="conf") renderConf();
   if(name==="portal") renderPortal();
+  if(name==="users") renderUsers();
   window.scrollTo(0,0);
 }
 
@@ -758,7 +772,8 @@ function renderPortal(){
     box.innerHTML=(!mine.length?"<div class='card'>Todavía no tenés turnos cargados.</div>":mine.map(t=>"<div class='card' style='margin:0 0 10px'><b>"+(t.tipo||"Turno")+"</b><p>"+t.dia+" · "+t.hora+"</p></div>").join(""));
     return;
   }
-  const files=getFiles()[libTab]||[];
+  const me=currentPacUser();
+  const files=isLogged()? (getFiles()[libTab]||[]) : filesOf(me&&me.user, libTab);
   if(!files.length){ box.innerHTML="<div class='card'>Todavía no hay archivos en esta sección.</div>"; return; }
   box.innerHTML=files.map(f=>{
     const del=isLogged()?" <button type='button' class='save' data-del='"+f.id+"' style='width:auto;height:34px;padding:0 12px;margin:8px 0 0'>Quitar</button>":"";
@@ -767,6 +782,36 @@ function renderPortal(){
   }).join("");
   box.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
     const all=getFiles(); all[libTab]=(all[libTab]||[]).filter(x=>x.id!==b.dataset.del); saveFiles(all); renderPortal();
+  });
+}
+function renderUsers(){
+  const box=document.getElementById("userPanel");
+  const acc=getAcc();
+  if(!acc.length){ box.innerHTML="<div class='card'>Todavía no hay usuarios creados.</div>"; return; }
+  box.innerHTML=acc.map((a,i)=>{
+    const g=filesOf(a.user,"guia"), r=filesOf(a.user,"recetas");
+    return "<div class='card' style='margin:0 0 12px' data-u='"+a.user+"'><b>"+(a.nombre||a.user)+"</b><p>Usuario: <b>"+a.user+"</b><br>Contraseña: <b>"+(a.pass||"-")+"</b><br>Tel: "+(a.telefono||"-")+"</p><p>Guía: "+g.length+" archivo(s) · Recetas: "+r.length+" archivo(s)</p><label>Asignar a Guía mensual</label><input type='file' data-as='guia'><label>Asignar a Recetas</label><input type='file' data-as='recetas'><div>"+g.concat(r).map(f=>"<div class='file-card'>"+f.name+" <button type='button' data-kill='"+f.id+"'>Quitar</button></div>").join("")+"</div><button class='save' type='button' data-drop='1' style='background:#9a5a52'>Eliminar usuario</button></div>";
+  }).join("");
+  box.querySelectorAll("[data-drop]").forEach(b=>b.onclick=()=>{
+    const u=b.closest("[data-u]").dataset.u;
+    if(!confirm("¿Eliminar el usuario "+u+"?")) return;
+    saveAcc(getAcc().filter(x=>x.user!==u));
+    const f=getFiles(); if(f.users) delete f.users[u]; saveFiles(f);
+    renderUsers();
+  });
+  box.querySelectorAll("[data-as]").forEach(inp=>inp.onchange=e=>{
+    const file=e.target.files&&e.target.files[0]; if(!file) return;
+    if(file.size>1500000){ alert("Hasta 1,5 MB."); e.target.value=""; return; }
+    const u=inp.closest("[data-u]").dataset.u, tab=inp.dataset.as;
+    const reader=new FileReader();
+    reader.onload=()=>{ const all=getFiles(); all.users[u]=all.users[u]||{guia:[],recetas:[]}; all.users[u][tab]=all.users[u][tab]||[]; all.users[u][tab].push({id:"f"+Date.now(),name:file.name,type:file.type,data:reader.result}); saveFiles(all); renderUsers(); };
+    reader.readAsDataURL(file);
+  });
+  box.querySelectorAll("[data-kill]").forEach(b=>b.onclick=()=>{
+    const u=b.closest("[data-u]").dataset.u, id=b.dataset.kill;
+    const all=getFiles(); const pack=all.users[u]||{guia:[],recetas:[]};
+    pack.guia=(pack.guia||[]).filter(x=>x.id!==id); pack.recetas=(pack.recetas||[]).filter(x=>x.id!==id);
+    all.users[u]=pack; saveFiles(all); renderUsers();
   });
 }
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{ libTab=t.dataset.lib; renderPortal(); });
