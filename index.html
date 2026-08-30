@@ -308,7 +308,7 @@
             </div>
           </div>
           <div class="field"><label>Nombre completo</label><input id="tNombre" type="text" required placeholder="Nombre y apellido"></div>
-          <div class="field"><label>Teléfono / contacto</label><input id="tTel" type="tel" required placeholder="WhatsApp o teléfono"></div>
+          <div class="field"><label>Teléfono / contacto</label><input id="tTel" type="tel" required placeholder="WhatsApp o teléfono"><small id="telLink" style="display:block;margin-top:6px;color:#5c6f4e"></small></div>
           <button class="save" type="submit">Guardar turno</button>
           <div class="toast" id="tToast"></div>
         </form>
@@ -597,6 +597,8 @@ function drawCSlots(){
 function getOwner(){try{return Object.assign({nombre:"Javier",whatsapp:"",apikey:""}, JSON.parse(localStorage.getItem(OWNER_KEY))||{});}catch(e){return{nombre:"Javier",whatsapp:"",apikey:""};}}
 function saveOwner(o){localStorage.setItem(OWNER_KEY,JSON.stringify(o));}
 function waDigits(n){return String(n||"").replace(/\D/g,"");}
+function phoneKey(n){let d=waDigits(n); if(d.startsWith("54")&&d.length>10) d=d.slice(2); if(d.startsWith("9")&&d.length>=10) d=d.slice(1); if(d.startsWith("0")) d=d.slice(1); return d.slice(-10);}
+function findAccByPhone(tel){const k=phoneKey(tel); if(!k||k.length<6) return null; return getAcc().concat(getPacs()).find(x=>phoneKey(x.telefono||x.tel||"")===k)||null;}
 function getInbox(){try{return JSON.parse(localStorage.getItem(INBOX_KEY))||[];}catch(e){return [];}}
 function saveInbox(list){localStorage.setItem(INBOX_KEY,JSON.stringify(list));}
 function botAviso(turno){
@@ -745,12 +747,23 @@ document.getElementById("cAdd").onclick=()=>{
 document.getElementById("cSave").onclick=()=>{ document.getElementById("cToast").classList.add("show"); };
 let tTipo="";
 document.querySelectorAll("#tTipos .tipo").forEach(b=>b.onclick=()=>{ tTipo=b.dataset.tipo; document.querySelectorAll("#tTipos .tipo").forEach(x=>x.classList.remove("on")); b.classList.add("on"); });
+document.getElementById("tTel").addEventListener("input",()=>{
+  const acc=findAccByPhone(document.getElementById("tTel").value);
+  const n=document.getElementById("tNombre");
+  const hint=document.getElementById("telLink");
+  if(acc){
+    hint.textContent="Se vincula a la cuenta: "+(acc.user||acc.nombre);
+    if(acc.nombre && !n.value) n.value=acc.nombre;
+  } else hint.textContent="";
+});
 document.getElementById("tDatos").onsubmit=e=>{
   e.preventDefault(); if(!tDay||!tHour) return;
   if(!tTipo){ document.getElementById("tToast").textContent="Elegí el tipo de consulta."; document.getElementById("tToast").classList.add("show"); return; }
   const a=getAgenda(); a.booked[tDay]=a.booked[tDay]||[]; a.booked[tDay].push(tHour); saveAgenda(a);
   const nombre=document.getElementById("tNombre").value.trim(), tel=document.getElementById("tTel").value.trim();
-  botAviso({nombre,tel,dia:tDay,hora:tHour,tipo:tTipo});
+  const logged=currentPacUser();
+  const acc=logged||findAccByPhone(tel);
+  botAviso({nombre,tel,dia:tDay,hora:tHour,tipo:tTipo,user:acc&&acc.user?acc.user:""});
   const ow=getOwner();
   sendWa(ow.whatsapp, "Nuevo turno Mar\nNombre: "+nombre+"\nContacto: "+tel+"\nDía: "+tDay+"\nHora: "+tHour+"\nTipo: "+tTipo);
   document.getElementById("tToast").textContent="Turno confirmado. El estudio ya recibió tu reserva.";
@@ -781,8 +794,9 @@ function renderPortal(){
   if(libTab==="turnos"){
     const me=currentPacUser()||{};
     const mine=getInbox().filter(t=>{
-      const tel=waDigits(t.tel), mineTel=waDigits(me.telefono||me.tel||"");
-      return (mineTel && tel===mineTel) || (me.nombre && t.nombre && t.nombre.toLowerCase()===String(me.nombre).toLowerCase());
+      if(me.user && t.user && String(t.user).toLowerCase()===String(me.user).toLowerCase()) return true;
+      const k=phoneKey(t.tel), mineK=phoneKey(me.telefono||me.tel||"");
+      return (mineK && k===mineK) || (me.nombre && t.nombre && t.nombre.toLowerCase()===String(me.nombre).toLowerCase());
     });
     if(isLogged()) {
       const all=getInbox();
