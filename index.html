@@ -87,6 +87,34 @@
     .login-pill {
       background: var(--login); color: #6f8464; font-weight: 700; font-size: var(--font-size);
     }
+    .admin-link {
+      display: none;
+      position: fixed;
+      left: 12px;
+      bottom: 12px;
+      z-index: 70;
+      background: #2c4a38;
+      color: #fff;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 10px 12px;
+      border-radius: 999px;
+    }
+    body.is-admin .admin-link { display: inline-block; }
+    @media (max-width: 720px) {
+      .bloom { top: 30%; width: 100vw; height: 50vh; }
+      #box-logo { width: min(230px, 62vw) !important; height: 190px !important; top: 7% !important; }
+      #box-turno, #box-cuenta {
+        width: 100vw !important;
+        left: 50% !important;
+        height: 70px !important;
+      }
+      #box-turno { top: auto !important; bottom: 148px !important; }
+      #box-cuenta { top: auto !important; bottom: 76px !important; }
+      #box-login { top: auto !important; bottom: 18px !important; width: 140px !important; height: 42px !important; }
+      .editor { width: calc(100% - 24px); left: 12px; right: 12px; max-height: 42vh; }
+    }
     .editor {
       display: none;
       position: fixed; top: 12px; right: 12px;
@@ -167,11 +195,13 @@
     <div class="ed-row col"><span>Alto</span><input id="boxH" type="range" min="36" max="360" /></div>
     <div class="ed-row col"><span>Redondeo</span><input id="boxR" type="range" min="0" max="80" /></div>
     <div class="ed-actions">
+      <a href="calendario.html">Cargar calendario</a>
       <button type="button" id="reset">Restablecer</button>
       <a href="#" id="salir">Salir</a>
     </div>
   </aside>
 
+  <a class="admin-link" href="calendario.html">Cargar calendario</a>
   <main class="stage">
     <div class="box" id="box-logo" data-box="logo"><img src="logo.png" alt="Mar" /></div>
     <a class="box btn-main dark" id="box-turno" data-box="turno" href="turno.html">

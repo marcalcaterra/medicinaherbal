@@ -4,64 +4,139 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Agendá tu turno | Mar</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="logo-dark.png" />
+  <style>
+    :root { --bg:#96ab82; --ink:#2c4a38; --green:#2f7a4a; --red:#b4453b; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Nunito, "Segoe UI", sans-serif; background:#f3f6ef; color:var(--ink); }
+    .top { padding:16px; }
+    .back { color:var(--ink); font-weight:800; text-decoration:none; }
+    .wrap { width:min(560px, calc(100% - 24px)); margin:0 auto 32px; }
+    h1 { font-size:26px; margin:0 0 6px; }
+    .lead { color:#5b6d60; margin:0 0 16px; }
+    .cal { background:#fff; border-radius:18px; padding:16px; box-shadow:0 8px 24px rgba(28,51,40,.06); }
+    .cal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .cal-head button { border:0; background:#e7eee3; border-radius:10px; width:36px; height:36px; font-size:18px; }
+    .week, .days { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+    .week { text-align:center; font-size:11px; font-weight:800; color:#7a8b7d; margin-bottom:6px; }
+    .day { min-height:42px; border:0; border-radius:10px; font-weight:700; background:#ececec; color:#888; }
+    .day.green { background:#d7efd8; color:var(--green); }
+    .day.red { background:#f4d4d0; color:var(--red); }
+    .day.sel { outline:2px solid var(--ink); }
+    .legend { display:flex; gap:12px; font-size:12px; margin-top:12px; }
+    .dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:4px; }
+    .hours, .datos { display:none; margin-top:14px; }
+    .hours.show, .datos.show { display:block; }
+    .slots { display:flex; flex-wrap:wrap; gap:8px; }
+    .slot { border:0; border-radius:999px; padding:8px 12px; background:#e7eee3; font-weight:700; }
+    .slot.ok { background:var(--green); color:#fff; }
+    .slot.off { background:#f4d4d0; color:var(--red); opacity:.55; }
+    label { display:block; font-size:12px; font-weight:800; margin:10px 0 4px; }
+    input { width:100%; height:46px; border:1px solid #d7e0d2; border-radius:12px; padding:0 12px; font:inherit; }
+    .save { margin-top:14px; width:100%; height:48px; border:0; border-radius:12px; background:var(--ink); color:#fff; font-weight:800; }
+    .toast { display:none; margin-top:12px; padding:12px; border-radius:12px; background:#d7efd8; }
+    .toast.show { display:block; }
+  </style>
 </head>
 <body>
-  <div class="page">
-    <div class="topbar"><a class="back" href="index.html">← Inicio</a></div>
-    <section class="inner">
-      <h1>Agendá tu turno</h1>
-      <p class="lead">Reservá tu consulta de medicina herbal. Te confirmamos el horario.</p>
-      <form id="form-turno">
-        <div class="form-grid">
-          <div class="field">
-            <label for="nombre">Nombre y apellido</label>
-            <input id="nombre" required placeholder="Tu nombre" />
-          </div>
-          <div class="field">
-            <label for="telefono">Teléfono / WhatsApp</label>
-            <input id="telefono" required placeholder="Ej: 3401 555555" />
-          </div>
-          <div class="field">
-            <label for="fecha">Fecha</label>
-            <input id="fecha" type="date" required />
-          </div>
-          <div class="field">
-            <label for="hora">Horario</label>
-            <select id="hora" required>
-              <option value="">Elegí un horario</option>
-              <option>09:00</option>
-              <option>10:00</option>
-              <option>11:00</option>
-              <option>16:00</option>
-              <option>17:00</option>
-              <option>18:00</option>
-            </select>
-          </div>
-          <div class="field full">
-            <label for="servicio">Tipo de consulta</label>
-            <select id="servicio" required>
-              <option value="">Seleccioná una opción</option>
-              <option>Primera consulta</option>
-              <option>Seguimiento de tratamiento</option>
-              <option>Consulta de medicina herbal</option>
-              <option>Revisión de preparados</option>
-            </select>
-          </div>
-          <div class="field full">
-            <label for="motivo">Motivo de la consulta (opcional)</label>
-            <textarea id="motivo" placeholder="Contanos brevemente qué te gustaría trabajar"></textarea>
-          </div>
-        </div>
-        <div class="form-actions">
-          <button class="btn-submit" type="submit">Confirmar turno</button>
-        </div>
-        <div class="toast" id="toast-turno">Listo. Recibimos tu pedido de turno.</div>
+  <div class="top"><a class="back" href="index.html">← Inicio</a></div>
+  <div class="wrap">
+    <h1>Agendá tu turno</h1>
+    <p class="lead">Verde: hay lugar. Rojo: ocupado o no disponible.</p>
+    <section class="cal">
+      <div class="cal-head">
+        <button type="button" id="prev">‹</button>
+        <strong id="label"></strong>
+        <button type="button" id="next">›</button>
+      </div>
+      <div class="week"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+      <div class="days" id="days"></div>
+      <div class="legend">
+        <span><i class="dot" style="background:#2f7a4a"></i> Disponible</span>
+        <span><i class="dot" style="background:#b4453b"></i> Ocupado</span>
+      </div>
+      <div class="hours" id="hours">
+        <p id="dayTitle"></p>
+        <div class="slots" id="slots"></div>
+      </div>
+      <form class="datos" id="datos">
+        <label>Nombre completo</label>
+        <input id="nombre" required />
+        <label>Teléfono</label>
+        <input id="telefono" required placeholder="Ej: 3401 555555" />
+        <button class="save" type="submit">Guardar turno</button>
+        <div class="toast" id="toast">Turno guardado.</div>
       </form>
     </section>
   </div>
-  <script src="theme.js"></script>
-  <script src="main.js"></script>
+  <script src="agenda.js"></script>
+  <script>
+    let view = new Date(); view.setDate(1);
+    let pickedDay = null; let pickedHour = null;
+    const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+    function render() {
+      document.getElementById("label").textContent = months[view.getMonth()] + " " + view.getFullYear();
+      const first = new Date(view.getFullYear(), view.getMonth(), 1);
+      const start = (first.getDay() + 6) % 7;
+      const last = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+      const box = document.getElementById("days");
+      box.innerHTML = "";
+      for (let i = 0; i < start; i++) box.appendChild(document.createElement("div"));
+      for (let d = 1; d <= last; d++) {
+        const date = new Date(view.getFullYear(), view.getMonth(), d);
+        const id = isoDay(date);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "day " + dayStatus(id);
+        btn.textContent = d;
+        if (pickedDay === id) btn.classList.add("sel");
+        btn.onclick = () => chooseDay(id, date);
+        box.appendChild(btn);
+      }
+    }
+    function chooseDay(id, date) {
+      pickedDay = id; pickedHour = null;
+      document.getElementById("datos").classList.remove("show");
+      document.getElementById("hours").classList.add("show");
+      const free = freeHours(id);
+      document.getElementById("dayTitle").textContent = date.toLocaleDateString("es-AR", { weekday:"long", day:"numeric", month:"long" });
+      const slots = document.getElementById("slots");
+      slots.innerHTML = "";
+      const list = getAgenda().available[id] || [];
+      if (!list.length) {
+        slots.innerHTML = "<p>Este día no está disponible.</p>";
+        render(); return;
+      }
+      list.forEach((h) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "slot " + (free.includes(h) ? "ok" : "off");
+        b.textContent = h;
+        if (free.includes(h)) b.onclick = () => {
+          pickedHour = h;
+          document.querySelectorAll(".slot").forEach((x) => x.style.outline = "");
+          b.style.outline = "2px solid #2c4a38";
+          document.getElementById("datos").classList.add("show");
+        };
+        slots.appendChild(b);
+      });
+      render();
+    }
+    document.getElementById("prev").onclick = () => { view.setMonth(view.getMonth() - 1); render(); };
+    document.getElementById("next").onclick = () => { view.setMonth(view.getMonth() + 1); render(); };
+    document.getElementById("datos").addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!pickedDay || !pickedHour) return;
+      const ok = bookSlot(pickedDay, pickedHour, document.getElementById("nombre").value.trim(), document.getElementById("telefono").value.trim());
+      const toast = document.getElementById("toast");
+      toast.textContent = ok ? "Turno guardado para " + pickedDay + " a las " + pickedHour : "Ese horario ya no está libre.";
+      toast.classList.add("show");
+      if (ok) {
+        document.getElementById("datos").reset();
+        document.getElementById("datos").classList.remove("show");
+        chooseDay(pickedDay, new Date(pickedDay + "T12:00:00"));
+      }
+    });
+    render();
+  </script>
 </body>
 </html>

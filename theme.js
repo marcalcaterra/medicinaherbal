@@ -51,7 +51,7 @@ function applyBoxes(theme) {
     if (!el) return;
     const b = boxes[name];
     el.style.left = b.x + "%";
-    el.style.top = b.y + "%";
+    if (window.innerWidth > 720) el.style.top = b.y + "%";
     el.style.width = b.w + "px";
     el.style.height = b.h + "px";
     el.style.setProperty("border-radius", (b.r || 0) + "px", "important");

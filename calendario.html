@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cargar calendario | Mar</title>
+  <style>
+    :root { --ink:#2c4a38; --green:#2f7a4a; --red:#b4453b; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Nunito, "Segoe UI", sans-serif; background:#f3f6ef; color:var(--ink); }
+    .top { padding:16px; display:flex; justify-content:space-between; }
+    a { color:var(--ink); font-weight:800; text-decoration:none; }
+    .wrap { width:min(640px, calc(100% - 24px)); margin:0 auto 40px; }
+    h1 { font-size:26px; margin:0 0 6px; }
+    .lead { color:#5b6d60; margin:0 0 16px; }
+    .cal { background:#fff; border-radius:18px; padding:16px; }
+    .cal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .cal-head button { border:0; background:#e7eee3; border-radius:10px; width:36px; height:36px; }
+    .week, .days { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+    .week { font-size:11px; font-weight:800; text-align:center; color:#7a8b7d; margin-bottom:6px; }
+    .day { min-height:42px; border:0; border-radius:10px; font-weight:700; background:#f4d4d0; color:var(--red); }
+    .day.green { background:#d7efd8; color:var(--green); }
+    .day.sel { outline:2px solid var(--ink); }
+    .panel { margin-top:16px; }
+    .slots { display:flex; flex-wrap:wrap; gap:8px; }
+    .slot { border:0; border-radius:999px; padding:8px 12px; background:#f4d4d0; color:var(--red); font-weight:700; }
+    .slot.on { background:var(--green); color:#fff; }
+    .save { margin-top:14px; width:100%; height:48px; border:0; border-radius:12px; background:var(--ink); color:#fff; font-weight:800; }
+    .toast { display:none; margin-top:12px; padding:12px; border-radius:12px; background:#d7efd8; }
+    .toast.show { display:block; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <a href="index.html">← Inicio</a>
+    <a href="#" id="salir">Salir</a>
+  </div>
+  <div class="wrap">
+    <h1>Cargar calendario</h1>
+    <p class="lead">Marcá el día y encendé los horarios que querés dejar libres. El resto queda en rojo.</p>
+    <section class="cal">
+      <div class="cal-head">
+        <button type="button" id="prev">‹</button>
+        <strong id="label"></strong>
+        <button type="button" id="next">›</button>
+      </div>
+      <div class="week"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+      <div class="days" id="days"></div>
+      <div class="panel" id="panel">
+        <p id="dayTitle">Elegí un día</p>
+        <div class="slots" id="slots"></div>
+        <button class="save" type="button" id="save">Guardar día</button>
+        <div class="toast" id="toast">Calendario actualizado.</div>
+      </div>
+    </section>
+  </div>
+  <script src="theme.js"></script>
+  <script src="agenda.js"></script>
+  <script>
+    if (!isLogged()) window.location.href = "cuenta.html";
+    document.getElementById("salir").onclick = (e) => { e.preventDefault(); logout(); location.href = "index.html"; };
+
+    let view = new Date(); view.setDate(1);
+    let picked = null;
+    const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+    function render() {
+      document.getElementById("label").textContent = months[view.getMonth()] + " " + view.getFullYear();
+      const first = new Date(view.getFullYear(), view.getMonth(), 1);
+      const start = (first.getDay() + 6) % 7;
+      const last = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+      const box = document.getElementById("days");
+      box.innerHTML = "";
+      for (let i = 0; i < start; i++) box.appendChild(document.createElement("div"));
+      for (let d = 1; d <= last; d++) {
+        const date = new Date(view.getFullYear(), view.getMonth(), d);
+        const id = isoDay(date);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "day " + dayStatus(id);
+        btn.textContent = d;
+        if (picked === id) btn.classList.add("sel");
+        btn.onclick = () => openDay(id, date);
+        box.appendChild(btn);
+      }
+    }
+
+    function openDay(id, date) {
+      picked = id;
+      document.getElementById("dayTitle").textContent = date.toLocaleDateString("es-AR", { weekday:"long", day:"numeric", month:"long" });
+      const current = getAgenda().available[id] || [];
+      const slots = document.getElementById("slots");
+      slots.innerHTML = "";
+      HOURS.forEach((h) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "slot" + (current.includes(h) ? " on" : "");
+        b.textContent = h;
+        b.onclick = () => b.classList.toggle("on");
+        slots.appendChild(b);
+      });
+      render();
+    }
+
+    document.getElementById("save").onclick = () => {
+      if (!picked) return;
+      const hours = Array.from(document.querySelectorAll(".slot.on")).map((b) => b.textContent);
+      const agenda = getAgenda();
+      if (hours.length) agenda.available[picked] = hours;
+      else delete agenda.available[picked];
+      saveAgenda(agenda);
+      document.getElementById("toast").classList.add("show");
+      render();
+    };
+    document.getElementById("prev").onclick = () => { view.setMonth(view.getMonth() - 1); render(); };
+    document.getElementById("next").onclick = () => { view.setMonth(view.getMonth() + 1); render(); };
+    render();
+  </script>
+</body>
+</html>
