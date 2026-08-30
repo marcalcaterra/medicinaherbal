@@ -27,14 +27,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     :root { --bg:#96ab82; --btn1:#5c6f4e; --btn2:#fff; --login:#fff; --font:"Nunito",sans-serif; --display:"Cormorant Garamond",serif; --font-size:13px; --sway:7s; --enter:1.4s; --sand:#E6D7C6; --sand-deep:#D4C4B0; --ink:#4a5740; --row:#F4EBE0; }
-    * { box-sizing:border-box; }
-    html, body { margin:0; min-height:100%; }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { margin:0; min-height:100%; -webkit-text-size-adjust:100%; }
     body { font-family:var(--font); background:var(--bg); color:#2c4a38; }
+    img { max-width:100%; height:auto; }
+    button, a, .tab, .slot, .day { touch-action:manipulation; }
     body.page-home { height:100%; overflow:hidden; }
     .bloom { position:fixed; left:50%; top:38%; width:min(620px,86vw); height:68vh; transform:translate(-50%,-50%); pointer-events:none; z-index:1; }
     body:not(.page-home) .bloom { display:none; }
     .branch { position:absolute; bottom:0; opacity:0; }
-    .branch img { height:100%; display:block; transform-origin:50% 100%; }
+    .branch img { height:100%; width:auto; max-width:none; display:block; transform-origin:50% 100%; }
     .b1 { left:0; height:80%; animation:enterL var(--enter) ease forwards; }
     .b2 { left:18%; height:90%; animation:enterL var(--enter) ease .1s forwards; }
     .b3 { left:36%; height:96%; animation:enterC var(--enter) ease .16s forwards; }
@@ -161,8 +163,30 @@
     .tabs { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:14px; }
     .tab { min-height:56px; border:0; border-radius:16px; background:var(--btn2); color:var(--btn1); font-family:var(--display); font-size:16px; letter-spacing:.08em; text-transform:uppercase; }
     .tab.on { background:var(--btn1); color:#f7f1e8; }
-    .file-card { background:#fbf6ef; border-radius:16px; padding:12px 14px; margin:0 0 10px; }
-    .file-card a { color:#5c6f4e; font-weight:700; }
+    .file-card { background:#fbf6ef; border-radius:20px; padding:0; margin:0 0 16px; overflow:hidden; box-shadow:0 8px 22px rgba(74,87,64,.08); contain:layout paint; }
+    .file-card .media-frame { width:100%; background:#efe6d8; display:flex; align-items:center; justify-content:center; cursor:zoom-in; }
+    .file-card .media-frame img { display:block; width:100%; height:auto; max-height:min(70vh,720px); object-fit:contain; margin:0 auto; }
+    .file-card .media-frame.pdf { height:min(70vh,640px); cursor:default; }
+    .file-card .media-frame iframe { width:100%; height:100%; border:0; background:#fff; }
+    .file-card .doc-preview { min-height:160px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; background:#efe6d8; color:#5c6f4e; font-family:var(--display); font-size:22px; letter-spacing:.08em; }
+    .file-card .file-actions { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:12px 14px 14px; }
+    .file-card .dl, .file-card .openf {
+      display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:0 18px; border-radius:999px;
+      background:#5c6f4e; color:#f7f1e8 !important; text-decoration:none; border:0; cursor:pointer;
+      font-family:var(--display); letter-spacing:.08em; text-transform:uppercase; font-size:14px;
+    }
+    .file-card .openf { background:#c9b79f; color:#4a5740 !important; }
+    .file-card b, .file-card h1, .file-card h2, .file-card h3, .file-card .fname { display:none !important; }
+    .file-card .file-admin-name { display:none; }
+    .lightbox { display:none; position:fixed; inset:0; z-index:200; background:rgba(44,50,40,.94); align-items:center; justify-content:center; padding:10px; }
+    .lightbox.on { display:flex; }
+    .lightbox img { max-width:100%; max-height:100%; object-fit:contain; }
+    .lightbox .lb-close { position:absolute; top:12px; right:12px; min-height:44px; padding:0 16px; border:0; border-radius:999px; background:#fbf6ef; color:#5c6f4e; font-family:var(--display); letter-spacing:.08em; text-transform:uppercase; }
+    html { overflow-x:hidden; }
+    body { overscroll-behavior-y:contain; }
+    @media (prefers-reduced-motion: reduce) {
+      .branch, .branch img { animation:none !important; opacity:.72; }
+    }
     .install-pill { display:none; position:fixed; left:18px; bottom:18px; z-index:100; border:1px solid #d8cbb8; background:#fbf6ef; color:#5c6f4e; border-radius:999px; padding:10px 16px; font:600 12px Nunito,sans-serif; letter-spacing:.08em; text-transform:uppercase; box-shadow:0 8px 22px rgba(74,87,64,.12); }
     body.page-home:not(.is-admin):not(.edit-mode) .install-pill { display:block; }
     body.standalone .install-pill { display:none !important; }
@@ -200,6 +224,11 @@
       .btn-main b { font-size:13px; letter-spacing:.12em; }
       .btn-main small { font-size:10px; }
       .view h1 { font-size:28px; }
+      .tabs { gap:6px; }
+      .tab { min-height:48px; font-size:13px; letter-spacing:.04em; padding:0 4px; }
+      .welcome { font-size:17px; }
+      .file-card .media-frame img { max-height:62vh; }
+      .file-card .media-frame.pdf { height:62vh; }
       .days { min-height:240px; gap:4px; }
       .day { min-height:46px; font-size:15px; }
       .grid { grid-template-columns:1fr; }
@@ -211,6 +240,7 @@
       #box-turno,#box-cal { top:42%!important; }
       #box-cuenta,#box-hist { top:55%!important; }
       .btn-main b { font-size:12px; }
+      .tab { font-size:12px; min-height:44px; }
     }
     @keyframes enterL { from{opacity:0;transform:translate(-24px,28px)} to{opacity:.72;transform:none} }
     @keyframes enterC { from{opacity:0;transform:translate(0,36px)} to{opacity:.78;transform:none} }
@@ -219,6 +249,10 @@
   </style>
 </head>
 <body class="page-home">
+  <div class="lightbox" id="lightbox">
+    <button type="button" class="lb-close" id="lbClose">Cerrar</button>
+    <img id="lbImg" alt="">
+  </div>
   <div class="popup" id="popOk">
     <div class="boxp">
       <h3>Reserva realizada con éxito</h3>
@@ -886,6 +920,73 @@ document.getElementById("addPac").onclick=()=>{
   renderHist();
 };
 let libTab="guia";
+function esc(s){
+  return String(s||"").replace(/&/g,"&"+"amp;").replace(/</g,"&"+"lt;").replace(/>/g,"&"+"gt;").replace(/"/g,"&"+"quot;").replace(/'/g,"&#39;");
+}
+function fileKind(f){
+  const t=String(f.type||"").toLowerCase(), n=String(f.name||"").toLowerCase();
+  if(t.indexOf("image/")===0 || /\.(png|jpe?g|webp|gif|svg)$/.test(n)) return "image";
+  if(t.indexOf("pdf")>=0 || /\.pdf$/.test(n)) return "pdf";
+  return "file";
+}
+function dlName(f){
+  const k=fileKind(f);
+  if(k==="image"){ const m=String(f.name||"").match(/\.(png|jpe?g|webp|gif)$/i); return "archivo"+(m?m[0].toLowerCase():".jpg"); }
+  if(k==="pdf") return "archivo.pdf";
+  return "archivo";
+}
+function blobFromData(f){
+  try{
+    const parts=String(f.data||"").split(",");
+    const mime=(parts[0].match(/:(.*?);/)||[])[1]||f.type||"application/octet-stream";
+    const bin=atob(parts[1]||"");
+    const u8=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) u8[i]=bin.charCodeAt(i);
+    return URL.createObjectURL(new Blob([u8],{type:mime}));
+  }catch(e){ return f.data; }
+}
+function triggerDownload(f){
+  const name=dlName(f);
+  try{
+    const url=blobFromData(f);
+    const a=document.createElement("a");
+    a.href=url; a.download=name; a.rel="noopener";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ try{ URL.revokeObjectURL(url); }catch(e){} }, 2500);
+  }catch(e){
+    const a=document.createElement("a"); a.href=f.data; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+  }
+}
+function openFile(f){
+  const url=blobFromData(f);
+  window.open(url,"_blank","noopener");
+}
+function fileCardHtml(f, admin){
+  const k=fileKind(f);
+  const mobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+  const dl='<button type="button" class="dl" data-dl="'+f.id+'">Descargar</button>';
+  const open='<button type="button" class="openf" data-openf="'+f.id+'">Ver</button>';
+  const del=admin?'<button type="button" class="save" data-del="'+f.id+'" style="width:auto;height:44px;padding:0 16px;margin:0">Quitar</button>':'';
+  if(k==="image") return '<article class="file-card"><div class="media-frame" data-zoom="'+f.id+'"><img src="'+f.data+'" alt="" loading="lazy"></div><div class="file-actions">'+dl+del+'</div></article>';
+  if(k==="pdf" && !mobile) return '<article class="file-card"><div class="media-frame pdf"><iframe src="'+f.data+'#toolbar=0&navpanes=0" title=""></iframe></div><div class="file-actions">'+open+dl+del+'</div></article>';
+  if(k==="pdf") return '<article class="file-card"><div class="doc-preview">Documento</div><div class="file-actions">'+open+dl+del+'</div></article>';
+  return '<article class="file-card"><div class="doc-preview">Archivo</div><div class="file-actions">'+open+dl+del+'</div></article>';
+}
+function bindFileActions(box, files){
+  const byId={}; files.forEach(function(f){ byId[f.id]=f; });
+  box.querySelectorAll("[data-dl]").forEach(function(b){ b.onclick=function(){ const f=byId[b.dataset.dl]; if(f) triggerDownload(f); }; });
+  box.querySelectorAll("[data-openf]").forEach(function(b){ b.onclick=function(){ const f=byId[b.dataset.openf]; if(f) openFile(f); }; });
+  box.querySelectorAll("[data-zoom]").forEach(function(el){
+    el.onclick=function(){
+      const f=byId[el.dataset.zoom]; if(!f) return;
+      document.getElementById("lbImg").src=f.data;
+      document.getElementById("lightbox").classList.add("on");
+    };
+  });
+  box.querySelectorAll("[data-del]").forEach(function(b){ b.onclick=function(){
+    const all=getFiles(); all[libTab]=(all[libTab]||[]).filter(function(x){ return x.id!==b.dataset.del; }); saveFiles(all); renderPortal();
+  }; });
+}
 function renderPortal(){
   document.getElementById("upBox").style.display=(isLogged() && libTab!=="turnos")?"block":"none";
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on", t.dataset.lib===libTab));
@@ -899,23 +1000,17 @@ function renderPortal(){
     });
     if(isLogged()) {
       const all=getInbox();
-      box.innerHTML=(!all.length?"<div class='card'>No hay turnos.</div>":all.map(t=>"<div class='card' style='margin:0 0 10px'><b>"+t.nombre+"</b><p>"+t.dia+" · "+t.hora+"<br>"+(t.tipo||"")+"<br>"+(t.tel||"")+(t.reminded?"<br>Recordatorio enviado":"")+"</p></div>").join(""));
+      box.innerHTML=(!all.length?"<div class='card'>No hay turnos.</div>":all.map(t=>"<div class='card' style='margin:0 0 10px'><b>"+esc(t.nombre)+"</b><p>"+esc(t.dia)+" · "+esc(t.hora)+"<br>"+esc(t.tipo||"")+"<br>"+esc(t.tel||"")+(t.reminded?"<br>Recordatorio enviado":"")+"</p></div>").join(""));
       return;
     }
-    box.innerHTML=(!mine.length?"<div class='card'>Todavía no tenés turnos cargados.</div>":mine.map(t=>"<div class='card' style='margin:0 0 10px'><b>"+(t.tipo||"Turno")+"</b><p>"+t.dia+" · "+t.hora+"</p></div>").join(""));
+    box.innerHTML=(!mine.length?"<div class='card'>Todavía no tenés turnos cargados.</div>":mine.map(t=>"<div class='card' style='margin:0 0 10px'><b>"+esc(t.tipo||"Turno")+"</b><p>"+esc(t.dia)+" · "+esc(t.hora)+"</p></div>").join(""));
     return;
   }
   const me=currentPacUser();
   const files=isLogged()? (getFiles()[libTab]||[]) : filesOf(me&&me.user, libTab);
   if(!files.length){ box.innerHTML="<div class='card'>Todavía no hay archivos en esta sección.</div>"; return; }
-  box.innerHTML=files.map(f=>{
-    const del=isLogged()?" <button type='button' class='save' data-del='"+f.id+"' style='width:auto;height:34px;padding:0 12px;margin:8px 0 0'>Quitar</button>":"";
-    if((f.type||"").indexOf("image/")===0) return "<div class='file-card'><b>"+f.name+"</b><img src='"+f.data+"' alt=''>"+del+"</div>";
-    return "<div class='file-card'><a href='"+f.data+"' target='_blank' rel='noopener'>"+f.name+"</a>"+del+"</div>";
-  }).join("");
-  box.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
-    const all=getFiles(); all[libTab]=(all[libTab]||[]).filter(x=>x.id!==b.dataset.del); saveFiles(all); renderPortal();
-  });
+  box.innerHTML=files.map(f=>fileCardHtml(f, isLogged())).join("");
+  bindFileActions(box, files);
 }
 function renderUsers(){
   const box=document.getElementById("userPanel");
@@ -923,7 +1018,7 @@ function renderUsers(){
   if(!acc.length){ box.innerHTML="<div class='card'>Todavía no hay usuarios creados.</div>"; return; }
   box.innerHTML=acc.map((a,i)=>{
     const g=filesOf(a.user,"guia"), r=filesOf(a.user,"recetas");
-    return "<div class='card' style='margin:0 0 12px' data-u='"+a.user+"'><b>"+(a.nombre||a.user)+"</b><p>Usuario: <b>"+a.user+"</b><br>Contraseña: <b>"+(a.pass||"-")+"</b><br>Tel: "+(a.telefono||"-")+"</p><p>Guía: "+g.length+" archivo(s) · Recetas: "+r.length+" archivo(s)</p><label>Asignar a Guía mensual</label><input type='file' data-as='guia'><label>Asignar a Recetas</label><input type='file' data-as='recetas'><div>"+g.concat(r).map(f=>"<div class='file-card'>"+f.name+" <button type='button' data-kill='"+f.id+"'>Quitar</button></div>").join("")+"</div><button class='save' type='button' data-drop='1' style='background:#9a5a52'>Eliminar usuario</button></div>";
+    return "<div class='card' style='margin:0 0 12px' data-u='"+a.user+"'><b>"+(a.nombre||a.user)+"</b><p>Usuario: <b>"+a.user+"</b><br>Contraseña: <b>"+(a.pass||"-")+"</b><br>Tel: "+(a.telefono||"-")+"</p><p>Guía: "+g.length+" archivo(s) · Recetas: "+r.length+" archivo(s)</p><label>Asignar a Guía mensual</label><input type='file' data-as='guia'><label>Asignar a Recetas</label><input type='file' data-as='recetas'><div>"+g.concat(r).map(f=>"<div class='file-card'><div class='doc-preview'>"+(fileKind(f)==="image"?"Imagen":fileKind(f)==="pdf"?"Documento":"Archivo")+"</div><button type='button' data-kill='"+f.id+"'>Quitar</button></div>").join("")+"</div><button class='save' type='button' data-drop='1' style='background:#9a5a52'>Eliminar usuario</button></div>";
   }).join("");
   box.querySelectorAll("[data-drop]").forEach(b=>b.onclick=()=>{
     const u=b.closest("[data-u]").dataset.u;
@@ -987,6 +1082,8 @@ function updateWa(){
   if(document.body.classList.contains("page-home")) a.classList.add("on");
   else a.classList.remove("on");
 }
+document.getElementById("lbClose").onclick=()=>document.getElementById("lightbox").classList.remove("on");
+document.getElementById("lightbox").addEventListener("click",e=>{ if(e.target.id==="lightbox"||e.target.id==="lbClose") document.getElementById("lightbox").classList.remove("on"); });
 document.getElementById("popClose").onclick=()=>document.getElementById("popOk").classList.remove("on");
 document.getElementById("popOk").addEventListener("click",e=>{ if(e.target.id==="popOk") e.currentTarget.classList.remove("on"); });
 updateWa();
@@ -1015,7 +1112,7 @@ if("serviceWorker" in navigator){
   }).then(function(keys){
     return Promise.all(keys.map(function(k){ return caches.delete(k); }));
   }).then(function(){
-    return navigator.serviceWorker.register("sw.js?v=4");
+    return navigator.serviceWorker.register("sw.js?v=5");
   }).catch(function(){});
 }
 document.addEventListener("click",function(e){
