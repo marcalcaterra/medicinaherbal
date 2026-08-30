@@ -24,8 +24,8 @@
     .stage { position:relative; z-index:5; min-height:100vh; }
     .box { position:absolute; display:flex; align-items:center; justify-content:center; transform:translate(-50%,0); overflow:hidden; }
     body.edit-mode .box[data-box] { outline:1px dashed rgba(44,74,56,.45); cursor:grab; }
-    #box-logo { left:50%; top:8%; width:260px; height:210px; }
-    #box-logo img { width:100%; height:100%; object-fit:contain; pointer-events:none; }
+    #box-logo { left:50%; top:14%; width:240px; height:190px; }
+    #box-logo img { width:100%; height:100%; object-fit:contain; object-position:center; pointer-events:none; margin:0 auto; display:block; }
     #box-turno,#box-cal { left:50%; top:46%; width:min(520px,92vw); height:58px; }
     #box-cuenta,#box-hist { left:50%; top:56%; width:min(520px,92vw); height:58px; }
     #box-login,#box-salir { left:50%; top:66%; width:140px; height:40px; }
@@ -59,7 +59,7 @@
     #view-turno.on,#view-cal.on,#view-hist.on,#view-ficha.on { align-items:flex-start; padding-top:6vh; }
     .top { display:flex; justify-content:space-between; margin-bottom:12px; }
     .top button { border:0; background:transparent; font:800 14px Nunito,sans-serif; color:#2c4a38; }
-    .wrap { width:min(640px,100%); margin:0 auto; }
+    .wrap { width:min(520px,92vw); margin:0 auto; }
     .card input, .card textarea { width:100% !important; max-width:100%; }
     .view h1 { color:#fff; font-size:26px; margin:0 0 6px; }
     .lead { color:#eef3e8; margin:0 0 16px; }
@@ -111,11 +111,11 @@
     .tools button { border:0; background:#2c4a38; color:#fff; border-radius:999px; padding:8px 12px; font-size:11px; font-weight:800; }
     @media (max-width:720px) {
       .bloom { top:28%; width:92vw; height:46vh; }
-      #box-logo { width:min(200px,52vw)!important; height:150px!important; top:8%!important; left:50%!important; }
-      #box-turno,#box-cuenta,#box-cal,#box-hist { width:min(520px,88vw)!important; left:50%!important; height:64px!important; }
-      #box-turno,#box-cal { top:42%!important; bottom:auto!important; }
-      #box-cuenta,#box-hist { top:54%!important; bottom:auto!important; }
-      #box-login,#box-salir { top:66%!important; bottom:auto!important; width:140px!important; height:42px!important; left:50%!important; }
+      #box-logo { width:min(210px,56vw)!important; height:160px!important; top:16%!important; left:50%!important; transform:translate(-50%,0)!important; }
+      #box-turno,#box-cuenta,#box-cal,#box-hist { width:min(520px,92vw)!important; left:50%!important; height:64px!important; transform:translate(-50%,0)!important; }
+      #box-turno,#box-cal { top:46%!important; bottom:auto!important; }
+      #box-cuenta,#box-hist { top:56%!important; bottom:auto!important; }
+      #box-login,#box-salir { top:66%!important; bottom:auto!important; width:140px!important; height:42px!important; left:50%!important; transform:translate(-50%,0)!important; }
       .grid { grid-template-columns:1fr; }
       .editor { width:calc(100% - 24px); left:12px; right:12px; }
     }
@@ -254,9 +254,9 @@
   </section>
 
 <script>
-const THEME_KEY="mar_theme_v7", AUTH_KEY="mar_auth", AGENDA_KEY="mar_agenda_v3", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1";
+const THEME_KEY="mar_theme_v8", AUTH_KEY="mar_auth", AGENDA_KEY="mar_agenda_v3", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1";
 const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-const DEFAULT_THEME={bg:"#96ab82",btn1:"#2c4a38",btn2:"#ffffff",login:"#ffffff",font:'"Nunito", sans-serif',fontSize:13,sway:7,enter:14,boxes:{logo:{x:50,y:8,w:260,h:210,r:0},turno:{x:50,y:46,w:520,h:58,r:2},cuenta:{x:50,y:56,w:520,h:58,r:2},login:{x:50,y:66,w:140,h:40,r:40}}};
+const DEFAULT_THEME={bg:"#96ab82",btn1:"#2c4a38",btn2:"#ffffff",login:"#ffffff",font:'"Nunito", sans-serif',fontSize:13,sway:7,enter:14,boxes:{logo:{x:50,y:14,w:240,h:190,r:0},turno:{x:50,y:46,w:520,h:58,r:2},cuenta:{x:50,y:56,w:520,h:58,r:2},login:{x:50,y:66,w:140,h:40,r:40}}};
 const DEFAULT_HOURS=["09:00","10:00","11:00","16:00","17:00"];
 const DEFAULT_FICHA=[
   {id:"datos",title:"Datos personales",fields:[{k:"nombre",l:"Nombre"},{k:"fnac",l:"Fecha de nacimiento"},{k:"edad",l:"Edad"},{k:"sexo",l:"Sexo"},{k:"civil",l:"Estado civil"},{k:"ocupacion",l:"Ocupación"},{k:"telefono",l:"Teléfono"},{k:"direccion",l:"Dirección"}]},
@@ -271,7 +271,7 @@ const DEFAULT_FICHA=[
 const clone=o=>JSON.parse(JSON.stringify(o));
 function getTheme(){try{const s=JSON.parse(localStorage.getItem(THEME_KEY))||{};const t=clone(DEFAULT_THEME);Object.assign(t,s);t.boxes=clone(DEFAULT_THEME.boxes);if(s.boxes)Object.keys(t.boxes).forEach(k=>t.boxes[k]={...t.boxes[k],...(s.boxes[k]||{})});return t;}catch(e){return clone(DEFAULT_THEME);}}
 function saveTheme(t){localStorage.setItem(THEME_KEY,JSON.stringify(t));applyTheme(t);}
-function applyTheme(theme){const t=theme||getTheme();const r=document.documentElement;[["--bg",t.bg],["--btn1",t.btn1],["--btn2",t.btn2],["--login",t.login],["--font",t.font],["--font-size",t.fontSize+"px"],["--sway",t.sway+"s"],["--enter",(Number(t.enter)/10)+"s"]].forEach(([k,v])=>r.style.setProperty(k,v));document.body.style.background=t.bg;Object.keys(t.boxes).forEach(name=>{const el=document.getElementById("box-"+name);if(!el)return;const b=t.boxes[name];el.style.left=b.x+"%";if(innerWidth>720)el.style.top=b.y+"%";el.style.width=b.w+"px";el.style.height=b.h+"px";el.style.setProperty("border-radius",(b.r||0)+"px","important");});}
+function applyTheme(theme){const t=theme||getTheme();const r=document.documentElement;[["--bg",t.bg],["--btn1",t.btn1],["--btn2",t.btn2],["--login",t.login],["--font",t.font],["--font-size",t.fontSize+"px"],["--sway",t.sway+"s"],["--enter",(Number(t.enter)/10)+"s"]].forEach(([k,v])=>r.style.setProperty(k,v));document.body.style.background=t.bg;Object.keys(t.boxes).forEach(name=>{const el=document.getElementById("box-"+name);if(!el)return;const b=t.boxes[name];el.style.left="50%";el.style.top=b.y+"%";el.style.width=b.w+"px";el.style.height=b.h+"px";el.style.transform="translate(-50%,0)";el.style.setProperty("border-radius",(b.r||0)+"px","important");});}
 function isLogged(){try{return sessionStorage.getItem(AUTH_KEY)==="ok";}catch(e){return false;}}
 function loginOk(u,p){return String(u).trim().toLowerCase()==="javier"&&String(p)==="1234";}
 function pad(n){return String(n).padStart(2,"0");}
