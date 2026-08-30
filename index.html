@@ -24,11 +24,11 @@
     .stage { position:relative; z-index:5; min-height:100vh; }
     .box { position:absolute; display:flex; align-items:center; justify-content:center; transform:translate(-50%,0); overflow:hidden; }
     body.edit-mode .box[data-box] { outline:1px dashed rgba(44,74,56,.45); cursor:grab; }
-    #box-logo { left:50%; top:10%; width:260px; height:210px; }
+    #box-logo { left:50%; top:8%; width:260px; height:210px; }
     #box-logo img { width:100%; height:100%; object-fit:contain; pointer-events:none; }
-    #box-turno,#box-cal { left:50%; top:68%; width:min(520px,92vw); height:58px; }
-    #box-cuenta,#box-hist { left:50%; top:78%; width:min(520px,92vw); height:58px; }
-    #box-login,#box-salir { left:50%; top:90%; width:120px; height:38px; }
+    #box-turno,#box-cal { left:50%; top:46%; width:min(520px,92vw); height:58px; }
+    #box-cuenta,#box-hist { left:50%; top:56%; width:min(520px,92vw); height:58px; }
+    #box-login,#box-salir { left:50%; top:66%; width:140px; height:40px; }
     .btn-main,.login-pill { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; border:0; background:transparent; color:inherit; font-family:var(--font); text-align:center; cursor:pointer; }
     .btn-main b { font-size:var(--font-size); letter-spacing:.14em; text-transform:uppercase; }
     .btn-main small { font-size:calc(var(--font-size) - 2px); opacity:.85; margin-top:2px; }
@@ -54,11 +54,13 @@
     .editor input[type="color"] { width:42px; height:28px; padding:0; border:0; background:none; }
     .editor input,.editor select { width:130px; height:28px; }
     .editor input[type="range"] { width:100%; }
-    .view { display:none; position:relative; z-index:6; padding:16px 16px 40px; }
-    .view.on { display:block; }
+    .view { display:none; position:relative; z-index:6; padding:16px; min-height:100vh; }
+    .view.on { display:flex; align-items:center; justify-content:center; }
+    #view-turno.on,#view-cal.on,#view-hist.on,#view-ficha.on { align-items:flex-start; padding-top:6vh; }
     .top { display:flex; justify-content:space-between; margin-bottom:12px; }
     .top button { border:0; background:transparent; font:800 14px Nunito,sans-serif; color:#2c4a38; }
-    .wrap { width:min(720px,100%); margin:0 auto; }
+    .wrap { width:min(640px,100%); margin:0 auto; }
+    .card input, .card textarea { width:100% !important; max-width:100%; }
     .view h1 { color:#fff; font-size:26px; margin:0 0 6px; }
     .lead { color:#eef3e8; margin:0 0 16px; }
     .card { background:#fff; border-radius:16px; padding:16px; }
@@ -88,9 +90,14 @@
     .ficha-shell { background:#8ea67c; padding:10px; border-radius:6px; }
     .ficha { background:#fff; overflow:hidden; }
     .ficha h2 { margin:0; padding:18px 18px 6px; font-size:22px; font-weight:700; letter-spacing:.06em; color:#2fa3b4; }
-    .sec { margin:0 14px 12px; border:1px solid #d8eef2; }
-    .sec-h { background:#2fa3b4; color:#fff; padding:8px 12px; font-weight:800; display:flex; justify-content:space-between; align-items:center; }
-    .sec-h .ttl { border:0; background:transparent; color:#fff; font-weight:800; width:100%; }
+    .sec { margin:0 14px 10px; border:1px solid #d8eef2; }
+    .sec-h { background:#2fa3b4; color:#fff; padding:10px 12px; font-weight:800; display:flex; justify-content:space-between; align-items:center; gap:8px; cursor:pointer; }
+    .sec-h .ttl { border:0; background:transparent; color:#fff; font-weight:800; width:100%; pointer-events:none; text-align:left; }
+    .customizing .sec-h .ttl { pointer-events:auto; }
+    .sec-h .chev { font-size:18px; line-height:1; }
+    .sec .grid, .sec .sec-tools { display:none; }
+    .sec.open .grid { display:grid; }
+    .customizing .sec.open .sec-tools { display:flex; }
     .grid { display:grid; grid-template-columns:1fr 1fr; }
     .cell { background:#eaf6fb; border:1px solid #fff; padding:8px 10px; position:relative; }
     .cell.full { grid-column:1 / -1; }
@@ -104,11 +111,11 @@
     .tools button { border:0; background:#2c4a38; color:#fff; border-radius:999px; padding:8px 12px; font-size:11px; font-weight:800; }
     @media (max-width:720px) {
       .bloom { top:28%; width:92vw; height:46vh; }
-      #box-logo { width:min(220px,58vw)!important; height:170px!important; top:12%!important; left:50%!important; }
+      #box-logo { width:min(200px,52vw)!important; height:150px!important; top:8%!important; left:50%!important; }
       #box-turno,#box-cuenta,#box-cal,#box-hist { width:min(520px,88vw)!important; left:50%!important; height:64px!important; }
-      #box-turno,#box-cal { top:46%!important; bottom:auto!important; }
-      #box-cuenta,#box-hist { top:58%!important; bottom:auto!important; }
-      #box-login,#box-salir { top:70%!important; bottom:auto!important; width:140px!important; height:42px!important; left:50%!important; }
+      #box-turno,#box-cal { top:42%!important; bottom:auto!important; }
+      #box-cuenta,#box-hist { top:54%!important; bottom:auto!important; }
+      #box-login,#box-salir { top:66%!important; bottom:auto!important; width:140px!important; height:42px!important; left:50%!important; }
       .grid { grid-template-columns:1fr; }
       .editor { width:calc(100% - 24px); left:12px; right:12px; }
     }
@@ -176,8 +183,8 @@
       <div class="top"><button type="button" data-go="home">← Inicio</button></div>
       <h1>Login</h1>
       <div class="card">
-        <div class="field"><label>Usuario</label><input id="usuario"></div>
-        <div class="field"><label>Contraseña</label><input id="clave" type="password"></div>
+        <div class="field"><label>Usuario</label><input id="usuario" type="text" autocomplete="username"></div>
+        <div class="field"><label>Contraseña</label><input id="clave" type="password" autocomplete="current-password"></div>
         <button class="save" type="button" id="doLogin">Ingresar</button>
         <div class="toast" id="toastLogin">Usuario o contraseña incorrectos.</div>
       </div>
@@ -247,9 +254,9 @@
   </section>
 
 <script>
-const THEME_KEY="mar_theme_v6", AUTH_KEY="mar_auth", AGENDA_KEY="mar_agenda_v3", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1";
+const THEME_KEY="mar_theme_v7", AUTH_KEY="mar_auth", AGENDA_KEY="mar_agenda_v3", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1";
 const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-const DEFAULT_THEME={bg:"#96ab82",btn1:"#2c4a38",btn2:"#ffffff",login:"#ffffff",font:'"Nunito", sans-serif',fontSize:13,sway:7,enter:14,boxes:{logo:{x:50,y:10,w:260,h:210,r:0},turno:{x:50,y:68,w:520,h:58,r:2},cuenta:{x:50,y:78,w:520,h:58,r:2},login:{x:50,y:90,w:120,h:38,r:40}}};
+const DEFAULT_THEME={bg:"#96ab82",btn1:"#2c4a38",btn2:"#ffffff",login:"#ffffff",font:'"Nunito", sans-serif',fontSize:13,sway:7,enter:14,boxes:{logo:{x:50,y:8,w:260,h:210,r:0},turno:{x:50,y:46,w:520,h:58,r:2},cuenta:{x:50,y:56,w:520,h:58,r:2},login:{x:50,y:66,w:140,h:40,r:40}}};
 const DEFAULT_HOURS=["09:00","10:00","11:00","16:00","17:00"];
 const DEFAULT_FICHA=[
   {id:"datos",title:"Datos personales",fields:[{k:"nombre",l:"Nombre"},{k:"fnac",l:"Fecha de nacimiento"},{k:"edad",l:"Edad"},{k:"sexo",l:"Sexo"},{k:"civil",l:"Estado civil"},{k:"ocupacion",l:"Ocupación"},{k:"telefono",l:"Teléfono"},{k:"direccion",l:"Dirección"}]},
@@ -415,8 +422,13 @@ function renderFicha(){
   tpl.forEach((sec,si)=>{
     const list=isListSec(sec);
     const wrap=document.createElement("div"); wrap.className="sec";
-    wrap.innerHTML="<div class='sec-h'><input class='ttl' data-si='"+si+"'><button class='edit-only' type='button' data-del='"+si+"'>Quitar</button></div><div class='grid'></div><div class='tools edit-only'><button type='button' data-addf='"+si+"' "+(list?"disabled":"")+">+ Campo</button></div>";
+    wrap.innerHTML="<div class='sec-h'><input class='ttl' data-si='"+si+"' readonly><span class='chev'>+</span><button class='edit-only' type='button' data-del='"+si+"'>Quitar</button></div><div class='grid'></div><div class='tools sec-tools'><button type='button' data-addf='"+si+"' "+(list?"disabled":"")+">+ Campo</button></div>";
     wrap.querySelector(".ttl").value=sec.title;
+    wrap.querySelector(".sec-h").onclick=e=>{
+      if(e.target.closest("[data-del]") || e.target.classList.contains("ttl") && box.classList.contains("customizing")) return;
+      wrap.classList.toggle("open");
+      wrap.querySelector(".chev").textContent = wrap.classList.contains("open") ? "–" : "+";
+    };
     const grid=wrap.querySelector(".grid");
     if(list){
       const f=sec.fields[0]||{k:"medicacion",l:"Anotar un medicamento por línea"};
