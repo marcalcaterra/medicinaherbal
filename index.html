@@ -45,18 +45,17 @@
       width: auto;
       display: block;
       transform-origin: 50% 100%;
-      will-change: transform;
     }
     .b1 { left: 0; height: 80%; animation: enterL var(--enter) ease forwards; }
-    .b2 { left: 18%; height: 90%; animation: enterL var(--enter) ease .12s forwards; }
-    .b3 { left: 36%; height: 96%; animation: enterC var(--enter) ease .2s forwards; }
-    .b4 { left: 54%; height: 86%; animation: enterR var(--enter) ease .16s forwards; }
-    .b5 { left: 72%; height: 74%; animation: enterR var(--enter) ease .28s forwards; }
-    .b1 img { animation: swayA var(--sway) ease-in-out calc(var(--enter) + .2s) infinite; }
-    .b2 img { animation: swayB calc(var(--sway) * 1.12) ease-in-out calc(var(--enter) + .3s) infinite; }
-    .b3 img { animation: swayC calc(var(--sway) * 1.25) ease-in-out calc(var(--enter) + .4s) infinite; }
-    .b4 img { animation: swayB calc(var(--sway) * 1.06) ease-in-out calc(var(--enter) + .35s) infinite; }
-    .b5 img { animation: swayA calc(var(--sway) * 1.18) ease-in-out calc(var(--enter) + .45s) infinite; }
+    .b2 { left: 18%; height: 90%; animation: enterL var(--enter) ease .1s forwards; }
+    .b3 { left: 36%; height: 96%; animation: enterC var(--enter) ease .16s forwards; }
+    .b4 { left: 54%; height: 86%; animation: enterR var(--enter) ease .12s forwards; }
+    .b5 { left: 72%; height: 74%; animation: enterR var(--enter) ease .2s forwards; }
+    .branch.is-sway img { animation: swaySoft var(--sway) ease-in-out infinite; }
+    .b2.is-sway img { animation-duration: calc(var(--sway) * 1.1); animation-direction: reverse; }
+    .b3.is-sway img { animation-duration: calc(var(--sway) * 1.2); }
+    .b4.is-sway img { animation-duration: calc(var(--sway) * 1.08); animation-direction: reverse; }
+    .b5.is-sway img { animation-duration: calc(var(--sway) * 1.16); }
 
     .stage { position: relative; z-index: 5; min-height: 100vh; }
     .box {
@@ -66,6 +65,7 @@
       justify-content: center;
       transform: translate(-50%, 0);
       overflow: hidden;
+      border-radius: 0;
     }
     body.is-admin .box { outline: 1px dashed rgba(44,74,56,.4); cursor: grab; }
     body.is-admin .box.dragging { cursor: grabbing; outline-color: #2c4a38; }
@@ -105,20 +105,22 @@
     .editor button, .editor a { font-size: 13px; font-weight: 800; color: #2c4a38; margin-right: 8px; }
 
     @keyframes enterL {
-      from { opacity: 0; transform: translate(-28px, 36px) scale(.92); }
-      to { opacity: .72; transform: none; }
+      from { opacity: 0; transform: translate(-24px, 28px); }
+      to { opacity: .72; transform: translate(0, 0); }
     }
     @keyframes enterC {
-      from { opacity: 0; transform: translate(0, 48px) scale(.9); }
-      to { opacity: .78; transform: none; }
+      from { opacity: 0; transform: translate(0, 36px); }
+      to { opacity: .78; transform: translate(0, 0); }
     }
     @keyframes enterR {
-      from { opacity: 0; transform: translate(28px, 36px) scale(.92); }
-      to { opacity: .72; transform: none; }
+      from { opacity: 0; transform: translate(24px, 28px); }
+      to { opacity: .72; transform: translate(0, 0); }
     }
-    @keyframes swayA { 0%,100% { transform: rotate(-1.6deg); } 50% { transform: rotate(1.8deg); } }
-    @keyframes swayB { 0%,100% { transform: rotate(1.4deg); } 50% { transform: rotate(-1.9deg); } }
-    @keyframes swayC { 0%,100% { transform: rotate(-.4deg); } 50% { transform: rotate(1.1deg); } }
+    @keyframes swaySoft {
+      0% { transform: rotate(0deg); }
+      50% { transform: rotate(1.6deg); }
+      100% { transform: rotate(0deg); }
+    }
   </style>
 </head>
 <body>

@@ -54,7 +54,8 @@ function applyBoxes(theme) {
     el.style.top = b.y + "%";
     el.style.width = b.w + "px";
     el.style.height = b.h + "px";
-    el.style.borderRadius = (b.r || 0) + "px";
+    el.style.setProperty("border-radius", (b.r || 0) + "px", "important");
+    el.style.setProperty("overflow", "hidden", "important");
     el.style.transform = "translate(-50%, 0)";
   });
 }
@@ -181,7 +182,19 @@ function bindEditor() {
   });
 }
 
+function startFlowerSway() {
+  document.querySelectorAll(".branch").forEach((el) => {
+    const go = () => {
+      el.style.opacity = getComputedStyle(el).opacity;
+      el.style.transform = "translate(0, 0)";
+      el.classList.add("is-sway");
+    };
+    el.addEventListener("animationend", go, { once: true });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   applyTheme();
   bindEditor();
+  startFlowerSway();
 });
