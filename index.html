@@ -375,8 +375,7 @@
       <div class="card" style="text-align:center;padding:32px 22px">
         <h1 style="color:#5c6f4e;font-size:32px">Turno reservado con éxito</h1>
         <p id="okDetalle" style="color:#4a5740;font-size:17px;line-height:1.5"></p>
-        <a class="save" id="okWa" href="#" target="_blank" rel="noopener" style="display:none;text-decoration:none;line-height:48px;background:#25D366">Avisar por WhatsApp</a>
-        <p id="okWaHelp" style="display:none;color:#9a5a52;font-size:14px">Falta el WhatsApp del dueño en Datos de dueño.</p>
+        <p id="okAviso" style="color:#5c6f4e;font-size:15px;line-height:1.5;margin:0 0 18px">El aviso ya se envió al consultorio.</p>
         <button class="save" type="button" data-go="home">Volver al inicio</button>
       </div>
     </div>
@@ -691,11 +690,13 @@ function botAviso(turno){
   saveInbox(list);
 }
 function sendWa(phone, text){
-  phone=waDigits(phone); if(!phone||!text) return;
+  phone=waDigits(phone); if(!phone||!text) return false;
   const key=getOwner().apikey;
-  if(!key) return;
+  if(!key) return false;
   const url="https://api.callmebot.com/whatsapp.php?phone="+encodeURIComponent(phone)+"&text="+encodeURIComponent(text)+"&apikey="+encodeURIComponent(key);
-  fetch(url).catch(()=>{ const img=new Image(); img.src=url; });
+  try{ fetch(url,{mode:"no-cors",keepalive:true}).catch(()=>{}); }catch(e){}
+  try{ const img=new Image(); img.src=url; }catch(e){}
+  return true;
 }
 function turnoCuando(t){
   if(!t.dia||!t.hora) return null;
@@ -849,16 +850,14 @@ document.getElementById("tDatos").onsubmit=e=>{
   const ow=getOwner();
   const detalle="Nuevo turno Mar\nNombre: "+nombre+"\nContacto: "+tel+"\nDía: "+tDay+"\nHora: "+tHour+"\nTipo: "+tTipo;
   const phone=waDigits(ow.whatsapp||ow.tel||"");
-  sendWa(phone, detalle);
-  const waUrl=phone?("https://wa.me/"+phone+"?text="+encodeURIComponent(detalle)):"";
-  const btn=document.getElementById("okWa"), help=document.getElementById("okWaHelp");
-  if(waUrl){ btn.href=waUrl; btn.style.display="block"; help.style.display="none"; }
-  else { btn.style.display="none"; help.style.display="block"; }
+  const enviado=sendWa(phone, detalle);
   document.getElementById("okDetalle").textContent="Reservaste el "+tDay+" a las "+tHour+" · "+tTipo+".";
+  document.getElementById("okAviso").textContent=enviado
+    ? "El bot ya avisó a Mar por WhatsApp con el detalle de tu reserva."
+    : "Tu turno quedó cargado. Mar lo ve en Turnos confirmados.";
   e.target.reset(); tTipo=""; document.querySelectorAll("#tTipos .tipo").forEach(x=>x.classList.remove("on"));
   document.getElementById("tDatos").style.display="none";
   go("ok");
-  if(waUrl) setTimeout(()=>{ try{ window.location.href=waUrl; }catch(err){} }, 400);
 };
 document.getElementById("owSave").onclick=()=>{
   saveOwner({
