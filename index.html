@@ -44,7 +44,7 @@
     .b5 { left:72%; height:74%; animation:enterR var(--enter) ease .2s forwards; }
     .branch.is-sway img { animation:swaySoft var(--sway) ease-in-out infinite; }
     .stage { position:relative; z-index:5; min-height:100vh; }
-    .box { position:absolute; display:flex; align-items:center; justify-content:center; transform:translate(-50%,0); overflow:hidden; }
+    .box { position:absolute; display:flex; align-items:center; justify-content:center; transform:translate(-50%,0); overflow:hidden; border-radius:999px; }
     body.edit-mode .box[data-box] { outline:1px dashed rgba(44,74,56,.45); cursor:grab; }
     #box-logo { left:50%; top:14%; width:240px; height:190px; }
     #box-logo img { width:100%; height:100%; object-fit:contain; object-position:center; pointer-events:none; margin:0 auto; display:block; }
@@ -56,7 +56,7 @@
     body.is-admin:not(.edit-mode) #box-cal { top:42%; }
     body.is-admin:not(.edit-mode) #box-hist { top:52%; }
     body.is-admin:not(.edit-mode) #box-conf { top:62%; }
-    .btn-main,.login-pill { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; border:0; background:transparent; color:inherit; text-align:center; cursor:pointer; padding:0 16px; }
+    .btn-main,.login-pill { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; border:0; background:transparent; color:inherit; text-align:center; cursor:pointer; padding:0 16px; border-radius:999px; }
     .btn-main b { font-family:var(--display); font-size:15px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; }
     .btn-main small { font-family:var(--font); font-size:11px; font-weight:500; opacity:.85; margin-top:3px; letter-spacing:.02em; }
     .btn-main.dark { background:var(--btn1); color:#fff; }
@@ -77,7 +77,7 @@
     body.is-admin.page-home:not(.edit-mode) .users { display:block; }
     body.edit-mode .guardar { display:block; }
     .tipos { display:grid; gap:8px; margin:8px 0 12px; }
-    .tipo { border:1px solid var(--sand-deep); background:#fffdf9; color:var(--ink); min-height:44px; font-weight:600; text-align:left; padding:8px 14px; border-radius:12px; font-family:var(--display); font-size:17px; }
+    .tipo { border:1px solid var(--sand-deep); background:#fffdf9; color:var(--ink); min-height:44px; font-weight:600; text-align:left; padding:8px 14px; border-radius:999px; font-family:var(--display); font-size:17px; }
     .tipo.on { background:#5c6f4e; color:#f7f1e8; border-color:#5c6f4e; }
     .pac .more { display:none; padding:0 16px 14px; font-size:14px; color:#4d5f52; }
     .pac.open .more { display:block; }
@@ -99,14 +99,14 @@
     .wrap { width:min(520px,92vw); margin:0 auto; }
     .view h1 { color:#f7f1e8; font-family:var(--display); font-size:34px; font-weight:600; margin:0 0 6px; letter-spacing:.02em; }
     .lead { color:#f3eadf; margin:0 0 16px; font-size:15px; }
-    .card { background:#fbf6ef; border-radius:22px; padding:20px; box-shadow:0 10px 30px rgba(74,87,64,.08); }
+    .card { background:#fbf6ef; border-radius:32px; padding:22px 20px; box-shadow:0 10px 30px rgba(74,87,64,.08); }
     .field { margin:12px 0; }
     label { display:block; font-size:12px; font-weight:700; margin-bottom:8px; letter-spacing:.04em; color:#6b5c4c; }
     .remember { display:flex; align-items:center; gap:10px; margin:4px 0 12px; color:#6b5c4c; font-size:14px; font-weight:600; }
     .remember input { width:18px !important; height:18px !important; min-height:18px !important; margin:0; accent-color:#5c6f4e; flex:none; }
     .card input:not([type="checkbox"]):not([type="file"]), .field input:not([type="checkbox"]):not([type="file"]), #tNombre, #tTel, #nuevoNombre, #nuevoTel, #usuario, #clave, #owNombre, #owTel, #cHour {
       width:100% !important; max-width:100%; min-height:48px !important; height:48px;
-      border:1px solid #d8cbb8 !important; border-radius:18px !important;
+      border:1px solid #d8cbb8 !important; border-radius:999px !important;
       padding:12px 16px !important; background:#fffdf9 !important;
       font:600 16px "Cormorant Garamond",serif !important; color:#4a5740;
       outline:none !important; box-shadow:none !important; -webkit-appearance:none; appearance:none;
@@ -114,16 +114,17 @@
     .card input:focus, .field input:focus, #tNombre:focus, #tTel:focus, #nuevoNombre:focus, #nuevoTel:focus {
       border-color:#5c6f4e !important; box-shadow:0 0 0 3px rgba(92,111,78,.12) !important;
     }
-    .save,.add { width:100%; height:48px; border:0; background:#5c6f4e; color:#f7f1e8; font-family:var(--display); font-size:16px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; margin-top:10px; border-radius:14px; }
+    .save,.add { width:100%; height:48px; border:0; background:#5c6f4e; color:#f7f1e8; font-family:var(--display); font-size:16px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; margin-top:10px; border-radius:999px; }
     .add.light { background:#fff; color:#2c4a38; }
     .toast { display:none; margin-top:12px; padding:12px; border-radius:12px; background:#d7efd8; }
     .toast.show { display:block; }
     .cal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
     .cal-head strong { font-family:var(--display); font-size:20px; font-weight:600; }
-    .cal-head button { border:0; background:var(--sand); color:#5c6f4e; border-radius:50%; width:36px; height:36px; }
+    .cal-head button { border:0; background:var(--sand); color:#5c6f4e; border-radius:50%; width:44px; height:44px; font-size:22px; line-height:1; }
     .week,.days { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; width:100%; }
     .week { font-size:11px; font-weight:700; text-align:center; color:#8a7b6a; margin-bottom:6px; letter-spacing:.08em; }
-    .day { width:100%; min-width:0; min-height:44px; border:0; border-radius:12px; font-weight:700; background:#edd7d2; color:#9a5a52; -webkit-appearance:none; appearance:none; }
+    .days { min-height:220px; }
+    .day { width:100%; min-width:0; min-height:44px; border:0; border-radius:14px; font-weight:700; background:#edd7d2; color:#9a5a52; -webkit-appearance:none; appearance:none; }
     .day.green { background:#d7e3cc; color:#4e6144; }
     .day.sun { background:#eee7de; color:#b2a89c; }
     .day.sel { outline:2px solid #5c6f4e; }
@@ -133,7 +134,7 @@
     .row-add { display:flex; gap:8px; margin-top:10px; }
     .row-add input { flex:1; }
     .row-add button { width:auto; padding:0 14px; margin:0; }
-    .pac { background:#fbf6ef; border-radius:16px; margin:0 0 10px; overflow:hidden; }
+    .pac { background:#fbf6ef; border-radius:28px; margin:0 0 10px; overflow:hidden; }
     .pac .name { width:100%; border:0; background:#fbf6ef; text-align:left; padding:16px; font:600 20px "Cormorant Garamond",serif; color:#4a5740; }
     .ficha-shell { background:var(--sand); padding:12px; border-radius:20px; }
     .ficha { background:#fffdf9; overflow:hidden; border-radius:14px; }
@@ -161,9 +162,9 @@
     .welcome { font-family:var(--display); font-size:20px; line-height:1.45; color:#f7f1e8; margin:0 0 18px; text-align:center; }
     body.portal-edit .welcome { color:var(--ink); }
     .tabs { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:14px; }
-    .tab { min-height:56px; border:0; border-radius:16px; background:var(--btn2); color:var(--btn1); font-family:var(--display); font-size:16px; letter-spacing:.08em; text-transform:uppercase; }
+    .tab { min-height:56px; border:0; border-radius:999px; background:var(--btn2); color:var(--btn1); font-family:var(--display); font-size:16px; letter-spacing:.08em; text-transform:uppercase; }
     .tab.on { background:var(--btn1); color:#f7f1e8; }
-    .file-card { background:#fbf6ef; border-radius:20px; padding:0; margin:0 0 16px; overflow:hidden; box-shadow:0 8px 22px rgba(74,87,64,.08); contain:layout paint; }
+    .file-card { background:#fbf6ef; border-radius:32px; padding:0; margin:0 0 16px; overflow:hidden; box-shadow:0 8px 22px rgba(74,87,64,.08); contain:layout paint; }
     .file-card .media-frame { width:100%; background:#efe6d8; display:flex; align-items:center; justify-content:center; cursor:zoom-in; }
     .file-card .media-frame img { display:block; width:100%; height:auto; max-height:min(70vh,720px); object-fit:contain; margin:0 auto; }
     .file-card .media-frame.pdf { height:min(70vh,640px); cursor:default; }
@@ -198,9 +199,9 @@
     .install-sheet li { margin:6px 0; }
     .popup { display:none; position:fixed; inset:0; background:rgba(74,87,64,.45); z-index:120; align-items:center; justify-content:center; padding:20px; }
     .popup.on { display:flex; }
-    .popup .boxp { width:min(420px,92vw); background:#fbf6ef; border-radius:22px; padding:28px 22px; text-align:center; }
+    .popup .boxp { width:min(420px,92vw); background:#fbf6ef; border-radius:32px; padding:28px 22px; text-align:center; }
     .popup h3 { font-family:var(--display); font-size:28px; margin:0 0 8px; color:#5c6f4e; }
-    .wa-float { position:fixed; right:18px; bottom:18px; z-index:100; width:54px; height:54px; border-radius:50%; background:#fbf6ef; display:none; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 8px 22px rgba(74,87,64,.14); border:1px solid #d8cbb8; }
+    .wa-float { position:fixed; right:16px; bottom:16px; z-index:140; width:56px; height:56px; border-radius:50%; background:#fbf6ef; display:none; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 8px 22px rgba(74,87,64,.18); border:1px solid #d8cbb8; -webkit-tap-highlight-color:transparent; }
     .wa-float.on { display:flex; }
     .wa-float:hover { transform:scale(1.04); background:#f7f1e8; }
     .wa-float svg { width:26px; height:26px; fill:#5c6f4e; }
@@ -259,7 +260,7 @@
       <button class="save" type="button" id="popClose">Listo</button>
     </div>
   </div>
-  <a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <a class="wa-float" id="waFloat" href="#" rel="noopener" aria-label="WhatsApp">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.4c-5.1 0-9.2 4-9.2 9 0 1.6.4 3.1 1.2 4.4L3 21.6l5.9-1.5c1.3.7 2.7 1 4.1 1 5.1 0 9.2-4 9.2-9s-4.1-9.1-10.2-9.1zm0 16.5c-1.3 0-2.5-.3-3.6-.9l-.3-.1-3.5.9.9-3.4-.2-.3A7.2 7.2 0 1 1 12 18.9zm4.1-5.3c-.2-.1-1.3-.6-1.5-.7-.2-.1-.3-.1-.5.1s-.6.7-.7.8-.3.2-.5.1a6 6 0 0 1-1.8-1.1 6.5 6.5 0 0 1-1.2-1.5c-.1-.2 0-.3.1-.5l.2-.2.1-.2c0-.1 0-.3 0-.4C10 9.4 9.6 8.4 9.4 8s-.3-.3-.5-.3h-.4c-.2 0-.5.1-.6.3-.6.6-.8 1.5-.8 2.3 0 .8.3 1.6.9 2.2a9.4 9.4 0 0 0 3.6 3.2c.4.2.9.4 1.1.4.5.1 1 0 1.3-.1.4-.2.9-.6 1-1.1.1-.4 0-.7-.1-1-.1-.1-.2-.2-.5-.3z"/></svg>
   </a>
   <button class="install-pill" id="btnInstall" type="button">Instalar app</button>
@@ -508,6 +509,19 @@
         <button class="save" type="button" id="owSave">Guardar datos</button>
         <div class="toast" id="owToast">Datos guardados.</div>
       </div>
+      <h1 style="margin-top:22px">Nube Firebase</h1>
+      <p class="lead">Para que el calendario, los turnos y los archivos se vean iguales en todos los celulares y computadoras.</p>
+      <div class="card">
+        <p id="fbState" style="margin:0 0 12px;color:#4a5740">Todavía no está conectada.</p>
+        <div class="field"><label>apiKey</label><input id="fbApiKey" type="text" placeholder="AIza..."></div>
+        <div class="field"><label>authDomain</label><input id="fbAuth" type="text" placeholder="proyecto.firebaseapp.com"></div>
+        <div class="field"><label>projectId</label><input id="fbProject" type="text" placeholder="proyecto-id"></div>
+        <div class="field"><label>storageBucket</label><input id="fbBucket" type="text" placeholder="proyecto.appspot.com"></div>
+        <div class="field"><label>messagingSenderId</label><input id="fbSender" type="text" placeholder="123456789"></div>
+        <div class="field"><label>appId</label><input id="fbApp" type="text" placeholder="1:123:web:abc"></div>
+        <button class="save" type="button" id="fbConnect">Conectar y sincronizar</button>
+        <p style="margin:12px 0 0;color:#6b5c4c;font-size:13px;line-height:1.45">En Firebase: creá un proyecto → App web → copiá esa config. Activá Firestore y Storage. En reglas de ambos, para empezar: allow read, write: if true;</p>
+      </div>
       <h1 style="margin-top:22px">Avisos del bot</h1>
       <div id="inboxList"></div>
     </div>
@@ -519,8 +533,11 @@
     </div>
   </section>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script>
-const THEME_KEY="mar_theme_v8", AUTH_KEY="mar_auth", PAC_SESS="mar_pac_sess", ACC_KEY="mar_acc_v1", AGENDA_KEY="mar_agenda_v3", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1", OWNER_KEY="mar_owner_v1", INBOX_KEY="mar_inbox_v1", FILES_KEY="mar_files_v1";
+const THEME_KEY="mar_theme_v8", AUTH_KEY="mar_auth", PAC_SESS="mar_pac_sess", ACC_KEY="mar_acc_v1", AGENDA_KEY="mar_agenda_v3", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1", OWNER_KEY="mar_owner_v1", INBOX_KEY="mar_inbox_v1", FILES_KEY="mar_files_v1", FB_KEY="mar_fb_cfg_v1";
 const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const DEFAULT_THEME={bg:"#96ab82",btn1:"#2c4a38",btn2:"#ffffff",login:"#ffffff",font:'"Nunito", sans-serif',fontSize:13,sway:7,enter:14,boxes:{logo:{x:50,y:14,w:240,h:190,r:0},turno:{x:50,y:46,w:520,h:58,r:2},cuenta:{x:50,y:56,w:520,h:58,r:2},login:{x:50,y:66,w:140,h:40,r:40}}};
 const DEFAULT_HOURS=["09:00","10:00","11:00","16:00","17:00"];
@@ -535,27 +552,111 @@ const DEFAULT_FICHA=[
   {id:"hab",title:"Hábitos de alimentación",fields:[{k:"hab_quien",l:"¿Con quién come?"},{k:"hab_prepara",l:"¿Quién prepara sus alimentos?"},{k:"hab_comidas",l:"Comidas en el día"},{k:"hab_colacion",l:"¿Hace colaciones?"},{k:"hab_alim",l:"¿Con qué alimentos?"},{k:"hab_horarios",l:"Horarios de comida"},{k:"hab_casa",l:"Comidas en casa"},{k:"hab_fuera",l:"Comidas fuera de casa"},{k:"hab_finde",l:"Comidas fuera el fin de semana"},{k:"hab_apetito_hora",l:"Hora de mayor apetito"},{k:"hab_apetito",l:"¿Cómo considera su apetito?"},{k:"hab_suple",l:"Suplementos"},{k:"hab_alergia",l:"Alergias"},{k:"hab_intol",l:"Intolerancias"},{k:"hab_dietas",l:"Dietas anteriores"},{k:"hab_bajar",l:"Medicamentos para bajar de peso"},{k:"hab_pref",l:"Alimentos preferidos"},{k:"hab_disg",l:"Alimentos que le disgustan"}]}
 ];
 const clone=o=>JSON.parse(JSON.stringify(o));
+let fbDb=null, fbSt=null, fbReady=false, fbListen=false;
+function getFbCfg(){try{return Object.assign({apiKey:"",authDomain:"",projectId:"",storageBucket:"",messagingSenderId:"",appId:""}, JSON.parse(localStorage.getItem(FB_KEY)||"{}"));}catch(e){return {apiKey:"",authDomain:"",projectId:"",storageBucket:"",messagingSenderId:"",appId:""};}}
+function saveFbCfg(c){localStorage.setItem(FB_KEY,JSON.stringify(c));}
+function fbOn(){return !!(fbReady && fbDb);}
+function cloudPut(col,id,data){ if(!fbOn()) return Promise.resolve(); return fbDb.collection(col).doc(id).set(data,{merge:true}).catch(function(){}); }
+function cloudDel(col,id){ if(!fbOn()) return Promise.resolve(); return fbDb.collection(col).doc(id).delete().catch(function(){}); }
+function stripFiles(f){
+  const clean=function(arr){ return (arr||[]).map(function(x){ return {id:x.id,name:x.name||"",type:x.type||"",url:x.url||"",path:x.path||""}; }); };
+  const users={};
+  Object.keys(f.users||{}).forEach(function(u){
+    users[u]={guia:clean((f.users[u]||{}).guia), recetas:clean((f.users[u]||{}).recetas)};
+  });
+  return {guia:clean(f.guia), recetas:clean(f.recetas), users:users};
+}
+function refreshOpenViews(){
+  try{
+    if(document.getElementById("view-turno")&&document.getElementById("view-turno").classList.contains("on")) renderTurno();
+    if(document.getElementById("view-cal")&&document.getElementById("view-cal").classList.contains("on")) renderCal();
+    if(document.getElementById("view-conf")&&document.getElementById("view-conf").classList.contains("on")) renderConf();
+    if(document.getElementById("view-owner")&&document.getElementById("view-owner").classList.contains("on")) renderOwner();
+    if(document.getElementById("view-hist")&&document.getElementById("view-hist").classList.contains("on")) renderHist();
+    if(document.getElementById("view-portal")&&document.getElementById("view-portal").classList.contains("on")) renderPortal();
+    if(document.getElementById("view-users")&&document.getElementById("view-users").classList.contains("on")) renderUsers();
+    updateWa(document.body.classList.contains("page-home"));
+  }catch(e){}
+}
+function listenCloud(){
+  if(!fbOn()||fbListen) return;
+  fbListen=true;
+  fbDb.collection("meta").doc("agenda").onSnapshot(function(s){ if(!s.exists) return; localStorage.setItem(AGENDA_KEY, JSON.stringify(s.data())); refreshOpenViews(); });
+  fbDb.collection("meta").doc("owner").onSnapshot(function(s){ if(!s.exists) return; localStorage.setItem(OWNER_KEY, JSON.stringify(s.data())); refreshOpenViews(); });
+  fbDb.collection("meta").doc("theme").onSnapshot(function(s){ if(!s.exists) return; localStorage.setItem(THEME_KEY, JSON.stringify(s.data())); applyTheme(); });
+  fbDb.collection("meta").doc("files").onSnapshot(function(s){ if(!s.exists) return; localStorage.setItem(FILES_KEY, JSON.stringify(s.data())); refreshOpenViews(); });
+  fbDb.collection("inbox").onSnapshot(function(snap){
+    const list=[]; snap.forEach(function(d){ list.push(d.data()); });
+    list.sort(function(a,b){ return String(b.id||"").localeCompare(String(a.id||"")); });
+    localStorage.setItem(INBOX_KEY, JSON.stringify(list));
+    refreshOpenViews();
+  });
+  fbDb.collection("pacs").onSnapshot(function(snap){
+    const list=[]; snap.forEach(function(d){ list.push(d.data()); });
+    localStorage.setItem(PAC_KEY, JSON.stringify(list));
+    refreshOpenViews();
+  });
+  fbDb.collection("acc").onSnapshot(function(snap){
+    const list=[]; snap.forEach(function(d){ list.push(d.data()); });
+    localStorage.setItem(ACC_KEY, JSON.stringify(list));
+    refreshOpenViews();
+  });
+}
+async function startFirebase(){
+  const cfg=getFbCfg();
+  const st=document.getElementById("fbState");
+  if(!cfg.apiKey||!cfg.projectId){ if(st) st.textContent="Todavía no está conectada."; return false; }
+  if(typeof firebase==="undefined"){ if(st) st.textContent="No se pudo cargar Firebase. Revisá internet."; return false; }
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(cfg);
+    fbDb=firebase.firestore();
+    try{ fbSt=firebase.storage(); }catch(e){ fbSt=null; }
+    fbReady=true;
+    const ag=await fbDb.collection("meta").doc("agenda").get();
+    if(!ag.exists){
+      await cloudPut("meta","agenda", getAgenda());
+      await cloudPut("meta","owner", getOwner());
+      await cloudPut("meta","theme", getTheme());
+      await cloudPut("meta","files", stripFiles(getFiles()));
+      getInbox().forEach(function(t){ if(t.id) cloudPut("inbox", t.id, t); });
+      getPacs().forEach(function(p){ if(p.id) cloudPut("pacs", p.id, p); });
+      getAcc().forEach(function(a){ if(a.user) cloudPut("acc", String(a.user).toLowerCase(), a); });
+    }
+    listenCloud();
+    if(st) st.textContent="Conectada. Los cambios se ven en todos los dispositivos.";
+    return true;
+  }catch(e){
+    fbReady=false;
+    if(st) st.textContent="No conectó. Revisá la config y las reglas de Firestore.";
+    return false;
+  }
+}
 function getTheme(){try{const s=JSON.parse(localStorage.getItem(THEME_KEY))||{};const t=clone(DEFAULT_THEME);Object.assign(t,s);t.boxes=clone(DEFAULT_THEME.boxes);if(s.boxes)Object.keys(t.boxes).forEach(k=>t.boxes[k]={...t.boxes[k],...(s.boxes[k]||{})});return t;}catch(e){return clone(DEFAULT_THEME);}}
-function saveTheme(t){localStorage.setItem(THEME_KEY,JSON.stringify(t));applyTheme(t);}
-function applyTheme(theme){const t=theme||getTheme();const r=document.documentElement;[["--bg",t.bg],["--btn1",t.btn1],["--btn2",t.btn2],["--login",t.login],["--font",t.font],["--font-size",t.fontSize+"px"],["--sway",t.sway+"s"],["--enter",(Number(t.enter)/10)+"s"]].forEach(([k,v])=>r.style.setProperty(k,v));document.body.style.background=t.bg;Object.keys(t.boxes).forEach(name=>{const el=document.getElementById("box-"+name);if(!el)return;const b=t.boxes[name];el.style.left="50%";el.style.top=b.y+"%";el.style.transform="translate(-50%,0)";if(innerWidth>720){el.style.width=b.w+"px";el.style.height=b.h+"px";}else{el.style.width="";el.style.height="";}el.style.setProperty("border-radius",(b.r||0)+"px","important");});}
+function saveTheme(t){localStorage.setItem(THEME_KEY,JSON.stringify(t));applyTheme(t); cloudPut("meta","theme", t);}
+function applyTheme(theme){const t=theme||getTheme();const r=document.documentElement;[["--bg",t.bg],["--btn1",t.btn1],["--btn2",t.btn2],["--login",t.login],["--font",t.font],["--font-size",t.fontSize+"px"],["--sway",t.sway+"s"],["--enter",(Number(t.enter)/10)+"s"]].forEach(([k,v])=>r.style.setProperty(k,v));document.body.style.background=t.bg;const pills={turno:1,cuenta:1,cal:1,hist:1,conf:1,login:1,salir:1};Object.keys(t.boxes).forEach(name=>{const el=document.getElementById("box-"+name);if(!el)return;const b=t.boxes[name];el.style.left="50%";el.style.top=b.y+"%";el.style.transform="translate(-50%,0)";if(innerWidth>720){el.style.width=b.w+"px";el.style.height=b.h+"px";}else{el.style.width="";el.style.height="";}el.style.setProperty("border-radius",pills[name]?"999px":((b.r||0)+"px"),"important");});}
 function isLogged(){try{return sessionStorage.getItem(AUTH_KEY)==="ok"||localStorage.getItem(AUTH_KEY)==="ok";}catch(e){return false;}}
 function adminUser(){const o=getOwner(); return String(o.user||"javier").trim().toLowerCase();}
 function adminPass(){const o=getOwner(); return String(o.pass||"1234");}
 function loginOk(u,p){return String(u).trim().toLowerCase()===adminUser()&&String(p)===adminPass();}
 function currentPacUser(){try{return JSON.parse(sessionStorage.getItem(PAC_SESS)||localStorage.getItem(PAC_SESS));}catch(e){return null;}}
 function getAcc(){try{return JSON.parse(localStorage.getItem(ACC_KEY))||[];}catch(e){return [];}}
-function saveAcc(a){localStorage.setItem(ACC_KEY,JSON.stringify(a));}
+function saveAcc(a){
+  const prev=getAcc();
+  localStorage.setItem(ACC_KEY,JSON.stringify(a));
+  (a||[]).forEach(function(x){ if(x&&x.user) cloudPut("acc", String(x.user).toLowerCase(), x); });
+  (prev||[]).forEach(function(x){ if(x&&x.user && !(a||[]).some(function(y){ return String(y.user||"").toLowerCase()===String(x.user).toLowerCase(); })) cloudDel("acc", String(x.user).toLowerCase()); });
+}
 function upsertAcc(a){const list=getAcc();const i=list.findIndex(x=>String(x.user||"").toLowerCase()===String(a.user||"").toLowerCase());if(i>=0)list[i]={...list[i],...a};else list.push(a);saveAcc(list);}
 function findPacLogin(u,p){u=String(u).trim().toLowerCase();p=String(p);return getAcc().find(x=>String(x.user||"").toLowerCase()===u&&String(x.pass||"")===p)||getPacs().find(x=>String(x.user||"").toLowerCase()===u&&String(x.pass||"")===p)||null;}
 function getFiles(){try{const f=JSON.parse(localStorage.getItem(FILES_KEY))||{}; return {guia:f.guia||[],recetas:f.recetas||[],users:f.users||{}};}catch(e){return{guia:[],recetas:[],users:{}};}}
-function saveFiles(f){localStorage.setItem(FILES_KEY,JSON.stringify(f));}
+function saveFiles(f){localStorage.setItem(FILES_KEY,JSON.stringify(f)); cloudPut("meta","files", stripFiles(f));}
 function filesOf(user,tab){const f=getFiles(); if(!user) return f[tab]||[]; f.users[user]=f.users[user]||{guia:[],recetas:[]}; return f.users[user][tab]||[];}
 function pad(n){return String(n).padStart(2,"0");}
 function isoDay(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
 function isSunday(date){return new Date(date+"T12:00:00").getDay()===0;}
 function defaultAgenda(){return{available:{},booked:{}};}
 function getAgenda(){try{const s=JSON.parse(localStorage.getItem(AGENDA_KEY));if(s&&s.available)return s;}catch(e){}const f=defaultAgenda();localStorage.setItem(AGENDA_KEY,JSON.stringify(f));return f;}
-function saveAgenda(a){localStorage.setItem(AGENDA_KEY,JSON.stringify(a));}
+function saveAgenda(a){localStorage.setItem(AGENDA_KEY,JSON.stringify(a)); cloudPut("meta","agenda", a);}
 function hoursOf(date){if(isSunday(date)) return []; return (getAgenda().available[date]||[]).map(normHora);}
 function freeHours(date){const taken=(getAgenda().booked[date]||[]).map(normHora); return hoursOf(date).filter(h=>!taken.includes(h));}
 function dayStatus(date){if(isSunday(date)) return "sun"; return freeHours(date).length?"green":"red";}
@@ -571,7 +672,12 @@ function getFichaTpl(){
 }
 function saveFichaTpl(t){localStorage.setItem(FICHA_KEY,JSON.stringify(t));}
 function getPacs(){try{return JSON.parse(localStorage.getItem(PAC_KEY))||[];}catch(e){return [];}}
-function savePacs(p){localStorage.setItem(PAC_KEY,JSON.stringify(p));}
+function savePacs(p){
+  const prev=getPacs();
+  localStorage.setItem(PAC_KEY,JSON.stringify(p));
+  (p||[]).forEach(function(x){ if(x&&x.id) cloudPut("pacs", x.id, x); });
+  (prev||[]).forEach(function(x){ if(x&&x.id && !(p||[]).some(function(y){ return y.id===x.id; })) cloudDel("pacs", x.id); });
+}
 function upsertPac(p){const list=getPacs();const i=list.findIndex(x=>x.id===p.id);if(i>=0)list[i]=p;else list.push(p);savePacs(list);}
 
 function go(name){
@@ -580,8 +686,7 @@ function go(name){
   document.getElementById("home").style.display=name==="home"?"block":"none";
   document.body.classList.toggle("page-home",name==="home");
   if(name!=="home") document.getElementById("view-"+name).classList.add("on");
-  const waBtn=document.getElementById("waFloat");
-  if(waBtn){ if(name==="home") waBtn.classList.add("on"); else { waBtn.classList.remove("on"); waBtn.removeAttribute("href"); } }
+  updateWa(name==="home");
   if(name==="cal"||name==="hist"||name==="ficha"||name==="owner"||name==="conf"||name==="users"){ if(!isLogged()) return go("login"); }
   if(name==="portal" && !isLogged() && !currentPacUser()) return go("login");
   if(name==="cal") renderCal();
@@ -664,7 +769,11 @@ function paintDays(box, view, picked, onPick){
     const date=new Date(view.getFullYear(),view.getMonth(),d), id=isoDay(date);
     const b=document.createElement("button"); b.type="button"; b.className="day "+dayStatus(id); b.textContent=d;
     if(picked===id) b.classList.add("sel");
-    if(!isSunday(id)) b.onclick=()=>onPick(id,date);
+    if(!isSunday(id)){
+      const pick=function(ev){ if(ev) ev.preventDefault(); onPick(id,date); };
+      b.addEventListener("click", pick);
+      b.addEventListener("pointerup", function(ev){ if(ev.pointerType==="touch") pick(ev); });
+    }
     box.appendChild(b);
   }
 }
@@ -709,12 +818,29 @@ function drawCSlots(){
   });
 }
 function getOwner(){try{return Object.assign({nombre:"Mar",user:"javier",pass:"1234",whatsapp:"",apikey:""}, JSON.parse(localStorage.getItem(OWNER_KEY))||{});}catch(e){return{nombre:"Mar",user:"javier",pass:"1234",whatsapp:"",apikey:""};}}
-function saveOwner(o){localStorage.setItem(OWNER_KEY,JSON.stringify(o));}
+function saveOwner(o){localStorage.setItem(OWNER_KEY,JSON.stringify(o)); cloudPut("meta","owner", o);}
 function waDigits(n){return String(n||"").replace(/\D/g,"");}
+function waIntl(n){
+  n=waDigits(n);
+  if(!n) return "";
+  if(n.indexOf("54")===0) return n;
+  if(n.length===10) return "549"+n;
+  if(n.length===11 && n.charAt(0)==="9") return "54"+n;
+  return n;
+}
+function waHref(phone, text){
+  const n=waIntl(phone); if(!n) return "";
+  return "https://api.whatsapp.com/send?phone="+n+(text?("&text="+encodeURIComponent(text)):"");
+}
 function phoneKey(n){let d=waDigits(n); if(d.startsWith("54")&&d.length>10) d=d.slice(2); if(d.startsWith("9")&&d.length>=10) d=d.slice(1); if(d.startsWith("0")) d=d.slice(1); return d.slice(-10);}
 function findAccByPhone(tel){const k=phoneKey(tel); if(!k||k.length<6) return null; return getAcc().concat(getPacs()).find(x=>phoneKey(x.telefono||x.tel||"")===k)||null;}
 function getInbox(){try{return JSON.parse(localStorage.getItem(INBOX_KEY))||[];}catch(e){return [];}}
-function saveInbox(list){localStorage.setItem(INBOX_KEY,JSON.stringify(list));}
+function saveInbox(list){
+  const prev=getInbox();
+  localStorage.setItem(INBOX_KEY,JSON.stringify(list));
+  (list||[]).forEach(function(t){ if(t&&t.id) cloudPut("inbox", t.id, t); });
+  (prev||[]).forEach(function(t){ if(t&&t.id && !(list||[]).some(function(x){ return x.id===t.id; })) cloudDel("inbox", t.id); });
+}
 function normHora(h){h=String(h||"").trim(); if(/^\d{1,2}$/.test(h)) h=h.padStart(2,"0")+":00"; if(/^\d{1,2}:\d{2}$/.test(h)) h=h.replace(/^(\d):/,"0$1:"); return h.slice(0,5);}
 function liberarHorario(dia,hora){
   if(!dia||!hora) return;
@@ -779,6 +905,12 @@ function renderOwner(){
   document.getElementById("owPass").value=o.pass||"1234";
   document.getElementById("owTel").value=o.whatsapp||"";
   document.getElementById("owKey").value=o.apikey||"";
+  const cfg=getFbCfg();
+  const setv=function(id,v){ const el=document.getElementById(id); if(el) el.value=v||""; };
+  setv("fbApiKey", cfg.apiKey); setv("fbAuth", cfg.authDomain); setv("fbProject", cfg.projectId);
+  setv("fbBucket", cfg.storageBucket); setv("fbSender", cfg.messagingSenderId); setv("fbApp", cfg.appId);
+  const st=document.getElementById("fbState");
+  if(st) st.textContent=fbOn()?"Conectada. Los cambios se ven en todos los dispositivos.":"Todavía no está conectada.";
   const box=document.getElementById("inboxList");
   const list=getInbox();
   if(!list.length){ box.innerHTML="<div class='card'>Todavía no hay avisos del bot.</div>"; return; }
@@ -857,10 +989,14 @@ function saveCurrentFicha(){
   alert("Ficha guardada");
 }
 
-document.getElementById("tPrev").onclick=()=>{tView.setMonth(tView.getMonth()-1);renderTurno();};
-document.getElementById("tNext").onclick=()=>{tView.setMonth(tView.getMonth()+1);renderTurno();};
-document.getElementById("cPrev").onclick=()=>{cView.setMonth(cView.getMonth()-1);renderCal();};
-document.getElementById("cNext").onclick=()=>{cView.setMonth(cView.getMonth()+1);renderCal();};
+function shiftMonth(which, dir){
+  if(which==="t"){ tView=new Date(tView.getFullYear(), tView.getMonth()+dir, 1); tDay=null; tHour=null; document.getElementById("tHours").style.display="none"; document.getElementById("tDatos").style.display="none"; renderTurno(); }
+  else { cView=new Date(cView.getFullYear(), cView.getMonth()+dir, 1); cDay=null; renderCal(); }
+}
+document.getElementById("tPrev").onclick=()=>shiftMonth("t",-1);
+document.getElementById("tNext").onclick=()=>shiftMonth("t",1);
+document.getElementById("cPrev").onclick=()=>shiftMonth("c",-1);
+document.getElementById("cNext").onclick=()=>shiftMonth("c",1);
 document.getElementById("cAdd").onclick=()=>{
   if(!cDay||isSunday(cDay)) return;
   let h=document.getElementById("cHour").value.trim();
@@ -908,6 +1044,18 @@ document.getElementById("owSave").onclick=()=>{
   document.getElementById("owToast").classList.add("show");
   updateWa();
 };
+document.getElementById("fbConnect").onclick=async ()=>{
+  saveFbCfg({
+    apiKey:document.getElementById("fbApiKey").value.trim(),
+    authDomain:document.getElementById("fbAuth").value.trim(),
+    projectId:document.getElementById("fbProject").value.trim(),
+    storageBucket:document.getElementById("fbBucket").value.trim(),
+    messagingSenderId:document.getElementById("fbSender").value.trim(),
+    appId:document.getElementById("fbApp").value.trim()
+  });
+  const ok=await startFirebase();
+  document.getElementById("fbState").textContent=ok?"Conectada. Los cambios se ven en todos los dispositivos.":"No conectó. Revisá la config y las reglas.";
+};
 document.getElementById("addPac").onclick=()=>{
   const nombre=document.getElementById("nuevoNombre").value.trim(); if(!nombre) return;
   const telefono=document.getElementById("nuevoTel").value.trim();
@@ -935,7 +1083,9 @@ function dlName(f){
   if(k==="pdf") return "archivo.pdf";
   return "archivo";
 }
+function fileSrc(f){ return (f&&(f.url||f.data))||""; }
 function blobFromData(f){
+  if(f&&f.url) return f.url;
   try{
     const parts=String(f.data||"").split(",");
     const mime=(parts[0].match(/:(.*?);/)||[])[1]||f.type||"application/octet-stream";
@@ -954,7 +1104,7 @@ function triggerDownload(f){
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function(){ try{ URL.revokeObjectURL(url); }catch(e){} }, 2500);
   }catch(e){
-    const a=document.createElement("a"); a.href=f.data; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    const a=document.createElement("a"); a.href=fileSrc(f); a.download=name; document.body.appendChild(a); a.click(); a.remove();
   }
 }
 function openFile(f){
@@ -967,8 +1117,8 @@ function fileCardHtml(f, admin){
   const dl='<button type="button" class="dl" data-dl="'+f.id+'">Descargar</button>';
   const open='<button type="button" class="openf" data-openf="'+f.id+'">Ver</button>';
   const del=admin?'<button type="button" class="save" data-del="'+f.id+'" style="width:auto;height:44px;padding:0 16px;margin:0">Quitar</button>':'';
-  if(k==="image") return '<article class="file-card"><div class="media-frame" data-zoom="'+f.id+'"><img src="'+f.data+'" alt="" loading="lazy"></div><div class="file-actions">'+dl+del+'</div></article>';
-  if(k==="pdf" && !mobile) return '<article class="file-card"><div class="media-frame pdf"><iframe src="'+f.data+'#toolbar=0&navpanes=0" title=""></iframe></div><div class="file-actions">'+open+dl+del+'</div></article>';
+  if(k==="image") return '<article class="file-card"><div class="media-frame" data-zoom="'+f.id+'"><img src="'+fileSrc(f)+'" alt="" loading="lazy"></div><div class="file-actions">'+dl+del+'</div></article>';
+  if(k==="pdf" && !mobile) return '<article class="file-card"><div class="media-frame pdf"><iframe src="'+fileSrc(f)+'#toolbar=0&navpanes=0" title=""></iframe></div><div class="file-actions">'+open+dl+del+'</div></article>';
   if(k==="pdf") return '<article class="file-card"><div class="doc-preview">Documento</div><div class="file-actions">'+open+dl+del+'</div></article>';
   return '<article class="file-card"><div class="doc-preview">Archivo</div><div class="file-actions">'+open+dl+del+'</div></article>';
 }
@@ -979,7 +1129,7 @@ function bindFileActions(box, files){
   box.querySelectorAll("[data-zoom]").forEach(function(el){
     el.onclick=function(){
       const f=byId[el.dataset.zoom]; if(!f) return;
-      document.getElementById("lbImg").src=f.data;
+      document.getElementById("lbImg").src=fileSrc(f);
       document.getElementById("lightbox").classList.add("on");
     };
   });
@@ -1027,13 +1177,11 @@ function renderUsers(){
     const f=getFiles(); if(f.users) delete f.users[u]; saveFiles(f);
     renderUsers();
   });
-  box.querySelectorAll("[data-as]").forEach(inp=>inp.onchange=e=>{
+  box.querySelectorAll("[data-as]").forEach(inp=>inp.onchange=async e=>{
     const file=e.target.files&&e.target.files[0]; if(!file) return;
-    if(file.size>1500000){ alert("Hasta 1,5 MB."); e.target.value=""; return; }
     const u=inp.closest("[data-u]").dataset.u, tab=inp.dataset.as;
-    const reader=new FileReader();
-    reader.onload=()=>{ const all=getFiles(); all.users[u]=all.users[u]||{guia:[],recetas:[]}; all.users[u][tab]=all.users[u][tab]||[]; all.users[u][tab].push({id:"f"+Date.now(),name:file.name,type:file.type,data:reader.result}); saveFiles(all); renderUsers(); };
-    reader.readAsDataURL(file);
+    try{ await addFileToLib(file, u, tab); renderUsers(); }catch(err){ alert("No se pudo subir el archivo."); }
+    e.target.value="";
   });
   box.querySelectorAll("[data-kill]").forEach(b=>b.onclick=()=>{
     const u=b.closest("[data-u]").dataset.u, id=b.dataset.kill;
@@ -1043,12 +1191,34 @@ function renderUsers(){
   });
 }
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{ libTab=t.dataset.lib; renderPortal(); });
-document.getElementById("fileIn").onchange=e=>{
+function maxFileBytes(){ return fbOn()?8*1024*1024:1500000; }
+async function addFileToLib(file, target, tab){
+  if(file.size>maxFileBytes()){ alert(fbOn()?"Hasta 8 MB con Firebase.":"Hasta 1,5 MB. Conectá Firebase para archivos más grandes."); return; }
+  const id="f"+Date.now();
+  const item={id:id,name:file.name,type:file.type,url:"",path:"",data:""};
+  if(fbOn() && fbSt){
+    const path="mar/"+(target||"lib")+"/"+(tab||"guia")+"/"+id+"-"+(file.name||"archivo").replace(/[^\w.\-]+/g,"_");
+    const snap=await fbSt.ref(path).put(file);
+    item.url=await snap.ref.getDownloadURL();
+    item.path=path;
+  } else {
+    item.data=await new Promise(function(res,rej){ const r=new FileReader(); r.onload=function(){ res(r.result); }; r.onerror=rej; r.readAsDataURL(file); });
+  }
+  const all=getFiles();
+  if(target){
+    all.users[target]=all.users[target]||{guia:[],recetas:[]};
+    all.users[target][tab]=all.users[target][tab]||[];
+    all.users[target][tab].push(item);
+  } else {
+    all[tab]=all[tab]||[];
+    all[tab].push(item);
+  }
+  saveFiles(all);
+}
+document.getElementById("fileIn").onchange=async e=>{
   const file=e.target.files&&e.target.files[0]; if(!file||!isLogged()) return;
-  if(file.size>1500000){ alert("El archivo es grande. Probá uno de hasta 1,5 MB."); e.target.value=""; return; }
-  const reader=new FileReader();
-  reader.onload=()=>{ const all=getFiles(); all[libTab]=all[libTab]||[]; all[libTab].push({id:"f"+Date.now(),name:file.name,type:file.type,data:reader.result}); saveFiles(all); renderPortal(); };
-  reader.readAsDataURL(file); e.target.value="";
+  try{ await addFileToLib(file, null, libTab); renderPortal(); }catch(err){ alert("No se pudo subir el archivo."); }
+  e.target.value="";
 };
 
 document.getElementById("doRegistro").onclick=()=>{
@@ -1067,26 +1237,50 @@ document.getElementById("doRecupero").onclick=()=>{
   const user=document.getElementById("recUser").value.trim();
   if(!user) return;
   const wa=waDigits(getOwner().whatsapp);
-  const msg="Hola Mar, quiero recuperar la contraseña de mi cuenta. Usuario: "+encodeURIComponent(user);
-  if(wa) window.open("https://wa.me/"+wa+"?text="+msg,"_blank");
+  if(wa) window.location.href=waHref(wa, "Hola Mar, quiero recuperar la contraseña de mi cuenta. Usuario: "+user);
   else alert("Cargá el WhatsApp del dueño en Datos de dueño para habilitar el recupero.");
 };
 applyTheme();
 bindNav();
 if(isLogged()) bindEditor();
-function updateWa(){
-  const n=waDigits(getOwner().whatsapp), a=document.getElementById("waFloat");
-  if(!a) return;
-  if(n) a.setAttribute("href","https://wa.me/"+n);
-  else a.setAttribute("href","#");
-  if(document.body.classList.contains("page-home")) a.classList.add("on");
-  else a.classList.remove("on");
+startFirebase();
+function updateWa(show){
+  const a=document.getElementById("waFloat"); if(!a) return;
+  const n=waIntl(getOwner().whatsapp||getOwner().tel||"");
+  const url=n?waHref(n):"";
+  a.setAttribute("href", url||"#");
+  a.dataset.phone=n;
+  const visible=show!==false && (show===true || document.body.classList.contains("page-home"));
+  a.classList.toggle("on", visible);
+}
+function openOwnerWa(e){
+  if(e){ e.preventDefault(); e.stopPropagation(); }
+  const n=waIntl(getOwner().whatsapp||getOwner().tel||"");
+  if(!n){ alert("Cargá el WhatsApp de Mar en Datos de dueño (con código de país, ej. 549...)."); return false; }
+  const url=waHref(n);
+  try{ window.location.assign(url); }catch(err){ window.location.href=url; }
+  return false;
 }
 document.getElementById("lbClose").onclick=()=>document.getElementById("lightbox").classList.remove("on");
 document.getElementById("lightbox").addEventListener("click",e=>{ if(e.target.id==="lightbox"||e.target.id==="lbClose") document.getElementById("lightbox").classList.remove("on"); });
 document.getElementById("popClose").onclick=()=>document.getElementById("popOk").classList.remove("on");
 document.getElementById("popOk").addEventListener("click",e=>{ if(e.target.id==="popOk") e.currentTarget.classList.remove("on"); });
-updateWa();
+updateWa(true);
+document.getElementById("waFloat").addEventListener("click", openOwnerWa);
+document.addEventListener("visibilitychange", function(){
+  if(document.hidden) return;
+  if(document.getElementById("view-turno").classList.contains("on")) renderTurno();
+  if(document.getElementById("view-cal").classList.contains("on")) renderCal();
+});
+window.addEventListener("pageshow", function(){
+  if(document.getElementById("view-turno").classList.contains("on")) renderTurno();
+});
+window.addEventListener("storage", function(e){
+  if(e.key===AGENDA_KEY){
+    if(document.getElementById("view-turno").classList.contains("on")) renderTurno();
+    if(document.getElementById("view-cal").classList.contains("on")) renderCal();
+  }
+});
 processReminders();
 setInterval(processReminders, 60000);
 document.querySelectorAll(".branch").forEach(el=>el.addEventListener("animationend",()=>{el.style.opacity=getComputedStyle(el).opacity;el.classList.add("is-sway");},{once:true}));
@@ -1112,7 +1306,7 @@ if("serviceWorker" in navigator){
   }).then(function(keys){
     return Promise.all(keys.map(function(k){ return caches.delete(k); }));
   }).then(function(){
-    return navigator.serviceWorker.register("sw.js?v=5");
+    return navigator.serviceWorker.register("sw.js?v=7");
   }).catch(function(){});
 }
 document.addEventListener("click",function(e){
