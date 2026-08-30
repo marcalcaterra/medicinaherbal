@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MAR | Terapia de Medicina Herbal</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="assets/logo-badge.jpg" />
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <img class="logo-badge" src="assets/logo-badge.jpg" alt="Logo MAR Medicina Herbal" />
+      <img class="logo-wordmark" src="assets/logo-wordmark.jpg" alt="MAR Medicina Herbal" />
+      <p class="tagline">Terapia de medicina herbal</p>
+    </header>
+
+    <main class="main">
+      <div class="tabs" role="tablist">
+        <button class="tab active" id="tab-turno" type="button" data-target="panel-turno">
+          AGENDÁ TU TURNO
+          <small>Primera consulta o seguimiento</small>
+        </button>
+        <button class="tab" id="tab-cuenta" type="button" data-target="panel-cuenta">
+          INGRESÁ A TU CUENTA
+          <small>Consultá o modificá turnos</small>
+        </button>
+      </div>
+
+      <section class="panel active" id="panel-turno">
+        <h2>Agendá tu turno</h2>
+        <p class="lead">Reservá tu espacio para una consulta de medicina herbal. Te confirmamos el horario.</p>
+
+        <form id="form-turno">
+          <div class="form-grid">
+            <div class="field">
+              <label for="nombre">Nombre y apellido</label>
+              <input id="nombre" name="nombre" type="text" required placeholder="Ej: Javier Bravin" />
+            </div>
+            <div class="field">
+              <label for="telefono">Teléfono / WhatsApp</label>
+              <input id="telefono" name="telefono" type="tel" required placeholder="Ej: 3401 555555" />
+            </div>
+            <div class="field">
+              <label for="fecha">Fecha</label>
+              <input id="fecha" name="fecha" type="date" required />
+            </div>
+            <div class="field">
+              <label for="hora">Horario</label>
+              <select id="hora" name="hora" required>
+                <option value="">Elegí un horario</option>
+                <option>09:00</option>
+                <option>09:30</option>
+                <option>10:00</option>
+                <option>10:30</option>
+                <option>11:00</option>
+                <option>11:30</option>
+                <option>16:00</option>
+                <option>16:30</option>
+                <option>17:00</option>
+                <option>17:30</option>
+                <option>18:00</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="servicio">Tipo de consulta</label>
+              <select id="servicio" name="servicio" required>
+                <option value="">Seleccioná una opción</option>
+                <option>Primera consulta</option>
+                <option>Seguimiento de tratamiento</option>
+                <option>Consulta de medicina herbal</option>
+                <option>Revisión de preparados</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="motivo">Motivo de la consulta (opcional)</label>
+              <textarea id="motivo" name="motivo" placeholder="Contanos brevemente qué te gustaría trabajar"></textarea>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-gold" type="submit">Confirmar turno</button>
+          </div>
+          <div class="toast" id="toast-turno">Listo. Recibimos tu pedido de turno en MAR. Te confirmamos por WhatsApp.</div>
+        </form>
+      </section>
+
+      <section class="panel" id="panel-cuenta">
+        <h2>Ingresá a tu cuenta</h2>
+        <p class="lead">Accedé para ver tus turnos, tratamientos y próximas consultas.</p>
+
+        <form id="form-cuenta">
+          <div class="form-grid">
+            <div class="field full">
+              <label for="email-cuenta">Correo electrónico</label>
+              <input id="email-cuenta" type="email" required placeholder="tu@correo.com" />
+            </div>
+            <div class="field full">
+              <label for="pass-cuenta">Contraseña</label>
+              <input id="pass-cuenta" type="password" required placeholder="••••••••" />
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-navy" type="submit">Ingresar</button>
+          </div>
+          <div class="toast" id="toast-cuenta">Vista previa del acceso. El login real se conecta en el próximo paso.</div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <div>
+          <h3>Login</h3>
+          <p>Acceso rápido para pacientes de MAR.</p>
+        </div>
+        <form class="login-inline" id="form-login-footer">
+          <input type="email" required placeholder="Correo electrónico" aria-label="Correo electrónico" />
+          <input type="password" required placeholder="Contraseña" aria-label="Contraseña" />
+          <button class="btn btn-gold" type="submit">Entrar</button>
+        </form>
+      </div>
+      <p class="note">MAR · Terapia de medicina herbal · Primer paso del sitio</p>
+    </footer>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
