@@ -517,7 +517,7 @@
           <textarea id="fbPaste" rows="8" placeholder='const firebaseConfig = {&#10;  apiKey: "...",&#10;  authDomain: "...",&#10;  projectId: "...",&#10;  storageBucket: "...",&#10;  messagingSenderId: "...",&#10;  appId: "..."&#10;};' style="width:100%;min-height:160px;border:1px solid #d8cbb8;border-radius:22px;padding:14px 16px;background:#fffdf9;font:15px Nunito,sans-serif;color:#4a5740;resize:vertical;line-height:1.45"></textarea>
         </div>
         <button class="save" type="button" id="fbConnect">Guardar y conectar</button>
-        <p style="margin:12px 0 0;color:#6b5c4c;font-size:13px;line-height:1.45">También tenés que tener Firestore creado en modo prueba. Si no conecta, primero creá la base en Compilación → Firestore.</p>
+        <p style="margin:12px 0 0;color:#6b5c4c;font-size:13px;line-height:1.45">En Firebase → Realtime Database → pestaña Reglas, publicá: { "rules": { ".read": true, ".write": true } }</p>
       </div>
       <h1 style="margin-top:22px">Avisos del bot</h1>
       <div id="inboxList"></div>
@@ -531,7 +531,7 @@
   </section>
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script>
 const THEME_KEY="mar_theme_v8", AUTH_KEY="mar_auth", PAC_SESS="mar_pac_sess", ACC_KEY="mar_acc_v1", AGENDA_KEY="mar_agenda_v3", FICHA_KEY="mar_ficha_v2", PAC_KEY="mar_pac_v1", OWNER_KEY="mar_owner_v1", INBOX_KEY="mar_inbox_v1", FILES_KEY="mar_files_v1", FB_KEY="mar_fb_cfg_v1";
@@ -553,6 +553,7 @@ let fbDb=null, fbSt=null, fbReady=false, fbListen=false;
 const FB_DEFAULT={
   apiKey:"AIzaSyCAdt0XyG6s5Wb0CjJG4AyoOuj9tURyaKE",
   authDomain:"mar-medicina.firebaseapp.com",
+  databaseURL:"https://mar-medicina-default-rtdb.firebaseio.com",
   projectId:"mar-medicina",
   storageBucket:"mar-medicina.firebasestorage.app",
   messagingSenderId:"14464886100",
@@ -577,8 +578,13 @@ function parseFbPaste(text){
   return out;
 }
 function fbOn(){return !!(fbReady && fbDb);}
-function cloudPut(col,id,data){ if(!fbOn()) return Promise.resolve(); return fbDb.collection(col).doc(id).set(data,{merge:true}).catch(function(){}); }
-function cloudDel(col,id){ if(!fbOn()) return Promise.resolve(); return fbDb.collection(col).doc(id).delete().catch(function(){}); }
+function cloudPut(col,id,data){ if(!fbOn()) return Promise.resolve(); try{ return fbDb.ref(col+"/"+id).set(JSON.parse(JSON.stringify(data))); }catch(e){ return Promise.resolve(); } }
+function cloudDel(col,id){ if(!fbOn()) return Promise.resolve(); try{ return fbDb.ref(col+"/"+id).remove(); }catch(e){ return Promise.resolve(); } }
+function cloudObjToList(val){
+  if(!val) return [];
+  if(Array.isArray(val)) return val.filter(Boolean);
+  return Object.keys(val).map(function(k){ return val[k]; }).filter(Boolean);
+}
 function stripFiles(f){
   const clean=function(arr){ return (arr||[]).map(function(x){ return {id:x.id,name:x.name||"",type:x.type||"",url:x.url||"",path:x.path||""}; }); };
   const users={};
@@ -602,24 +608,22 @@ function refreshOpenViews(){
 function listenCloud(){
   if(!fbOn()||fbListen) return;
   fbListen=true;
-  fbDb.collection("meta").doc("agenda").onSnapshot(function(s){ if(!s.exists) return; localStorage.setItem(AGENDA_KEY, JSON.stringify(s.data())); refreshOpenViews(); });
-  fbDb.collection("meta").doc("owner").onSnapshot(function(s){ if(!s.exists) return; localStorage.setItem(OWNER_KEY, JSON.stringify(s.data())); refreshOpenViews(); });
-  fbDb.collection("meta").doc("theme").onSnapshot(function(s){ if(!s.exists) return; localStorage.setItem(THEME_KEY, JSON.stringify(s.data())); applyTheme(); });
-  fbDb.collection("meta").doc("files").onSnapshot(function(s){ if(!s.exists) return; localStorage.setItem(FILES_KEY, JSON.stringify(s.data())); refreshOpenViews(); });
-  fbDb.collection("inbox").onSnapshot(function(snap){
-    const list=[]; snap.forEach(function(d){ list.push(d.data()); });
+  fbDb.ref("meta/agenda").on("value", function(s){ const v=s.val(); if(!v) return; localStorage.setItem(AGENDA_KEY, JSON.stringify(v)); refreshOpenViews(); });
+  fbDb.ref("meta/owner").on("value", function(s){ const v=s.val(); if(!v) return; localStorage.setItem(OWNER_KEY, JSON.stringify(v)); refreshOpenViews(); });
+  fbDb.ref("meta/theme").on("value", function(s){ const v=s.val(); if(!v) return; localStorage.setItem(THEME_KEY, JSON.stringify(v)); applyTheme(); });
+  fbDb.ref("meta/files").on("value", function(s){ const v=s.val(); if(!v) return; localStorage.setItem(FILES_KEY, JSON.stringify(v)); refreshOpenViews(); });
+  fbDb.ref("inbox").on("value", function(s){
+    const list=cloudObjToList(s.val());
     list.sort(function(a,b){ return String(b.id||"").localeCompare(String(a.id||"")); });
     localStorage.setItem(INBOX_KEY, JSON.stringify(list));
     refreshOpenViews();
   });
-  fbDb.collection("pacs").onSnapshot(function(snap){
-    const list=[]; snap.forEach(function(d){ list.push(d.data()); });
-    localStorage.setItem(PAC_KEY, JSON.stringify(list));
+  fbDb.ref("pacs").on("value", function(s){
+    localStorage.setItem(PAC_KEY, JSON.stringify(cloudObjToList(s.val())));
     refreshOpenViews();
   });
-  fbDb.collection("acc").onSnapshot(function(snap){
-    const list=[]; snap.forEach(function(d){ list.push(d.data()); });
-    localStorage.setItem(ACC_KEY, JSON.stringify(list));
+  fbDb.ref("acc").on("value", function(s){
+    localStorage.setItem(ACC_KEY, JSON.stringify(cloudObjToList(s.val())));
     refreshOpenViews();
   });
 }
@@ -630,11 +634,11 @@ async function startFirebase(){
   if(typeof firebase==="undefined"){ if(st) st.textContent="No se pudo cargar Firebase. Revisá internet."; return false; }
   try{
     if(!firebase.apps.length) firebase.initializeApp(cfg);
-    fbDb=firebase.firestore();
+    fbDb=firebase.database();
     try{ fbSt=firebase.storage(); }catch(e){ fbSt=null; }
     fbReady=true;
-    const ag=await fbDb.collection("meta").doc("agenda").get();
-    if(!ag.exists){
+    const ag=await fbDb.ref("meta/agenda").once("value");
+    if(!ag.exists()){
       await cloudPut("meta","agenda", getAgenda());
       await cloudPut("meta","owner", getOwner());
       await cloudPut("meta","theme", getTheme());
@@ -648,7 +652,7 @@ async function startFirebase(){
     return true;
   }catch(e){
     fbReady=false;
-    if(st) st.textContent="No conectó. Revisá la config y las reglas de Firestore.";
+    if(st) st.textContent="No conectó. Revisá las reglas de Realtime Database.";
     return false;
   }
 }
@@ -1082,7 +1086,7 @@ document.getElementById("fbConnect").onclick=async ()=>{
   saveFbCfg(parsed);
   if(st) st.textContent="Conectando...";
   const ok=await startFirebase();
-  if(st) st.textContent=ok?"Guardado y conectado. Ya se sincroniza en todos los dispositivos.":"Se guardó la config, pero Firestore todavía no responde. Creá la base: Compilación → Firestore → Crear (modo prueba).";
+  if(st) st.textContent=ok?"Guardado y conectado. Ya se sincroniza en todos los dispositivos.":"Se guardó, pero la base no responde. En Realtime Database → Reglas publicá lectura y escritura en true.";
 };
 document.getElementById("addPac").onclick=()=>{
   const nombre=document.getElementById("nuevoNombre").value.trim(); if(!nombre) return;
@@ -1337,7 +1341,7 @@ if("serviceWorker" in navigator){
   }).then(function(keys){
     return Promise.all(keys.map(function(k){ return caches.delete(k); }));
   }).then(function(){
-    return navigator.serviceWorker.register("sw.js?v=8");
+    return navigator.serviceWorker.register("sw.js?v=9");
   }).catch(function(){});
 }
 document.addEventListener("click",function(e){
