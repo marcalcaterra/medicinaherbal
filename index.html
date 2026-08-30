@@ -11,7 +11,7 @@
   <main class="wrap">
     <section class="card logo-card">
       <div class="logo-wrap" id="logoWrap">
-        <img src="logo-dark.png" alt="Mar Terapia y Medicina Herbal" />
+        <img src="logo-dark.png" alt="Mar Terapia y Medicina Herbal" onerror="this.onerror=null;this.src='logo.png';" />
       </div>
     </section>
 
@@ -30,29 +30,5 @@
   </main>
 
   <script src="theme.js"></script>
-  <script>
-    const wrap = document.getElementById("logoWrap");
-    if (isLogged()) {
-      wrap.classList.add("draggable");
-      let dragging = false;
-      wrap.addEventListener("pointerdown", (e) => {
-        dragging = true;
-        wrap.classList.add("dragging");
-        wrap.setPointerCapture(e.pointerId);
-      });
-      wrap.addEventListener("pointerup", () => {
-        dragging = false;
-        wrap.classList.remove("dragging");
-      });
-      wrap.addEventListener("pointermove", (e) => {
-        if (!dragging) return;
-        const card = wrap.parentElement.getBoundingClientRect();
-        const theme = getTheme();
-        theme.logoX = Math.max(10, Math.min(90, ((e.clientX - card.left) / card.width) * 100));
-        theme.logoY = Math.max(10, Math.min(90, ((e.clientY - card.top) / card.height) * 100));
-        saveTheme(theme);
-      });
-    }
-  </script>
 </body>
 </html>
