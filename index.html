@@ -4,12 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mar | Terapia y Medicina Herbal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&family=Manrope:wght@500;700&family=Montserrat:wght@500;700&family=Lora:wght@500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --bg: #96ab82;
+      --btn1: #2c4a38;
+      --btn2: #ffffff;
+      --login: #ffffff;
+      --font: "Nunito", sans-serif;
+      --font-size: 13px;
+      --sway: 7s;
+      --enter: 1.4s;
+    }
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
     body {
-      font-family: Nunito, "Segoe UI", sans-serif;
-      background: #96ab82;
+      font-family: var(--font);
+      background: var(--bg);
       overflow: hidden;
       color: #2c4a38;
     }
@@ -27,7 +39,6 @@
       position: absolute;
       bottom: 0;
       opacity: 0;
-      animation: fadeIn .8s ease forwards;
     }
     .branch img {
       height: 100%;
@@ -36,16 +47,16 @@
       transform-origin: 50% 100%;
       will-change: transform;
     }
-    .b1 { left: 0; height: 80%; animation-delay: .05s; }
-    .b2 { left: 18%; height: 90%; animation-delay: .12s; }
-    .b3 { left: 36%; height: 96%; animation-delay: .18s; }
-    .b4 { left: 54%; height: 86%; animation-delay: .14s; }
-    .b5 { left: 72%; height: 74%; animation-delay: .22s; }
-    .b1 img { animation: swayA 6.2s ease-in-out 1s infinite; }
-    .b2 img { animation: swayB 7s ease-in-out 1.1s infinite; }
-    .b3 img { animation: swayC 8s ease-in-out 1.2s infinite; }
-    .b4 img { animation: swayB 6.6s ease-in-out 1.15s infinite; }
-    .b5 img { animation: swayA 7.4s ease-in-out 1.25s infinite; }
+    .b1 { left: 0; height: 80%; animation: enterL var(--enter) ease forwards; }
+    .b2 { left: 18%; height: 90%; animation: enterL var(--enter) ease .12s forwards; }
+    .b3 { left: 36%; height: 96%; animation: enterC var(--enter) ease .2s forwards; }
+    .b4 { left: 54%; height: 86%; animation: enterR var(--enter) ease .16s forwards; }
+    .b5 { left: 72%; height: 74%; animation: enterR var(--enter) ease .28s forwards; }
+    .b1 img { animation: swayA var(--sway) ease-in-out calc(var(--enter) + .2s) infinite; }
+    .b2 img { animation: swayB calc(var(--sway) * 1.12) ease-in-out calc(var(--enter) + .3s) infinite; }
+    .b3 img { animation: swayC calc(var(--sway) * 1.25) ease-in-out calc(var(--enter) + .4s) infinite; }
+    .b4 img { animation: swayB calc(var(--sway) * 1.06) ease-in-out calc(var(--enter) + .35s) infinite; }
+    .b5 img { animation: swayA calc(var(--sway) * 1.18) ease-in-out calc(var(--enter) + .45s) infinite; }
 
     .stage { position: relative; z-index: 5; min-height: 100vh; }
     .box {
@@ -54,34 +65,32 @@
       align-items: center;
       justify-content: center;
       transform: translate(-50%, 0);
-      transition: left .25s ease, top .25s ease, width .25s ease, height .25s ease;
+      overflow: hidden;
     }
-    body.is-admin .box { outline: 1px dashed rgba(44,74,56,.4); cursor: grab; transition: none; }
+    body.is-admin .box { outline: 1px dashed rgba(44,74,56,.4); cursor: grab; }
     body.is-admin .box.dragging { cursor: grabbing; outline-color: #2c4a38; }
-    #box-logo { left: 50%; top: 10%; width: 260px; height: 210px; }
+    #box-logo { left: 50%; top: 10%; width: 260px; height: 210px; border-radius: 0; }
     #box-logo img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
     #box-turno { left: 50%; top: 68%; width: min(520px, 92vw); height: 58px; }
     #box-cuenta { left: 50%; top: 78%; width: min(520px, 92vw); height: 58px; }
     #box-login { left: 50%; top: 90%; width: 120px; height: 38px; }
-    .btn-main {
+    .btn-main, .login-pill {
       width: 100%; height: 100%;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       text-decoration: none; text-align: center;
+      font-family: var(--font);
     }
-    .btn-main b { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; }
-    .btn-main small { font-size: 11px; opacity: .85; margin-top: 2px; }
-    .btn-main.dark { background: var(--btn1, #2c4a38); color: #fff; }
-    .btn-main.light { background: var(--btn2, #fff); color: var(--btn1, #2c4a38); }
+    .btn-main b { font-size: var(--font-size); letter-spacing: .14em; text-transform: uppercase; }
+    .btn-main small { font-size: calc(var(--font-size) - 2px); opacity: .85; margin-top: 2px; }
+    .btn-main.dark { background: var(--btn1); color: #fff; }
+    .btn-main.light { background: var(--btn2); color: var(--btn1); }
     .login-pill {
-      width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
-      text-decoration: none; background: var(--login, #fff); color: #6f8464;
-      border-radius: 999px; font-weight: 700;
+      background: var(--login); color: #6f8464; font-weight: 700; font-size: var(--font-size);
     }
     .editor {
       display: none;
       position: fixed; top: 12px; right: 12px;
-      width: 270px; max-height: calc(100vh - 24px); overflow: auto;
+      width: 280px; max-height: calc(100vh - 24px); overflow: auto;
       background: #fff; border-radius: 16px; padding: 14px; z-index: 80;
       box-shadow: 0 12px 28px rgba(0,0,0,.16);
     }
@@ -91,14 +100,25 @@
     .editor .ed-row { display: flex; justify-content: space-between; align-items: center; margin: 7px 0; font-size: 12px; font-weight: 700; }
     .editor .ed-row.col { flex-direction: column; align-items: stretch; gap: 4px; }
     .editor input[type="color"] { width: 42px; height: 28px; padding: 0; border: 0; background: none; }
-    .editor input, .editor select { width: 120px; height: 28px; }
+    .editor input, .editor select { width: 130px; height: 28px; }
     .editor input[type="range"] { width: 100%; }
     .editor button, .editor a { font-size: 13px; font-weight: 800; color: #2c4a38; margin-right: 8px; }
 
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: .72; } }
-    @keyframes swayA { 0%,100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.7deg); } }
-    @keyframes swayB { 0%,100% { transform: rotate(1.3deg); } 50% { transform: rotate(-1.8deg); } }
-    @keyframes swayC { 0%,100% { transform: rotate(-.5deg); } 50% { transform: rotate(1.2deg); } }
+    @keyframes enterL {
+      from { opacity: 0; transform: translate(-28px, 36px) scale(.92); }
+      to { opacity: .72; transform: none; }
+    }
+    @keyframes enterC {
+      from { opacity: 0; transform: translate(0, 48px) scale(.9); }
+      to { opacity: .78; transform: none; }
+    }
+    @keyframes enterR {
+      from { opacity: 0; transform: translate(28px, 36px) scale(.92); }
+      to { opacity: .72; transform: none; }
+    }
+    @keyframes swayA { 0%,100% { transform: rotate(-1.6deg); } 50% { transform: rotate(1.8deg); } }
+    @keyframes swayB { 0%,100% { transform: rotate(1.4deg); } 50% { transform: rotate(-1.9deg); } }
+    @keyframes swayC { 0%,100% { transform: rotate(-.4deg); } 50% { transform: rotate(1.1deg); } }
   </style>
 </head>
 <body>
@@ -112,11 +132,23 @@
 
   <aside class="editor" id="editor">
     <h2>Editar en vivo</h2>
-    <p>Arrastrá los recuadros o usá los controles.</p>
+    <p>Cambios al instante. Arrastrá los recuadros.</p>
     <div class="ed-row"><span>Fondo</span><input id="bg" type="color" /></div>
     <div class="ed-row"><span>Botón Agendá</span><input id="btn1" type="color" /></div>
     <div class="ed-row"><span>Botón Ingresá</span><input id="btn2" type="color" /></div>
     <div class="ed-row"><span>Login</span><input id="loginColor" type="color" /></div>
+    <div class="ed-row"><span>Fuente</span>
+      <select id="font">
+        <option value='"Nunito", sans-serif'>Nunito</option>
+        <option value='"Manrope", sans-serif'>Manrope</option>
+        <option value='"Montserrat", sans-serif'>Montserrat</option>
+        <option value='"Playfair Display", serif'>Playfair</option>
+        <option value='"Lora", serif'>Lora</option>
+      </select>
+    </div>
+    <div class="ed-row col"><span>Tamaño de fuente</span><input id="fontSize" type="range" min="10" max="22" /></div>
+    <div class="ed-row col"><span>Velocidad de flores</span><input id="sway" type="range" min="3" max="16" /></div>
+    <div class="ed-row col"><span>Entrada de flores</span><input id="enter" type="range" min="6" max="28" /></div>
     <h3>Recuadro</h3>
     <div class="ed-row">
       <span>Cuál</span>
@@ -131,6 +163,7 @@
     <div class="ed-row col"><span>Posición Y</span><input id="boxY" type="range" min="4" max="92" /></div>
     <div class="ed-row col"><span>Ancho</span><input id="boxW" type="range" min="80" max="700" /></div>
     <div class="ed-row col"><span>Alto</span><input id="boxH" type="range" min="36" max="360" /></div>
+    <div class="ed-row col"><span>Redondeo</span><input id="boxR" type="range" min="0" max="80" /></div>
     <div class="ed-actions">
       <button type="button" id="reset">Restablecer</button>
       <a href="#" id="salir">Salir</a>

@@ -1,4 +1,4 @@
-const THEME_KEY = "mar_theme_v5";
+const THEME_KEY = "mar_theme_v6";
 const AUTH_KEY = "mar_auth";
 
 const DEFAULT_THEME = {
@@ -7,11 +7,14 @@ const DEFAULT_THEME = {
   btn2: "#ffffff",
   login: "#ffffff",
   font: '"Nunito", sans-serif',
+  fontSize: 13,
+  sway: 7,
+  enter: 14,
   boxes: {
-    logo: { x: 50, y: 10, w: 260, h: 210 },
-    turno: { x: 50, y: 68, w: 520, h: 58 },
-    cuenta: { x: 50, y: 78, w: 520, h: 58 },
-    login: { x: 50, y: 90, w: 120, h: 38 }
+    logo: { x: 50, y: 10, w: 260, h: 210, r: 0 },
+    turno: { x: 50, y: 68, w: 520, h: 58, r: 2 },
+    cuenta: { x: 50, y: 78, w: 520, h: 58, r: 2 },
+    login: { x: 50, y: 90, w: 120, h: 38, r: 40 }
   }
 };
 
@@ -51,23 +54,25 @@ function applyBoxes(theme) {
     el.style.top = b.y + "%";
     el.style.width = b.w + "px";
     el.style.height = b.h + "px";
+    el.style.borderRadius = (b.r || 0) + "px";
     el.style.transform = "translate(-50%, 0)";
   });
 }
 
 function applyTheme(theme) {
   const t = theme || getTheme();
-  const root = document.documentElement;
   if (!document.body) return;
+  const root = document.documentElement;
   root.style.setProperty("--bg", t.bg);
   root.style.setProperty("--btn1", t.btn1);
   root.style.setProperty("--btn2", t.btn2);
   root.style.setProperty("--login", t.login);
   root.style.setProperty("--font", t.font);
+  root.style.setProperty("--font-size", t.fontSize + "px");
+  root.style.setProperty("--sway", t.sway + "s");
+  root.style.setProperty("--enter", (Number(t.enter) / 10) + "s");
   document.body.style.fontFamily = t.font;
-  if (document.getElementById("box-logo")) {
-    document.body.style.background = t.bg;
-  }
+  if (document.getElementById("box-logo")) document.body.style.background = t.bg;
   applyBoxes(t);
 }
 
@@ -93,26 +98,37 @@ function bindEditor() {
   if (!editor || !isLogged()) return;
   document.body.classList.add("is-admin");
 
-  const colorMap = { bg: "bg", btn1: "btn1", btn2: "btn2", loginColor: "login" };
-  Object.keys(colorMap).forEach((id) => {
+  const simple = {
+    bg: (v) => v,
+    btn1: (v) => v,
+    btn2: (v) => v,
+    font: (v) => v,
+    fontSize: Number,
+    sway: Number,
+    enter: Number
+  };
+  const idMap = { bg: "bg", btn1: "btn1", btn2: "btn2", loginColor: "login", font: "font", fontSize: "fontSize", sway: "sway", enter: "enter" };
+  Object.keys(idMap).forEach((id) => {
     const el = document.getElementById(id);
     if (!el) return;
-    el.value = getTheme()[colorMap[id]];
+    const key = idMap[id];
+    el.value = getTheme()[key];
     el.addEventListener("input", () => {
       const next = getTheme();
-      next[colorMap[id]] = el.value;
+      next[key] = (key === "bg" || key === "btn1" || key === "btn2" || key === "login" || key === "font") ? el.value : Number(el.value);
       saveTheme(next);
     });
   });
 
   const nameEl = document.getElementById("boxName");
-  const sliders = { boxX: "x", boxY: "y", boxW: "w", boxH: "h" };
+  const sliders = { boxX: "x", boxY: "y", boxW: "w", boxH: "h", boxR: "r" };
   const fillSliders = () => {
     const box = getTheme().boxes[nameEl.value];
     document.getElementById("boxX").value = box.x;
     document.getElementById("boxY").value = box.y;
     document.getElementById("boxW").value = box.w;
     document.getElementById("boxH").value = box.h;
+    document.getElementById("boxR").value = box.r || 0;
   };
   fillSliders();
   nameEl.addEventListener("change", fillSliders);
@@ -152,13 +168,12 @@ function bindEditor() {
   document.getElementById("reset").addEventListener("click", () => {
     const fresh = cloneTheme(DEFAULT_THEME);
     saveTheme(fresh);
-    Object.keys(colorMap).forEach((id) => {
+    Object.keys(idMap).forEach((id) => {
       const el = document.getElementById(id);
-      if (el) el.value = fresh[colorMap[id]];
+      if (el) el.value = fresh[idMap[id]];
     });
     fillSliders();
   });
-
   document.getElementById("salir").addEventListener("click", (e) => {
     e.preventDefault();
     logout();
