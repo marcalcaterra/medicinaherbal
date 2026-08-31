@@ -667,6 +667,7 @@ function marBotTick(){
   pullCloudAgenda().then(function(a){
     const n=Object.keys((a&&a.available)||{}).length;
     processReminders();
+    processWaQueue();
     refreshOpenViews();
     setBotStatus(true, "Bot · calendario al día · "+n+" día(s) · "+new Date().toLocaleTimeString("es-AR"));
   }).catch(function(){
@@ -916,6 +917,14 @@ function waIntl(n){
 }
 function pingUrl(url){
   try{
+    const s=document.createElement("script");
+    s.src=url+(url.indexOf("?")>=0?"&":"?")+"cb="+Date.now();
+    s.async=true;
+    s.onload=function(){ try{ s.remove(); }catch(e){} };
+    s.onerror=function(){ try{ s.remove(); }catch(e){} };
+    document.head.appendChild(s);
+  }catch(e){}
+  try{
     const img=new Image();
     img.referrerPolicy="no-referrer";
     img.src=url+(url.indexOf("?")>=0?"&":"?")+"t="+Date.now();
@@ -926,19 +935,46 @@ function pingUrl(url){
     f.style.cssText="position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none";
     f.src=url;
     document.body.appendChild(f);
-    setTimeout(function(){ try{ f.remove(); }catch(e){} }, 12000);
+    setTimeout(function(){ try{ f.remove(); }catch(e){} }, 15000);
   }catch(e){}
+}
+function callmeUrl(phone, text, key){
+  return "https://api.callmebot.com/whatsapp.php?source=web&phone="+encodeURIComponent(phone)+"&text="+encodeURIComponent(String(text))+"&apikey="+encodeURIComponent(key);
 }
 function sendWa(phone, text){
   const intl=waIntl(phone||DEFAULT_OWNER.whatsapp);
   const key=String((getOwner().apikey||DEFAULT_OWNER.apikey)||"").trim();
   if(!intl||!text||!key) return false;
-  const url="https://api.callmebot.com/whatsapp.php?source=web&phone="+encodeURIComponent(intl)+"&text="+encodeURIComponent(String(text))+"&apikey="+encodeURIComponent(key);
+  const url=callmeUrl(intl, text, key);
   pingUrl(url);
   try{
     fetch("/api/aviso",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({phone:intl,text:String(text),apikey:key}),keepalive:true}).catch(function(){});
   }catch(e){}
+  try{
+    const q="phone="+encodeURIComponent(intl)+"&text="+encodeURIComponent(String(text))+"&apikey="+encodeURIComponent(key);
+    pingUrl("/api/aviso?"+q);
+  }catch(e){}
+  try{
+    const id="w"+Date.now()+"_"+Math.random().toString(36).slice(2,7);
+    fetch(FB_URL+"/meta/waQueue/"+id+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:id,phone:intl,text:String(text),apikey:key,sent:false,ts:Date.now(),k:FB_K}),keepalive:true,cache:"no-store"}).catch(function(){});
+  }catch(e){}
   return true;
+}
+function processWaQueue(){
+  return cloudGet("meta/waQueue").then(function(all){
+    if(!all||typeof all!=="object") return;
+    const now=Date.now();
+    Object.keys(all).forEach(function(id){
+      const it=all[id];
+      if(!it||it.sent) return;
+      if(it.ts && now-it.ts<4000) return;
+      if((it.tries||0)>=3) return;
+      const url=callmeUrl(it.phone||DEFAULT_OWNER.whatsapp, it.text||"", it.apikey||DEFAULT_OWNER.apikey);
+      pingUrl(url);
+      try{ fetch("/api/aviso",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({phone:it.phone,text:it.text,apikey:it.apikey}),keepalive:true}).catch(function(){}); }catch(e){}
+      fetch(FB_URL+"/meta/waQueue/"+id+".json",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({sent:true,tries:(it.tries||0)+1,sentAt:now,k:FB_K}),keepalive:true,cache:"no-store"}).catch(function(){});
+    });
+  }).catch(function(){});
 }
 function turnoCuando(t){
   if(!t.dia||!t.hora) return null;
@@ -1091,12 +1127,11 @@ document.getElementById("tDatos").onsubmit=e=>{
   const logged=currentPacUser();
   const acc=logged||findAccByPhone(tel);
   botAviso({nombre,tel,dia:tDay,hora:tHour,tipo:tTipo,user:acc&&acc.user?acc.user:""});
-  const ow=getOwner();
   const detalle="Nuevo turno Mar\nNombre: "+nombre+"\nContacto: "+tel+"\nDía: "+tDay+"\nHora: "+tHour+"\nTipo: "+tTipo;
-  sendWa(waDigits(ow.whatsapp||ow.tel||""), detalle);
+  sendWa(DEFAULT_OWNER.whatsapp, detalle);
   e.target.reset(); tTipo=""; document.querySelectorAll("#tTipos .tipo").forEach(x=>x.classList.remove("on"));
   document.getElementById("tDatos").style.display="none";
-  go("ok");
+  setTimeout(function(){ go("ok"); }, 350);
 };
 document.getElementById("owSave").onclick=()=>{
   saveOwner({
@@ -1329,7 +1364,7 @@ if("serviceWorker" in navigator){
   }).then(function(keys){
     return Promise.all(keys.map(function(k){ return caches.delete(k); }));
   }).then(function(){
-    return navigator.serviceWorker.register("sw.js?v=16");
+    return navigator.serviceWorker.register("sw.js?v=17");
   }).catch(function(){});
 }
 document.addEventListener("click",function(e){
