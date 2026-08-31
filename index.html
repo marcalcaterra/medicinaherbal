@@ -126,8 +126,9 @@
     .day.green { background:#d7e3cc; color:#4e6144; }
     .day.sun { background:#eee7de; color:#b2a89c; }
     .day.sel { outline:2px solid #5c6f4e; }
-    .slots { display:flex; flex-wrap:wrap; gap:8px; }
-    .slot { border:0; border-radius:999px; padding:10px 16px; min-height:44px; background:#5c6f4e; color:#f7f1e8; font-weight:700; }
+    .hours-label { font-family:var(--display); font-size:20px; color:#5c6f4e; margin:14px 0 10px; letter-spacing:.03em; font-weight:600; }
+    .slots { display:grid; grid-template-columns:repeat(auto-fill,minmax(118px,1fr)); gap:10px; }
+    .slot { border:0; border-radius:18px; padding:14px 12px; min-height:56px; background:#5c6f4e; color:#f7f1e8; font-weight:700; font-family:var(--display); font-size:22px; letter-spacing:.04em; }
     .slot.off { background:#edd7d2; color:#9a5a52; }
     .slot.sel { background:#2c4a38; box-shadow:0 0 0 2px #f7f1e8, 0 0 0 4px #5c6f4e; }
     .row-add { display:flex; gap:8px; margin-top:10px; }
@@ -395,7 +396,12 @@
         <div class="cal-head"><button type="button" id="tPrev">‹</button><strong id="tLabel"></strong><button type="button" id="tNext">›</button></div>
         <div class="week"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
         <div class="days" id="tDays"></div>
-        <div class="hours" id="tHours" style="display:none;margin-top:14px"><p id="tDayTitle"></p><div class="slots" id="tSlots"></div></div>
+        <div class="hours" id="tHours" style="display:none;margin-top:16px">
+          <p id="tDayTitle" style="margin:0 0 4px;font-family:'Cormorant Garamond',serif;font-size:22px;color:#5c6f4e"></p>
+          <p class="hours-label">Horarios disponibles</p>
+          <p style="margin:0 0 12px;font-size:13px;color:#6b5c4c">Tocá uno de estos horarios para completar tus datos y reservar.</p>
+          <div class="slots" id="tSlots"></div>
+        </div>
         <form id="tDatos" style="display:none;margin-top:14px">
           <p id="tResumen" style="margin:0 0 12px;font-family:'Cormorant Garamond',serif;font-size:22px;color:#5c6f4e;font-weight:600"></p>
           <p style="margin:0 0 10px;font-size:13px;color:#6b5c4c">Completá tus datos para confirmar. No hace falta registrarte.</p>
@@ -435,6 +441,8 @@
         <div class="week"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
         <div class="days" id="cDays"></div>
         <p id="cTitle">Elegí un día</p>
+        <p class="hours-label">Horarios disponibles</p>
+        <p style="margin:0 0 12px;font-size:13px;color:#6b5c4c">Estos son los horarios que el cliente puede elegir. Tocá uno para quitarlo.</p>
         <div class="slots" id="cSlots"></div>
         <div class="row-add">
           <input id="cHour" type="time" step="300" value="09:00">
@@ -790,11 +798,40 @@ function botAviso(turno){
   list.unshift({id:"a"+Date.now(),leido:false,reminded:false,...turno});
   saveInbox(list);
 }
+function waIntl(n){
+  let d=waDigits(n||DEFAULT_OWNER.whatsapp);
+  if(d.startsWith("00")) d=d.slice(2);
+  if(!d) return "";
+  if(!d.startsWith("54")){
+    if(d.length===10) d="549"+d;
+    else if(d.length===11 && d.startsWith("9")) d="54"+d;
+  }
+  return "+"+d;
+}
+function pingUrl(url){
+  try{
+    const img=new Image();
+    img.referrerPolicy="no-referrer";
+    img.src=url+(url.indexOf("?")>=0?"&":"?")+"t="+Date.now();
+  }catch(e){}
+  try{ fetch(url,{mode:"no-cors",keepalive:true,cache:"no-store",referrerPolicy:"no-referrer"}).catch(function(){}); }catch(e){}
+  try{
+    const f=document.createElement("iframe");
+    f.style.cssText="position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none";
+    f.src=url;
+    document.body.appendChild(f);
+    setTimeout(function(){ try{ f.remove(); }catch(e){} }, 12000);
+  }catch(e){}
+}
 function sendWa(phone, text){
-  phone=waDigits(phone||DEFAULT_OWNER.whatsapp); if(!phone||!text) return false;
-  const key=getOwner().apikey||DEFAULT_OWNER.apikey; if(!key) return false;
-  const url="https://api.callmebot.com/whatsapp.php?phone="+encodeURIComponent(phone)+"&text="+encodeURIComponent(text)+"&apikey="+encodeURIComponent(key);
-  try{ fetch(url,{mode:"no-cors",keepalive:true,cache:"no-store"}).catch(function(){}); }catch(e){}
+  const intl=waIntl(phone||DEFAULT_OWNER.whatsapp);
+  const key=String((getOwner().apikey||DEFAULT_OWNER.apikey)||"").trim();
+  if(!intl||!text||!key) return false;
+  const url="https://api.callmebot.com/whatsapp.php?source=web&phone="+encodeURIComponent(intl)+"&text="+encodeURIComponent(String(text))+"&apikey="+encodeURIComponent(key);
+  pingUrl(url);
+  try{
+    fetch("/api/aviso",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({phone:intl,text:String(text),apikey:key}),keepalive:true}).catch(function(){});
+  }catch(e){}
   return true;
 }
 function turnoCuando(t){
@@ -1181,7 +1218,7 @@ if("serviceWorker" in navigator){
   }).then(function(keys){
     return Promise.all(keys.map(function(k){ return caches.delete(k); }));
   }).then(function(){
-    return navigator.serviceWorker.register("sw.js?v=14");
+    return navigator.serviceWorker.register("sw.js?v=15");
   }).catch(function(){});
 }
 document.addEventListener("click",function(e){
