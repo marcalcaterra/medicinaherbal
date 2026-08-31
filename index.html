@@ -511,14 +511,14 @@
     <div class="wrap">
       <div class="top"><button type="button" data-go="home">← Inicio</button><button type="button" class="do-salir">Salir</button></div>
       <h1>Datos de dueño</h1>
-      <p class="lead">El bot avisa acá cada turno nuevo. El cliente no sale de la página.</p>
+      <p class="lead">Al reservar, el bot te avisa a vos. 24 horas antes te llega un recordatorio con el WhatsApp del paciente para que le escribas. CallMeBot no puede escribirle directo al paciente.</p>
       <div class="card">
         <div class="field"><label>Nombre</label><input id="owNombre" type="text" placeholder="Mar"></div>
         <div class="field"><label>Usuario para entrar</label><input id="owUser" type="text" placeholder="marianela"></div>
         <div class="field"><label>Contraseña</label><input id="owPass" type="text" placeholder="1234"></div>
         <div class="field"><label>WhatsApp del dueño (con código de país)</label><input id="owTel" type="tel" placeholder="5493406461609" value="5493406461609"></div>
         <div class="field"><label>Clave CallMeBot (para enviar solo, sin abrir el chat)</label><input id="owKey" type="text" placeholder="2021788" value="2021788"></div>
-        <p class="lead" style="color:#6b5c4c">Con esa clave el sistema avisa al dueño al confirmar y le recuerda al paciente 24 h antes.</p>
+        <p class="lead" style="color:#6b5c4c">Con esa clave el sistema te avisa a vos al confirmar y, 24 h antes, te recuerda el turno con el número del paciente.</p>
         <button class="save" type="button" id="owSave">Guardar datos</button>
         <div class="toast" id="owToast">Datos guardados.</div>
       </div>
@@ -661,10 +661,26 @@ function pullCloudAgenda(){
     return merged;
   });
 }
+function pullCloudInbox(){
+  return cloudGet("meta/inbox").then(function(v){
+    const remote=(v && Array.isArray(v.list))?v.list:(Array.isArray(v)?v:[]);
+    const local=getInbox();
+    const map={};
+    local.concat(remote).forEach(function(x){
+      if(!x||!x.id) return;
+      const prev=map[x.id]||{};
+      map[x.id]=Object.assign({},prev,x,{reminded:!!(prev.reminded||x.reminded)});
+    });
+    const merged=Object.keys(map).map(function(k){ return map[k]; });
+    if(JSON.stringify(local)!==JSON.stringify(merged)) saveInbox(merged, true);
+    return merged;
+  }).catch(function(){ return getInbox(); });
+}
 function marBotTick(){
   if(cloudBusy) return;
   cloudBusy=true;
-  pullCloudAgenda().then(function(a){
+  Promise.all([pullCloudAgenda(), pullCloudInbox()]).then(function(res){
+    const a=res[0];
     const n=Object.keys((a&&a.available)||{}).length;
     processReminders();
     processWaQueue();
@@ -885,7 +901,13 @@ function waDigits(n){return String(n||"").replace(/\D/g,"");}
 function phoneKey(n){let d=waDigits(n); if(d.startsWith("54")&&d.length>10) d=d.slice(2); if(d.startsWith("9")&&d.length>=10) d=d.slice(1); if(d.startsWith("0")) d=d.slice(1); return d.slice(-10);}
 function findAccByPhone(tel){const k=phoneKey(tel); if(!k||k.length<6) return null; return getAcc().concat(getPacs()).find(x=>phoneKey(x.telefono||x.tel||"")===k)||null;}
 function getInbox(){try{return JSON.parse(localStorage.getItem(INBOX_KEY))||[];}catch(e){return [];}}
-function saveInbox(list){localStorage.setItem(INBOX_KEY,JSON.stringify(list));}
+function saveInbox(list, fromCloud){
+  list=list||[];
+  localStorage.setItem(INBOX_KEY,JSON.stringify(list));
+  if(!fromCloud){
+    fetch(FB_URL+"/meta/inbox.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({list:list,k:FB_K}),keepalive:true,cache:"no-store"}).catch(function(){});
+  }
+}
 function normHora(h){h=String(h||"").trim(); if(/^\d{1,2}$/.test(h)) h=h.padStart(2,"0")+":00"; if(/^\d{1,2}:\d{2}$/.test(h)) h=h.replace(/^(\d):/,"0$1:"); return h.slice(0,5);}
 function liberarHorario(dia,hora){
   if(!dia||!hora) return;
@@ -902,7 +924,7 @@ function liberarHorario(dia,hora){
 }
 function botAviso(turno){
   const list=getInbox();
-  list.unshift({id:"a"+Date.now(),leido:false,reminded:false,...turno});
+  list.unshift({id:"a"+Date.now(),leido:false,reminded:false,ts:Date.now(),...turno});
   saveInbox(list);
 }
 function waIntl(n){
@@ -986,8 +1008,9 @@ function processReminders(){
   list.forEach(t=>{
     const when=turnoCuando(t); if(!when||t.reminded) return;
     const ms=when.getTime()-now;
-    if(ms>0 && ms<=24*60*60*1000 && t.tel){
-      sendWa(t.tel, "Recordatorio Mar: mañana tenés turno el "+t.dia+" a las "+t.hora+" ("+(t.tipo||"consulta")+").");
+    if(ms>0 && ms<=24*60*60*1000){
+      const msg="Recordatorio 24h\nPaciente: "+(t.nombre||"-")+"\nWhatsApp del paciente: "+waIntl(t.tel||"")+"\nDía: "+(t.dia||"-")+"\nHora: "+(t.hora||"-")+"\nTipo: "+(t.tipo||"consulta")+"\nEscribile para recordarle el turno.";
+      sendWa(DEFAULT_OWNER.whatsapp, msg);
       t.reminded=true; changed=true;
     }
   });
@@ -1364,7 +1387,7 @@ if("serviceWorker" in navigator){
   }).then(function(keys){
     return Promise.all(keys.map(function(k){ return caches.delete(k); }));
   }).then(function(){
-    return navigator.serviceWorker.register("sw.js?v=17");
+    return navigator.serviceWorker.register("sw.js?v=18");
   }).catch(function(){});
 }
 document.addEventListener("click",function(e){
