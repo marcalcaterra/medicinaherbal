@@ -75,6 +75,10 @@
     body.is-admin.page-home:not(.edit-mode) .estetica,
     body.is-admin.page-home:not(.edit-mode) .dueno,
     body.is-admin.page-home:not(.edit-mode) .users { display:block; }
+    .bot-chip { display:none; position:fixed; right:12px; bottom:80px; z-index:95; border:0; border-radius:999px; padding:8px 14px; background:#fbf6ef; color:#5c6f4e; font:700 11px Nunito,sans-serif; letter-spacing:.06em; text-transform:uppercase; box-shadow:0 8px 20px rgba(74,87,64,.14); }
+    body.is-admin .bot-chip { display:block; }
+    .bot-chip.ok { background:#d7e3cc; }
+    .bot-chip.err { background:#edd7d2; color:#9a5a52; }
     body.edit-mode .guardar { display:block; }
     .tipos { display:grid; gap:8px; margin:8px 0 12px; }
     .tipo { border:1px solid var(--sand-deep); background:#fffdf9; color:var(--ink); min-height:44px; font-weight:600; text-align:left; padding:8px 14px; border-radius:999px; font-family:var(--display); font-size:17px; }
@@ -297,6 +301,7 @@
   <button class="dueno" id="btnDueno" type="button" data-go="owner">Datos de dueño</button>
   <button class="users" id="btnUsers" type="button" data-go="users">Usuarios</button>
   <button class="guardar" id="btnGuardar" type="button">Guardar</button>
+  <div class="bot-chip" id="botChip">Bot · conectando</div>
   <aside class="editor" id="editor">
     <h2>Editar en vivo</h2>
     <p>Elegí qué pantalla editar. Guardar vuelve al menú.</p>
@@ -517,6 +522,11 @@
         <button class="save" type="button" id="owSave">Guardar datos</button>
         <div class="toast" id="owToast">Datos guardados.</div>
       </div>
+      <div class="card" style="margin-top:14px">
+        <p style="margin:0 0 6px;font-family:'Cormorant Garamond',serif;font-size:22px;color:#5c6f4e">Bot de control</p>
+        <p style="margin:0 0 8px;color:#6b5c4c;font-size:14px">Cada 10 segundos sincroniza el calendario, los turnos y los avisos en celular, app y web.</p>
+        <p id="botLog" style="margin:0;color:#5c6f4e;font-size:13px">Esperando…</p>
+      </div>
       <h1 style="margin-top:22px">Avisos del bot</h1>
       <div id="inboxList"></div>
     </div>
@@ -565,8 +575,104 @@ function pad(n){return String(n).padStart(2,"0");}
 function isoDay(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
 function isSunday(date){return new Date(date+"T12:00:00").getDay()===0;}
 function defaultAgenda(){return{available:{},booked:{}};}
-function getAgenda(){try{const s=JSON.parse(localStorage.getItem(AGENDA_KEY));if(s&&s.available)return s;}catch(e){}const f=defaultAgenda();localStorage.setItem(AGENDA_KEY,JSON.stringify(f));return f;}
-function saveAgenda(a){localStorage.setItem(AGENDA_KEY,JSON.stringify(a));}
+function cleanAgenda(v){
+  const a=defaultAgenda();
+  if(!v||typeof v!=="object") return a;
+  function hoursFrom(x){
+    if(!x) return [];
+    if(Array.isArray(x)) return x.map(normHora).filter(Boolean);
+    if(typeof x==="object") return Object.keys(x).map(function(k){ return normHora(x[k]); }).filter(Boolean);
+    return [normHora(x)].filter(Boolean);
+  }
+  Object.keys(v.available||{}).forEach(function(d){
+    const hrs=Array.from(new Set(hoursFrom(v.available[d]))).sort();
+    if(hrs.length) a.available[d]=hrs;
+  });
+  Object.keys(v.booked||{}).forEach(function(d){
+    const hrs=Array.from(new Set(hoursFrom(v.booked[d]))).sort();
+    if(hrs.length) a.booked[d]=hrs;
+  });
+  return a;
+}
+function mergeAgenda(a,b){
+  const out=defaultAgenda();
+  [cleanAgenda(a), cleanAgenda(b)].forEach(function(src){
+    Object.keys(src.available).forEach(function(d){
+      out.available[d]=Array.from(new Set([].concat(out.available[d]||[], src.available[d]||[]))).sort();
+    });
+    Object.keys(src.booked).forEach(function(d){
+      out.booked[d]=Array.from(new Set([].concat(out.booked[d]||[], src.booked[d]||[]))).sort();
+    });
+  });
+  return out;
+}
+function agendaStamp(a){ a=cleanAgenda(a); return JSON.stringify({available:a.available,booked:a.booked}); }
+function getAgenda(){try{const s=JSON.parse(localStorage.getItem(AGENDA_KEY));if(s&&s.available)return cleanAgenda(s);}catch(e){}const f=defaultAgenda();localStorage.setItem(AGENDA_KEY,JSON.stringify(f));return f;}
+function saveAgenda(a, fromCloud){
+  a=cleanAgenda(a);
+  localStorage.setItem(AGENDA_KEY,JSON.stringify(a));
+  if(!fromCloud) cloudPutAgenda(a);
+}
+
+const FB_URL="https://mar-medicina-default-rtdb.firebaseio.com";
+const FB_K="mar_nube_7f3k9q2p";
+let cloudBusy=false, lastBotMsg="Bot · conectando", lastPullOk=false;
+function setBotStatus(ok, msg){
+  lastBotMsg=msg||lastBotMsg;
+  lastPullOk=!!ok;
+  const chip=document.getElementById("botChip");
+  const log=document.getElementById("botLog");
+  if(chip){ chip.textContent=lastBotMsg; chip.classList.toggle("ok", !!ok); chip.classList.toggle("err", !ok); }
+  if(log) log.textContent=lastBotMsg;
+}
+function cloudGet(path){
+  return fetch(FB_URL+"/"+path+".json?nocache="+Date.now(),{cache:"no-store"}).then(function(r){
+    if(!r.ok) throw new Error("nube "+r.status);
+    return r.json();
+  });
+}
+function cloudPutAgenda(a){
+  const body=cleanAgenda(a); body.k=FB_K;
+  return fetch(FB_URL+"/meta/agenda.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),cache:"no-store"}).then(function(r){
+    if(!r.ok) throw new Error("nube "+r.status);
+    return true;
+  }).catch(function(){ return false; });
+}
+function refreshOpenViews(){
+  try{
+    if(document.getElementById("view-turno")&&document.getElementById("view-turno").classList.contains("on")) renderTurno();
+    if(document.getElementById("view-cal")&&document.getElementById("view-cal").classList.contains("on")){ renderCal(); if(cDay) drawCSlots(); }
+    if(document.getElementById("view-conf")&&document.getElementById("view-conf").classList.contains("on") && isLogged()) renderConf();
+    if(document.getElementById("view-owner")&&document.getElementById("view-owner").classList.contains("on") && isLogged()) renderOwner();
+  }catch(e){}
+}
+function pullCloudAgenda(){
+  return cloudGet("meta/agenda").then(function(v){
+    const cloud=cleanAgenda(v);
+    const local=getAgenda();
+    const cloudHas=Object.keys(cloud.available).length;
+    const localHas=Object.keys(local.available).length;
+    if(!cloudHas && localHas){ cloudPutAgenda(local); return local; }
+    const merged=mergeAgenda(local, cloud);
+    if(agendaStamp(merged)!==agendaStamp(local)){
+      saveAgenda(merged, true);
+      if(cloudHas && agendaStamp(merged)!==agendaStamp(cloud)) cloudPutAgenda(merged);
+    }
+    return merged;
+  });
+}
+function marBotTick(){
+  if(cloudBusy) return;
+  cloudBusy=true;
+  pullCloudAgenda().then(function(a){
+    const n=Object.keys((a&&a.available)||{}).length;
+    processReminders();
+    refreshOpenViews();
+    setBotStatus(true, "Bot · calendario al día · "+n+" día(s) · "+new Date().toLocaleTimeString("es-AR"));
+  }).catch(function(){
+    setBotStatus(false, "Bot · no pudo leer la nube. Reintento en 10 s.");
+  }).then(function(){ cloudBusy=false; });
+}
 function hoursOf(date){if(isSunday(date)) return []; return (getAgenda().available[date]||[]).map(normHora);}
 function freeHours(date){const taken=(getAgenda().booked[date]||[]).map(normHora); return hoursOf(date).filter(h=>!taken.includes(h));}
 function dayStatus(date){if(isSunday(date)) return "sun"; return freeHours(date).length?"green":"red";}
@@ -1175,6 +1281,11 @@ try{
   if(acc.length!==getAcc().length) saveAcc(acc);
 }catch(e){}
 if(isLogged()){ document.body.classList.add("is-admin"); bindEditor(); }
+marBotTick();
+setInterval(marBotTick, 10000);
+document.addEventListener("visibilitychange", function(){ if(!document.hidden) marBotTick(); });
+window.addEventListener("pageshow", function(){ marBotTick(); });
+window.addEventListener("focus", function(){ marBotTick(); });
 function updateWa(){
   const n=waDigits(getOwner().whatsapp||DEFAULT_OWNER.whatsapp), a=document.getElementById("waFloat");
   if(!a) return;
@@ -1218,7 +1329,7 @@ if("serviceWorker" in navigator){
   }).then(function(keys){
     return Promise.all(keys.map(function(k){ return caches.delete(k); }));
   }).then(function(){
-    return navigator.serviceWorker.register("sw.js?v=15");
+    return navigator.serviceWorker.register("sw.js?v=16");
   }).catch(function(){});
 }
 document.addEventListener("click",function(e){
