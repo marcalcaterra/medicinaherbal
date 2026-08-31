@@ -92,6 +92,7 @@
     .editor input[type="range"] { width:100%; }
     .view { display:none; position:relative; z-index:6; padding:16px; min-height:100vh; min-height:100dvh; }
     .view.on { display:flex; align-items:center; justify-content:center; overflow:auto; padding-top:max(16px, 6vh); padding-bottom:max(24px, 8vh); }
+    #view-turno.on { align-items:flex-start; }
     .card { background:#fbf6ef; border-radius:32px; padding:22px 20px; box-shadow:0 10px 30px rgba(74,87,64,.08); }
     .top { display:flex; justify-content:space-between; margin-bottom:12px; }
     .top button { border:0; background:transparent; font:600 14px "Cormorant Garamond",serif; color:#4a5740; }
@@ -126,8 +127,9 @@
     .day.sun { background:#eee7de; color:#b2a89c; }
     .day.sel { outline:2px solid #5c6f4e; }
     .slots { display:flex; flex-wrap:wrap; gap:8px; }
-    .slot { border:0; border-radius:999px; padding:8px 14px; background:#5c6f4e; color:#f7f1e8; font-weight:700; }
+    .slot { border:0; border-radius:999px; padding:10px 16px; min-height:44px; background:#5c6f4e; color:#f7f1e8; font-weight:700; }
     .slot.off { background:#edd7d2; color:#9a5a52; }
+    .slot.sel { background:#2c4a38; box-shadow:0 0 0 2px #f7f1e8, 0 0 0 4px #5c6f4e; }
     .row-add { display:flex; gap:8px; margin-top:10px; }
     .row-add input { flex:1; }
     .row-add button { width:auto; padding:0 14px; margin:0; }
@@ -395,7 +397,8 @@
         <div class="days" id="tDays"></div>
         <div class="hours" id="tHours" style="display:none;margin-top:14px"><p id="tDayTitle"></p><div class="slots" id="tSlots"></div></div>
         <form id="tDatos" style="display:none;margin-top:14px">
-          <p style="margin:0 0 10px;font-size:13px;color:#6b5c4c">Reservás sin registrarte. La cuenta es solo para guías y recetas.</p>
+          <p id="tResumen" style="margin:0 0 12px;font-family:'Cormorant Garamond',serif;font-size:22px;color:#5c6f4e;font-weight:600"></p>
+          <p style="margin:0 0 10px;font-size:13px;color:#6b5c4c">Completá tus datos para confirmar. No hace falta registrarte.</p>
           <div class="field"><label>Tipo de consulta</label>
             <div class="tipos" id="tTipos">
               <button class="tipo" type="button" data-tipo="Primera consulta">1. Primera consulta</button>
@@ -669,9 +672,32 @@ function paintDays(box, view, picked, onPick){
     const date=new Date(view.getFullYear(),view.getMonth(),d), id=isoDay(date);
     const b=document.createElement("button"); b.type="button"; b.className="day "+dayStatus(id); b.textContent=d;
     if(picked===id) b.classList.add("sel");
-    if(!isSunday(id)) b.onclick=()=>onPick(id,date);
+    if(!isSunday(id)){
+      const pick=function(ev){ if(ev) ev.preventDefault(); onPick(id,date); };
+      b.addEventListener("click", pick);
+      b.addEventListener("pointerup", function(ev){ if(ev.pointerType==="touch") pick(ev); });
+    }
     box.appendChild(b);
   }
+}
+function revealEl(el){
+  if(!el) return;
+  el.style.display="block";
+  setTimeout(function(){
+    try{ el.scrollIntoView({behavior:"smooth", block:"center", inline:"nearest"}); }catch(e){}
+  }, 40);
+}
+function pickTurnoHour(h, btn){
+  tHour=h;
+  document.querySelectorAll("#tSlots .slot").forEach(function(x){ x.classList.remove("sel"); x.style.outline=""; });
+  if(btn) btn.classList.add("sel");
+  const form=document.getElementById("tDatos");
+  const res=document.getElementById("tResumen");
+  const title=document.getElementById("tDayTitle");
+  if(res) res.textContent="Turno: "+(title&&title.textContent?title.textContent:"")+" · "+h;
+  revealEl(form);
+  const n=document.getElementById("tNombre");
+  if(n && !n.value) setTimeout(function(){ try{ n.focus(); }catch(e){} }, 280);
 }
 function onTurnoDay(id,date){
   tDay=id; tHour=null;
@@ -682,12 +708,17 @@ function onTurnoDay(id,date){
   document.getElementById("tDayTitle").textContent=date.toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"});
   const free=freeHours(id), list=hoursOf(id), slots=document.getElementById("tSlots");
   slots.innerHTML="";
-  if(!list.length){ slots.innerHTML="<p>Este día todavía no tiene horarios cargados.</p>"; return; }
+  if(!list.length){ slots.innerHTML="<p>Este día todavía no tiene horarios cargados.</p>"; revealEl(document.getElementById("tHours")); return; }
   list.forEach(h=>{
     const b=document.createElement("button"); b.type="button"; b.className="slot"+(free.includes(h)?"":" off"); b.textContent=h;
-    if(free.includes(h)) b.onclick=()=>{ tHour=h; document.querySelectorAll("#tSlots .slot").forEach(x=>x.style.outline=""); b.style.outline="2px solid #96ab82"; document.getElementById("tDatos").style.display="block"; };
+    if(free.includes(h)){
+      const pick=function(ev){ if(ev) ev.preventDefault(); pickTurnoHour(h,b); };
+      b.addEventListener("click", pick);
+      b.addEventListener("pointerup", function(ev){ if(ev.pointerType==="touch") pick(ev); });
+    }
     slots.appendChild(b);
   });
+  revealEl(document.getElementById("tHours"));
 }
 function renderTurno(){
   document.getElementById("tLabel").textContent=MONTHS[tView.getMonth()]+" "+tView.getFullYear();
@@ -1150,7 +1181,7 @@ if("serviceWorker" in navigator){
   }).then(function(keys){
     return Promise.all(keys.map(function(k){ return caches.delete(k); }));
   }).then(function(){
-    return navigator.serviceWorker.register("sw.js?v=13");
+    return navigator.serviceWorker.register("sw.js?v=14");
   }).catch(function(){});
 }
 document.addEventListener("click",function(e){
